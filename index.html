@@ -771,10 +771,50 @@ function openCO(){
 }
 function sA(v,el){selA=v;document.querySelectorAll('#coMod .adc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
 function sP(v,el){selP=v;document.querySelectorAll('#coMod .popt').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
-function confO(){document.getElementById('coMod').innerHTML=`<div class="dbar"></div><div class="scr"><div class="scic">🎉</div><div class="scttl">${T('scT')}</div><div class="scsb">${T('scS')}</div><button class="bprim" style="margin-top:22px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button></div>`;cart=[];updB();}
+async function confO(){
+  // Build order object
+  const sub=cTot(), del=sub>=200?0:15, tot=sub+del;
+  const order={
+    id:'ORD-'+Date.now(),
+    items:cart.map(c=>({id:c.id, name:c.ar||c.en, emoji:c.em, price:c.pr, qty:c.qty})),
+    subtotal:sub, delivery:del, total:tot,
+    address:selA==='home'?'المنزل — أولاد صقر، شارع البحر':'العمل',
+    payment:selP==='cash'?'كاش عند الاستلام':selP==='card'?'بطاقة ائتمان':'محفظة إلكترونية',
+    status:'new',
+    time: new Date().toLocaleString('ar-EG'),
+    timestamp: Date.now()
+  };
+  // Save to Firebase
+  try {
+    const {db} = await initFB();
+    const {collection, addDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await addDoc(collection(db,'orders'), order);
+  } catch(e){ console.warn('Firebase error:', e); }
+  // Show success
+  document.getElementById('coMod').innerHTML=`<div class="dbar"></div><div class="scr"><div class="scic">🎉</div><div class="scttl">${T('scT')}</div><div class="scsb">${T('scS')}</div><button class="bprim" style="margin-top:22px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button></div>`;
+  cart=[];updB();
+}
 function closeCO(){document.getElementById('coOv').classList.remove('open');}
 // ── Toast ──
 function showT(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
+// ── Firebase ──
+const FB_CFG={
+  apiKey:"AIzaSyCh32ANAz144h5aSZfjZZq3jyzxOocxi94",
+  authDomain:"sparkeg-d8fdd.firebaseapp.com",
+  projectId:"sparkeg-d8fdd",
+  storageBucket:"sparkeg-d8fdd.firebasestorage.app",
+  messagingSenderId:"667897054721",
+  appId:"1:667897054721:web:a765f25a7576d0f1dd6200"
+};
+let _db=null;
+async function initFB(){
+  if(_db) return {db:_db};
+  const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+  _db=getFirestore(app);
+  return {db:_db};
+}
 // ── Init ──
 rHome();
 </script>

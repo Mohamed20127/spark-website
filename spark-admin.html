@@ -156,6 +156,10 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 <body>
 
 <!-- SIDEBAR -->
+<!-- New Order Notification -->
+<div id="newOrderAlert" style="display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--or);color:#fff;padding:12px 24px;border-radius:50px;font-weight:700;font-size:.9rem;z-index:9999;box-shadow:0 4px 20px rgba(255,107,0,.4);animation:pulse .8s infinite;">
+  🔔 طلب جديد!
+</div>
 <div class="sidebar" id="sidebar">
   <div class="sb-logo">
     <div style="font-size:1.6rem;">🔥</div>
@@ -555,14 +559,7 @@ let MEALS=[
   {id:69,cat:'drinks',em:'🧃',pr:32,cal:180,r:4.9,tm:'3-5',badge:'Special',ar:'مشروب سبارك',en:'SPARK Special Drink'},
 ];
 
-const ORDERS_DATA=[
-  {id:'#1042',cust:'أحمد محمد',items:'بيتزا سبارك × 2',total:230,status:'new',time:'منذ 5 دقائق'},
-  {id:'#1041',cust:'سارة أحمد',items:'رول دجاج × 1، بطاطس سبارك × 1',total:100,status:'pending',time:'منذ 12 دقيقة'},
-  {id:'#1040',cust:'محمود علي',items:'كريب نوتيلا × 3',total:105,status:'done',time:'منذ 25 دقيقة'},
-  {id:'#1039',cust:'ريم حسن',items:'كالزوني سبيشال × 1',total:95,status:'done',time:'منذ 40 دقيقة'},
-  {id:'#1038',cust:'خالد سامي',items:'موزاريلا ستيكس × 2، عصير × 1',total:98,status:'cancelled',time:'منذ 1 ساعة'},
-  {id:'#1037',cust:'نور إبراهيم',items:'بيتزا 4 جبن × 1',total:109,status:'done',time:'منذ 1.5 ساعة'},
-];
+let ORDERS_DATA=[];
 
 // ── STATE ──
 let curV='dashboard', editId=null, orderFilter='all';
@@ -605,7 +602,8 @@ function rDash(){
 // ── Orders ──
 function orderRow(o){
   const st={new:'st-new نشط جديد',pending:'st-pend قيد التنفيذ',done:'st-done مكتمل',cancelled:'st-canc ملغي'};
-  const [cls,...words]=st[o.status].split(' ');
+  const s=o.status&&st[o.status]?o.status:'new';
+  const [cls,...words]=st[s].split(' ');
   return `<tr>
     <td><strong style="color:var(--or);">${o.id}</strong></td>
     <td>${o.cust}</td><td>${o.items}</td>
@@ -613,8 +611,12 @@ function orderRow(o){
     <td><span class="st-badge ${cls}">${words.join(' ')}</span></td>
     <td style="color:var(--muted);font-size:.74rem;">${o.time}</td>
     <td>
-      <select style="background:var(--bg3);border:1px solid var(--bdr);border-radius:7px;padding:4px 7px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.72rem;" onchange="showT('✅ تم تحديث حالة الطلب!')">
-        <option>جديد</option><option>قيد التنفيذ</option><option>مكتمل</option><option>ملغي</option>
+      <select style="background:var(--bg3);border:1px solid var(--bdr);border-radius:7px;padding:4px 7px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.72rem;"
+        onchange="updateOrderStatus('${o._docId||''}',this.value==='جديد'?'new':this.value==='قيد التنفيذ'?'pending':this.value==='مكتمل'?'done':'cancelled')">
+        <option ${s==='new'?'selected':''}>جديد</option>
+        <option ${s==='pending'?'selected':''}>قيد التنفيذ</option>
+        <option ${s==='done'?'selected':''}>مكتمل</option>
+        <option ${s==='cancelled'?'selected':''}>ملغي</option>
       </select>
     </td>
   </tr>`;
@@ -735,8 +737,68 @@ function savePromo(){
 // ── Toast ──
 function showT(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
 
+// ── Firebase Config ──
+const FB_CFG={
+  apiKey:"AIzaSyCh32ANAz144h5aSZfjZZq3jyzxOocxi94",
+  authDomain:"sparkeg-d8fdd.firebaseapp.com",
+  projectId:"sparkeg-d8fdd",
+  storageBucket:"sparkeg-d8fdd.firebasestorage.app",
+  messagingSenderId:"667897054721",
+  appId:"1:667897054721:web:a765f25a7576d0f1dd6200"
+};
+
 // ── Init ──
-rDash();
+async function initAdmin(){
+  const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const {getFirestore,collection,onSnapshot,orderBy,query,doc,updateDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+  const db=getFirestore(app);
+  window._db=db;
+  window._updateDoc=updateDoc;
+  window._doc=doc;
+
+  // Listen realtime to orders
+  const q=query(collection(db,'orders'),orderBy('timestamp','desc'));
+  onSnapshot(q,(snap)=>{
+    const prevCount=ORDERS_DATA.length;
+    ORDERS_DATA=snap.docs.map(d=>({
+
+      ...d.data(),
+      _docId:d.id,
+      id:d.data().id||('#'+d.id.slice(-4).toUpperCase()),
+      cust:d.data().address||'عميل',
+      items:d.data().items?d.data().items.map(i=>i.name+' × '+i.qty).join('، '):'—',
+      total:d.data().total||0,
+      status:d.data().status||'new',
+      time:d.data().time||'—',
+    }));
+    // Play sound on new order
+    // Notify on new orders
+    if(prevCount>0 && ORDERS_DATA.length>prevCount){
+      const al=document.getElementById('newOrderAlert');
+      al.style.display='block';
+      try{new Audio('https://www.soundjay.com/buttons/sounds/button-09a.mp3').play();}catch(e){}
+      setTimeout(()=>{al.style.display='none';},4000);
+    }
+    if(ORDERS_DATA.length>0 && curV==='orders'){rOrders(orderFilter);}
+    if(curV==='dashboard'){rDash();}
+    // Update stats
+    document.querySelector('.sc-num').textContent=ORDERS_DATA.length;
+  });
+  rDash();
+}
+
+// Update order status in Firebase
+async function updateOrderStatus(docId, newStatus){
+  if(!window._db||!docId) return;
+  try{
+    const {doc,updateDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await updateDoc(doc(window._db,'orders',docId),{status:newStatus});
+    showT('✅ تم تحديث حالة الطلب!');
+  }catch(e){showT('❌ خطأ في التحديث');}
+}
+
+initAdmin();
 </script>
 </body>
 </html>
