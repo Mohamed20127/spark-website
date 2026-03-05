@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>SPARK 🔥 - لوحة التحكم</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{--or:#FF6B00;--orb:#FF8C00;--bg:#0A0A0A;--bg2:#111;--bg3:#1A1A1A;--card:#161616;--txt:#FFF;--muted:#888;--bdr:#2A2A2A;--red:#E53935;--green:#43A047;--blue:#1E88E5;}
+body{font-family:Cairo,sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;min-height:100vh;}
+button{cursor:pointer;border:none;outline:none;background:none;}
+input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--or);border-radius:2px;}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--bdr);z-index:100;display:flex;flex-direction:column;transition:transform .3s;}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;}
+.sb-logo-txt{font-size:1.5rem;font-weight:900;color:var(--or);letter-spacing:2px;}
+.sb-logo-sub{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto;}
+.sb-sec{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 8px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:2px;font-size:.86rem;font-weight:600;color:var(--muted);}
+.sb-item:hover{background:var(--bg3);color:var(--txt);}
+.sb-item.active{background:rgba(255,107,0,.15);color:var(--or);}
+.sb-item .icon{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0;}
+.sb-foot{padding:14px 10px;border-top:1px solid var(--bdr);}
+.sb-user{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;}
+.sb-av{width:34px;height:34px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.sb-uname{font-weight:700;font-size:.82rem;}
+.sb-urole{font-size:.68rem;color:var(--muted);}
+
+/* ── MAIN ── */
+.main{margin-right:240px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-title{font-size:1.1rem;font-weight:700;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-btn{background:var(--bg3);border:1px solid var(--bdr);color:var(--txt);padding:7px 14px;border-radius:9px;font-size:.78rem;font-weight:600;font-family:Cairo,sans-serif;transition:all .2s;}
+.tb-btn:hover{border-color:var(--or);color:var(--or);}
+.tb-btn.primary{background:var(--or);color:#fff;border-color:var(--or);}
+.tb-btn.primary:hover{background:var(--orb);}
+.mob-menu{display:none;background:var(--bg3);border:1px solid var(--bdr);width:34px;height:34px;border-radius:9px;align-items:center;justify-content:center;font-size:1.1rem;}
+
+.content{padding:20px 22px;flex:1;}
+
+/* ── VIEWS ── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px;}
+.sc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.sc-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.sc-badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:50px;}
+.sc-badge.up{background:rgba(67,160,71,.15);color:var(--green);}
+.sc-badge.dn{background:rgba(229,57,53,.15);color:var(--red);}
+.sc-num{font-size:1.7rem;font-weight:900;margin-bottom:2px;}
+.sc-lbl{font-size:.72rem;color:var(--muted);}
+
+/* ── RECENT ORDERS ── */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:18px;}
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bdr);}
+.card-title{font-weight:700;font-size:.9rem;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{padding:10px 18px;font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:right;border-bottom:1px solid var(--bdr);font-weight:700;}
+.tbl td{padding:12px 18px;font-size:.82rem;border-bottom:1px solid var(--bdr);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--bg3);}
+.st-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:50px;font-size:.66rem;font-weight:700;}
+.st-new{background:rgba(30,136,229,.15);color:var(--blue);}
+.st-done{background:rgba(67,160,71,.15);color:var(--green);}
+.st-pend{background:rgba(255,107,0,.15);color:var(--or);}
+.st-canc{background:rgba(229,57,53,.15);color:var(--red);}
+
+/* ── SECTION TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{padding:8px 16px;border-radius:9px;font-size:.8rem;font-weight:700;cursor:pointer;border:1px solid var(--bdr);color:var(--muted);font-family:Cairo,sans-serif;transition:all .2s;}
+.tab:hover{border-color:var(--or);color:var(--or);}
+.tab.active{background:var(--or);border-color:var(--or);color:#fff;}
+
+/* ── PRODUCTS GRID ── */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+.prod-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;transition:all .25s;}
+.prod-card:hover{border-color:rgba(255,107,0,.3);}
+.pc-img{height:110px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;}
+.pc-badge{position:absolute;top:7px;right:7px;background:var(--or);color:#fff;padding:2px 7px;border-radius:50px;font-size:.58rem;font-weight:700;}
+.pc-body{padding:13px;}
+.pc-name{font-weight:700;font-size:.86rem;margin-bottom:3px;}
+.pc-cat{font-size:.68rem;color:var(--or);margin-bottom:8px;}
+.pc-meta{display:flex;justify-content:space-between;align-items:center;}
+.pc-price{font-size:1.1rem;font-weight:900;color:var(--or);}
+.pc-actions{display:flex;gap:5px;}
+.pa-btn{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;cursor:pointer;border:1px solid var(--bdr);background:var(--bg3);}
+.pa-btn:hover{background:var(--or);border-color:var(--or);}
+.pa-btn.del:hover{background:var(--red);border-color:var(--red);}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--bdr);}
+.modal-title{font-size:1rem;font-weight:700;}
+.modal-cl{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--bdr);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+.modal-body{padding:18px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.84rem;transition:border-color .2s;}
+.field input:focus,.field select,.field textarea:focus{border-color:var(--or);}
+.field select{cursor:pointer;}
+.field textarea{resize:vertical;min-height:80px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--bdr);}
+.btn-cancel{background:var(--bg3);border:1px solid var(--bdr);color:var(--txt);padding:9px 18px;border-radius:9px;font-size:.82rem;font-weight:700;font-family:Cairo,sans-serif;}
+.btn-save{background:var(--or);color:#fff;padding:9px 22px;border-radius:9px;font-size:.82rem;font-weight:700;font-family:Cairo,sans-serif;}
+.btn-save:hover{background:var(--orb);}
+
+/* ── SETTINGS FORM ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.settings-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px;}
+.settings-card h3{font-size:.82rem;font-weight:700;color:var(--or);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bdr);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-lbl{font-size:.82rem;font-weight:600;}
+.toggle-sub{font-size:.7rem;color:var(--muted);margin-top:1px;}
+.toggle{width:40px;height:22px;border-radius:50px;background:var(--bg3);border:1px solid var(--bdr);position:relative;cursor:pointer;transition:background .3s;flex-shrink:0;}
+.toggle.on{background:var(--or);border-color:var(--or);}
+.toggle-dot{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .3s,background .3s;}
+.toggle.on .toggle-dot{transform:translateX(18px);background:#fff;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg2);border:1px solid var(--or);border-radius:50px;padding:9px 20px;font-weight:700;z-index:9999;transition:transform .4s;white-space:nowrap;color:var(--txt);font-size:.8rem;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(100%);width:260px;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-right:0;}
+  .mob-menu{display:flex;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .settings-grid{grid-template-columns:1fr;}
+}
+@media(max-width:560px){
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:9px;}
+  .content{padding:14px 14px;}
+  .tbl th,.tbl td{padding:9px 12px;}
+  .prod-grid{grid-template-columns:1fr 1fr;}
+  .field-row{grid-template-columns:1fr;}
+}
+@media(max-width:380px){
+  .prod-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div style="font-size:1.6rem;">🔥</div>
+    <div>
+      <div class="sb-logo-txt">SPARK</div>
+      <div class="sb-logo-sub">لوحة التحكم</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">الرئيسية</div>
+    <div class="sb-item active" onclick="goV('dashboard',this)"><div class="icon">📊</div> لوحة المعلومات</div>
+    <div class="sb-item" onclick="goV('orders',this)"><div class="icon">📦</div> الطلبات</div>
+
+    <div class="sb-sec">المنيو</div>
+    <div class="sb-item" onclick="goV('products',this)"><div class="icon">🍕</div> المنتجات</div>
+    <div class="sb-item" onclick="goV('categories',this)"><div class="icon">📂</div> الأقسام</div>
+
+    <div class="sb-sec">الإعدادات</div>
+    <div class="sb-item" onclick="goV('settings',this)"><div class="icon">⚙️</div> إعدادات الموقع</div>
+    <div class="sb-item" onclick="goV('promo',this)"><div class="icon">🎁</div> كودات الخصم</div>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av">👑</div>
+      <div>
+        <div class="sb-uname">Admin</div>
+        <div class="sb-urole">مدير النظام</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="mob-menu" onclick="toggleSb()">☰</button>
+      <div class="tb-title" id="topTitle">لوحة المعلومات</div>
+    </div>
+    <div class="tb-right">
+      <a href="spark-restaurant.html" target="_blank" class="tb-btn">🌐 فتح الموقع</a>
+      <button class="tb-btn primary" id="topAction" onclick="handleAction()">+ إضافة منتج</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="view active" id="v-dashboard">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="sc-top"><div class="sc-icon" style="background:rgba(255,107,0,.15);">📦</div><div class="sc-badge up">+12%</div></div>
+          <div class="sc-num">128</div><div class="sc-lbl">إجمالي الطلبات</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-top"><div class="sc-icon" style="background:rgba(67,160,71,.15);">💰</div><div class="sc-badge up">+8%</div></div>
+          <div class="sc-num">14,320</div><div class="sc-lbl">الإيرادات (EGP)</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-top"><div class="sc-icon" style="background:rgba(30,136,229,.15);">👥</div><div class="sc-badge up">+5%</div></div>
+          <div class="sc-num">342</div><div class="sc-lbl">العملاء</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-top"><div class="sc-icon" style="background:rgba(255,107,0,.12);">🍕</div><div class="sc-badge dn">69</div></div>
+          <div class="sc-num">69</div><div class="sc-lbl">المنتجات النشطة</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📦 آخر الطلبات</div>
+          <button class="tb-btn" onclick="goV('orders',null)">عرض الكل</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr>
+              <th>رقم الطلب</th><th>العميل</th><th>المنتجات</th><th>الإجمالي</th><th>الحالة</th><th>الوقت</th><th>إجراء</th>
+            </tr></thead>
+            <tbody id="ordersPreview"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">🏆 الأكثر مبيعاً</div></div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>المنتج</th><th>القسم</th><th>السعر</th><th>المبيعات</th><th>الإيراد</th></tr></thead>
+            <tbody id="topSales"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ORDERS ═══ -->
+    <div class="view" id="v-orders">
+      <div class="tabs" id="orderTabs">
+        <button class="tab active" onclick="filterOrders('all',this)">الكل</button>
+        <button class="tab" onclick="filterOrders('new',this)">جديد</button>
+        <button class="tab" onclick="filterOrders('pending',this)">قيد التنفيذ</button>
+        <button class="tab" onclick="filterOrders('done',this)">مكتمل</button>
+        <button class="tab" onclick="filterOrders('cancelled',this)">ملغي</button>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>رقم الطلب</th><th>العميل</th><th>المنتجات</th><th>الإجمالي</th><th>الحالة</th><th>الوقت</th><th>إجراء</th></tr></thead>
+            <tbody id="ordersList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PRODUCTS ═══ -->
+    <div class="view" id="v-products">
+      <div class="tabs" id="prodTabs">
+        <button class="tab active" onclick="filterProds('all',this)">الكل (69)</button>
+        <button class="tab" onclick="filterProds('pizza',this)">بيتزا (16)</button>
+        <button class="tab" onclick="filterProds('calzone',this)">كالزوني (9)</button>
+        <button class="tab" onclick="filterProds('crepe',this)">كريب (10)</button>
+        <button class="tab" onclick="filterProds('roll',this)">رول (8)</button>
+        <button class="tab" onclick="filterProds('fries',this)">بطاطس (7)</button>
+        <button class="tab" onclick="filterProds('extras',this)">إضافات (15)</button>
+        <button class="tab" onclick="filterProds('drinks',this)">مشروبات (4)</button>
+      </div>
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+
+    <!-- ═══ CATEGORIES ═══ -->
+    <div class="view" id="v-categories">
+      <div class="card">
+        <div class="card-head"><div class="card-title">📂 الأقسام</div><button class="tb-btn primary" onclick="openCatModal()">+ قسم جديد</button></div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>الرمز</th><th>اسم القسم (عربي)</th><th>اسم القسم (إنجليزي)</th><th>عدد المنتجات</th><th>إجراء</th></tr></thead>
+            <tbody id="catsList"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="view" id="v-settings">
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>🔥 بيانات المطعم</h3>
+          <div class="field"><label>اسم المطعم</label><input type="text" value="SPARK Restaurant"></div>
+          <div class="field"><label>الشعار</label><input type="text" value="Ignite Your Taste 🔥"></div>
+          <div class="field"><label>العنوان</label><input type="text" value="أولاد صقر - الشرقية - شارع البحر"></div>
+          <div class="field"><label>رقم التليفون</label><input type="text" value="01020009617"></div>
+          <button class="btn-save" style="width:100%;margin-top:4px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ التغييرات</button>
+        </div>
+        <div class="settings-card">
+          <h3>⏰ أوقات العمل</h3>
+          <div class="field"><label>أيام الأسبوع</label><input type="text" value="2م – 2ص"></div>
+          <div class="field"><label>رمضان</label><input type="text" value="9م – 4ص"></div>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">المطعم مفتوح الآن</div><div class="toggle-sub">يظهر للعملاء</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">قبول الطلبات</div><div class="toggle-sub">السماح بالطلبات الجديدة</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">التوصيل المجاني</div><div class="toggle-sub">فوق 200 جنيه</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <button class="btn-save" style="width:100%;margin-top:14px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ</button>
+        </div>
+        <div class="settings-card">
+          <h3>🚚 إعدادات التوصيل</h3>
+          <div class="field"><label>رسوم التوصيل (EGP)</label><input type="number" value="15"></div>
+          <div class="field"><label>الحد الأدنى للتوصيل المجاني</label><input type="number" value="200"></div>
+          <div class="field"><label>وقت التوصيل المتوقع</label><input type="text" value="25-35 دقيقة"></div>
+          <button class="btn-save" style="width:100%;margin-top:4px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ</button>
+        </div>
+        <div class="settings-card">
+          <h3>🎨 إعدادات الموقع</h3>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">الوضع الليلي افتراضي</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">شريط الإعلانات</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">ميزة المفضلة</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-lbl">كود الخصم</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+          </div>
+          <button class="btn-save" style="width:100%;margin-top:14px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROMO ═══ -->
+    <div class="view" id="v-promo">
+      <div class="card">
+        <div class="card-head"><div class="card-title">🎁 كودات الخصم</div><button class="tb-btn primary" onclick="openPromoModal()">+ كود جديد</button></div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الحالة</th><th>إجراء</th></tr></thead>
+            <tbody>
+              <tr><td><strong style="color:var(--or);">SPARK20</strong></td><td>20%</td><td>∞</td><td><span class="st-badge st-done">نشط</span></td><td><button class="pa-btn del" onclick="showT('🗑️ تم الحذف!')">🗑️</button></td></tr>
+              <tr><td><strong style="color:var(--or);">WELCOME10</strong></td><td>10%</td><td>1 لكل عميل</td><td><span class="st-badge st-done">نشط</span></td><td><button class="pa-btn del" onclick="showT('🗑️ تم الحذف!')">🗑️</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- content -->
+</div><!-- main -->
+
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="prodModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="prodModalTitle">إضافة منتج جديد</div>
+      <button class="modal-cl" onclick="closeProdModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>الاسم (عربي)</label><input type="text" id="pAr" placeholder="مثال: بيتزا سبارك"></div>
+        <div class="field"><label>الاسم (إنجليزي)</label><input type="text" id="pEn" placeholder="SPARK Pizza"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>القسم</label>
+          <select id="pCat">
+            <option value="pizza">🍕 بيتزا</option>
+            <option value="calzone">🫓 كالزوني</option>
+            <option value="crepe">🥞 كريب</option>
+            <option value="roll">🌯 رول</option>
+            <option value="fries">🍟 بطاطس</option>
+            <option value="extras">🧀 إضافات</option>
+            <option value="drinks">🧃 مشروبات</option>
+          </select>
+        </div>
+        <div class="field"><label>الإيموجي</label><input type="text" id="pEm" placeholder="🍕" maxlength="4"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>السعر (EGP)</label><input type="number" id="pPr" placeholder="89"></div>
+        <div class="field"><label>السعرات الحرارية</label><input type="number" id="pCal" placeholder="680"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>وقت التحضير</label><input type="text" id="pTm" placeholder="20-30"></div>
+        <div class="field"><label>التقييم</label><input type="number" id="pRt" placeholder="4.8" step="0.1" min="0" max="5"></div>
+      </div>
+      <div class="field"><label>الوصف (عربي)</label><textarea id="pDa" placeholder="وصف المنتج بالعربي..."></textarea></div>
+      <div class="field"><label>الوصف (إنجليزي)</label><textarea id="pDe" placeholder="Product description..."></textarea></div>
+      <div class="field"><label>الشارة (اختياري)</label><input type="text" id="pBdg" placeholder="Best Seller / Popular / Hot 🌶️"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeProdModal()">إلغاء</button>
+      <button class="btn-save" onclick="saveProd()">💾 حفظ المنتج</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal-bg" id="catModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">إضافة قسم جديد</div>
+      <button class="modal-cl" onclick="document.getElementById('catModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>الاسم (عربي)</label><input type="text" id="cAr" placeholder="بيتزا"></div>
+        <div class="field"><label>الاسم (إنجليزي)</label><input type="text" id="cEn" placeholder="Pizza"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>الإيموجي</label><input type="text" id="cEm" placeholder="🍕" maxlength="4"></div>
+        <div class="field"><label>الـ ID</label><input type="text" id="cId" placeholder="pizza"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="document.getElementById('catModal').classList.remove('open')">إلغاء</button>
+      <button class="btn-save" onclick="saveCat()">💾 حفظ القسم</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROMO MODAL -->
+<div class="modal-bg" id="promoModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">إضافة كود خصم</div>
+      <button class="modal-cl" onclick="document.getElementById('promoModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>الكود</label><input type="text" id="prCode" placeholder="SPARK30" style="text-transform:uppercase;"></div>
+        <div class="field"><label>نسبة الخصم %</label><input type="number" id="prDisc" placeholder="20" min="1" max="100"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>عدد الاستخدامات</label><input type="number" id="prUse" placeholder="∞ اتركه فارغ"></div>
+        <div class="field"><label>الحد الأدنى للطلب</label><input type="number" id="prMin" placeholder="0"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="document.getElementById('promoModal').classList.remove('open')">إلغاء</button>
+      <button class="btn-save" onclick="savePromo()">💾 إضافة الكود</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const CATS=[
+  {id:'all',ar:'الكل',en:'All',em:'🍽️',cnt:69},
+  {id:'pizza',ar:'بيتزا',en:'Pizza',em:'🍕',cnt:16},
+  {id:'calzone',ar:'كالزوني',en:'Calzone',em:'🫓',cnt:9},
+  {id:'crepe',ar:'كريب',en:'Crepe',em:'🥞',cnt:10},
+  {id:'roll',ar:'رول',en:'Roll',em:'🌯',cnt:8},
+  {id:'fries',ar:'بطاطس',en:'Fries',em:'🍟',cnt:7},
+  {id:'extras',ar:'إضافات',en:'Extras',em:'🧀',cnt:15},
+  {id:'drinks',ar:'مشروبات',en:'Drinks',em:'🧃',cnt:4},
+];
+
+let MEALS=[
+  {id:1,cat:'pizza',em:'🍕',pr:89,cal:680,r:4.8,tm:'20-30',badge:'Classic',ar:'مارغريتا كلاسيك',en:'Classic Margherita'},
+  {id:2,cat:'pizza',em:'🍕',pr:115,cal:820,r:4.9,tm:'25-35',badge:'Best Seller',ar:'بيتزا سبارك',en:'SPARK Special Pizza'},
+  {id:3,cat:'pizza',em:'🍕',pr:105,cal:790,r:4.7,tm:'25-35',badge:'Hot',ar:'بيتزا لحمة BBQ',en:'BBQ Beef Pizza'},
+  {id:4,cat:'pizza',em:'🍕',pr:95,cal:720,r:4.6,tm:'20-30',badge:'',ar:'بيتزا تونة',en:'Tuna Pizza'},
+  {id:5,cat:'pizza',em:'🍕',pr:99,cal:750,r:4.7,tm:'20-30',badge:'',ar:'بيتزا بيبروني',en:'Pepperoni Pizza'},
+  {id:6,cat:'pizza',em:'🍕',pr:109,cal:800,r:4.8,tm:'22-32',badge:'Popular',ar:'بيتزا 4 جبن',en:'4-Cheese Pizza'},
+  {id:7,cat:'pizza',em:'🍕',pr:102,cal:760,r:4.7,tm:'25-35',badge:'',ar:'بيتزا تيكا دجاج',en:'Chicken Tikka Pizza'},
+  {id:8,cat:'pizza',em:'🍕',pr:85,cal:650,r:4.5,tm:'20-30',badge:'Veggie',ar:'بيتزا مشروم',en:'Mushroom Pizza'},
+  {id:9,cat:'pizza',em:'🍕',pr:119,cal:810,r:4.8,tm:'25-35',badge:'',ar:'بيتزا مأكولات بحر',en:'Seafood Pizza'},
+  {id:10,cat:'pizza',em:'🍕',pr:82,cal:620,r:4.4,tm:'20-30',badge:'Veggie',ar:'بيتزا خضروات',en:'Veggie Supreme'},
+  {id:11,cat:'pizza',em:'🍕',pr:98,cal:770,r:4.6,tm:'22-32',badge:'Hot',ar:'بيتزا حارة',en:'Hot Sauce Pizza'},
+  {id:12,cat:'pizza',em:'🍕',pr:96,cal:730,r:4.6,tm:'22-32',badge:'',ar:'بيتزا دجاج رانش',en:'Ranch Chicken Pizza'},
+  {id:13,cat:'pizza',em:'🍕',pr:120,cal:900,r:4.9,tm:'25-35',badge:'Loaded',ar:'بيتزا عشاق اللحوم',en:'Meat Lovers Pizza'},
+  {id:14,cat:'pizza',em:'🍕',pr:100,cal:745,r:4.7,tm:'23-33',badge:'',ar:'بيتزا دجاج بافالو',en:'Buffalo Chicken Pizza'},
+  {id:15,cat:'pizza',em:'🍕',pr:92,cal:700,r:4.5,tm:'22-32',badge:'',ar:'بيتزا بيستو',en:'Pesto Pizza'},
+  {id:16,cat:'pizza',em:'🍕',pr:94,cal:710,r:4.6,tm:'22-32',badge:'',ar:'بيتزا كريمة مشروم',en:'Cream Mushroom Pizza'},
+  {id:17,cat:'calzone',em:'🫓',pr:85,cal:750,r:4.8,tm:'22-32',badge:'Popular',ar:'كالزوني 4 جبن',en:'4-Cheese Calzone'},
+  {id:18,cat:'calzone',em:'🫓',pr:79,cal:700,r:4.7,tm:'22-32',badge:'',ar:'كالزوني دجاج',en:'Chicken Calzone'},
+  {id:19,cat:'calzone',em:'🫓',pr:88,cal:780,r:4.7,tm:'25-35',badge:'',ar:'كالزوني لحمة',en:'Meat Calzone'},
+  {id:20,cat:'calzone',em:'🫓',pr:70,cal:620,r:4.4,tm:'20-30',badge:'Veggie',ar:'كالزوني خضروات',en:'Veggie Calzone'},
+  {id:21,cat:'calzone',em:'🫓',pr:83,cal:740,r:4.6,tm:'22-32',badge:'',ar:'كالزوني BBQ',en:'BBQ Calzone'},
+  {id:22,cat:'calzone',em:'🫓',pr:78,cal:720,r:4.6,tm:'20-30',badge:'',ar:'كالزوني بيبروني',en:'Pepperoni Calzone'},
+  {id:23,cat:'calzone',em:'🫓',pr:95,cal:800,r:4.9,tm:'25-35',badge:'Best Seller',ar:'كالزوني سبيشال',en:'Special Calzone'},
+  {id:24,cat:'calzone',em:'🫓',pr:75,cal:670,r:4.5,tm:'20-30',badge:'',ar:'كالزوني تونة',en:'Tuna Calzone'},
+  {id:25,cat:'calzone',em:'🫓',pr:65,cal:580,r:4.7,tm:'18-25',badge:'Sweet',ar:'كالزوني نوتيلا',en:'Nutella Calzone'},
+  {id:26,cat:'crepe',em:'🥞',pr:35,cal:420,r:4.8,tm:'8-12',badge:'Best Seller',ar:'كريب نوتيلا',en:'Nutella Crepe'},
+  {id:27,cat:'crepe',em:'🥞',pr:38,cal:380,r:4.7,tm:'8-12',badge:'',ar:'كريب فراولة',en:'Strawberry Crepe'},
+  {id:28,cat:'crepe',em:'🥞',pr:42,cal:450,r:4.6,tm:'10-15',badge:'',ar:'كريب دجاج',en:'Chicken Crepe'},
+  {id:29,cat:'crepe',em:'🥞',pr:45,cal:470,r:4.7,tm:'10-15',badge:'',ar:'كريب مكس',en:'Mixed Crepe'},
+  {id:30,cat:'crepe',em:'🥞',pr:40,cal:440,r:4.9,tm:'8-12',badge:'Popular',ar:'كريب لوتس',en:'Lotus Crepe'},
+  {id:31,cat:'crepe',em:'🥞',pr:36,cal:390,r:4.6,tm:'8-12',badge:'',ar:'كريب مانجو',en:'Mango Crepe'},
+  {id:32,cat:'crepe',em:'🥞',pr:37,cal:410,r:4.5,tm:'8-12',badge:'',ar:'كريب كراميل',en:'Caramel Crepe'},
+  {id:33,cat:'crepe',em:'🥞',pr:40,cal:430,r:4.5,tm:'10-15',badge:'',ar:'كريب تونة',en:'Tuna Crepe'},
+  {id:34,cat:'crepe',em:'🥞',pr:32,cal:360,r:4.4,tm:'7-10',badge:'',ar:'كريب جبن',en:'Cheese Crepe'},
+  {id:35,cat:'crepe',em:'🥞',pr:48,cal:490,r:4.8,tm:'10-15',badge:'Special',ar:'كريب مكس سبيشال',en:'Special Mixed Crepe'},
+  {id:36,cat:'roll',em:'🌯',pr:45,cal:520,r:4.7,tm:'10-18',badge:'Popular',ar:'رول دجاج',en:'Chicken Roll'},
+  {id:37,cat:'roll',em:'🌯',pr:52,cal:560,r:4.7,tm:'12-20',badge:'',ar:'رول لحمة',en:'Beef Roll'},
+  {id:38,cat:'roll',em:'🌯',pr:58,cal:490,r:4.8,tm:'12-20',badge:'',ar:'رول جمبري',en:'Shrimp Roll'},
+  {id:39,cat:'roll',em:'🌯',pr:38,cal:420,r:4.5,tm:'8-14',badge:'Veggie',ar:'رول فلافل',en:'Falafel Roll'},
+  {id:40,cat:'roll',em:'🌯',pr:42,cal:460,r:4.5,tm:'8-14',badge:'',ar:'رول تونة',en:'Tuna Roll'},
+  {id:41,cat:'roll',em:'🌯',pr:50,cal:540,r:4.7,tm:'12-20',badge:'',ar:'رول كفتة',en:'Kofta Roll'},
+  {id:42,cat:'roll',em:'🌯',pr:48,cal:510,r:4.6,tm:'10-18',badge:'',ar:'رول دجاج سيزر',en:'Caesar Chicken Roll'},
+  {id:43,cat:'roll',em:'🌯',pr:60,cal:580,r:4.9,tm:'12-20',badge:'Best Seller',ar:'رول سبارك',en:'SPARK Special Roll'},
+  {id:44,cat:'fries',em:'🍟',pr:25,cal:340,r:4.5,tm:'7-12',badge:'',ar:'بطاطس عادية',en:'Classic Fries'},
+  {id:45,cat:'fries',em:'🍟',pr:55,cal:580,r:4.9,tm:'10-18',badge:'Best Seller',ar:'بطاطس سبارك',en:'SPARK Loaded Fries'},
+  {id:46,cat:'fries',em:'🍟',pr:35,cal:420,r:4.7,tm:'8-14',badge:'',ar:'بطاطس جبن',en:'Cheese Fries'},
+  {id:47,cat:'fries',em:'🍟',pr:28,cal:360,r:4.6,tm:'7-12',badge:'Hot',ar:'بطاطس حارة',en:'Spicy Fries'},
+  {id:48,cat:'fries',em:'🍟',pr:45,cal:500,r:4.7,tm:'10-18',badge:'',ar:'بطاطس دجاج',en:'Chicken Fries'},
+  {id:49,cat:'fries',em:'🍟',pr:30,cal:380,r:4.5,tm:'10-16',badge:'',ar:'ويدج فراي',en:'Wedge Fries'},
+  {id:50,cat:'fries',em:'🍟',pr:60,cal:620,r:4.8,tm:'12-20',badge:'Combo',ar:'طبق بطاطس مكس',en:'Mixed Fries Plate'},
+  {id:51,cat:'extras',em:'🧀',pr:35,cal:380,r:4.8,tm:'8-12',badge:'Popular',ar:'موزاريلا ستيكس',en:'Mozzarella Sticks'},
+  {id:52,cat:'extras',em:'🥖',pr:22,cal:280,r:4.6,tm:'5-8',badge:'',ar:'خبز بالثوم',en:'Garlic Bread'},
+  {id:53,cat:'extras',em:'🍗',pr:45,cal:450,r:4.7,tm:'12-18',badge:'',ar:'أجنحة دجاج',en:'Chicken Wings'},
+  {id:54,cat:'extras',em:'🥔',pr:28,cal:320,r:4.5,tm:'10-16',badge:'',ar:'بطاطس ويدج',en:'Potato Wedges'},
+  {id:55,cat:'extras',em:'🧅',pr:25,cal:300,r:4.5,tm:'8-12',badge:'',ar:'حلقات بصل',en:'Onion Rings'},
+  {id:56,cat:'extras',em:'🌶️',pr:30,cal:350,r:4.6,tm:'8-12',badge:'Hot',ar:'هالبينو بوبرز',en:'Jalapeño Poppers'},
+  {id:57,cat:'extras',em:'🍅',pr:28,cal:240,r:4.4,tm:'5-8',badge:'',ar:'بروسكيتا',en:'Bruschetta'},
+  {id:58,cat:'extras',em:'🥟',pr:32,cal:330,r:4.6,tm:'8-14',badge:'',ar:'سبرينج رول',en:'Spring Rolls'},
+  {id:59,cat:'extras',em:'🧀',pr:30,cal:340,r:4.7,tm:'8-12',badge:'',ar:'كرات جبن',en:'Cheese Balls'},
+  {id:60,cat:'extras',em:'🌽',pr:35,cal:400,r:4.5,tm:'6-10',badge:'',ar:'ناتشوز',en:'Nachos'},
+  {id:61,cat:'extras',em:'🥟',pr:25,cal:280,r:4.5,tm:'6-10',badge:'',ar:'سمبوسك',en:'Samosa'},
+  {id:62,cat:'extras',em:'🦐',pr:50,cal:390,r:4.8,tm:'10-16',badge:'',ar:'قطع جمبري',en:'Shrimp Bites'},
+  {id:63,cat:'extras',em:'🌽',pr:20,cal:210,r:4.4,tm:'8-14',badge:'',ar:'ذرة مشوية',en:'Grilled Corn'},
+  {id:64,cat:'extras',em:'🌽',pr:50,cal:520,r:4.7,tm:'8-12',badge:'Best Seller',ar:'ناتشوز لودد',en:'Loaded Nachos Plate'},
+  {id:65,cat:'extras',em:'🥖',pr:18,cal:240,r:4.3,tm:'3-5',badge:'',ar:'سلة خبز',en:'Bread Basket'},
+  {id:66,cat:'drinks',em:'🍊',pr:28,cal:120,r:4.8,tm:'3-5',badge:'Fresh',ar:'عصير برتقال طازج',en:'Fresh Orange Juice'},
+  {id:67,cat:'drinks',em:'🥭',pr:30,cal:150,r:4.8,tm:'3-5',badge:'',ar:'عصير مانجو',en:'Mango Juice'},
+  {id:68,cat:'drinks',em:'🍋',pr:25,cal:80,r:4.9,tm:'3-5',badge:'Refreshing',ar:'ليمون بالنعناع',en:'Lemon Mint'},
+  {id:69,cat:'drinks',em:'🧃',pr:32,cal:180,r:4.9,tm:'3-5',badge:'Special',ar:'مشروب سبارك',en:'SPARK Special Drink'},
+];
+
+const ORDERS_DATA=[
+  {id:'#1042',cust:'أحمد محمد',items:'بيتزا سبارك × 2',total:230,status:'new',time:'منذ 5 دقائق'},
+  {id:'#1041',cust:'سارة أحمد',items:'رول دجاج × 1، بطاطس سبارك × 1',total:100,status:'pending',time:'منذ 12 دقيقة'},
+  {id:'#1040',cust:'محمود علي',items:'كريب نوتيلا × 3',total:105,status:'done',time:'منذ 25 دقيقة'},
+  {id:'#1039',cust:'ريم حسن',items:'كالزوني سبيشال × 1',total:95,status:'done',time:'منذ 40 دقيقة'},
+  {id:'#1038',cust:'خالد سامي',items:'موزاريلا ستيكس × 2، عصير × 1',total:98,status:'cancelled',time:'منذ 1 ساعة'},
+  {id:'#1037',cust:'نور إبراهيم',items:'بيتزا 4 جبن × 1',total:109,status:'done',time:'منذ 1.5 ساعة'},
+];
+
+// ── STATE ──
+let curV='dashboard', editId=null, orderFilter='all';
+
+// ── Navigation ──
+function goV(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('v-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  curV=id;
+  const titles={dashboard:'لوحة المعلومات',orders:'الطلبات',products:'المنتجات',categories:'الأقسام',settings:'إعدادات الموقع',promo:'كودات الخصم'};
+  const actions={dashboard:'+ إضافة منتج',orders:'تصدير',products:'+ إضافة منتج',categories:'+ قسم جديد',settings:'حفظ الكل',promo:'+ كود جديد'};
+  document.getElementById('topTitle').textContent=titles[id]||id;
+  document.getElementById('topAction').textContent=actions[id]||'+ إضافة';
+  if(id==='dashboard'){rDash();}
+  if(id==='products'){rProds('all');}
+  if(id==='categories'){rCats();}
+  if(id==='orders'){rOrders('all');}
+  // close sidebar on mobile
+  document.getElementById('sidebar').classList.remove('open');
+}
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');}
+function handleAction(){
+  if(curV==='products'||curV==='dashboard')openProdModal(null);
+  if(curV==='categories')openCatModal();
+  if(curV==='promo')openPromoModal();
+  if(curV==='settings')showT('✅ تم حفظ جميع الإعدادات!');
+}
+
+// ── Dashboard ──
+function rDash(){
+  const tbody=document.getElementById('ordersPreview');
+  tbody.innerHTML=ORDERS_DATA.slice(0,5).map(o=>orderRow(o)).join('');
+  const top=document.getElementById('topSales');
+  const sorted=[...MEALS].sort((a,b)=>b.r-a.r).slice(0,5);
+  top.innerHTML=sorted.map(m=>`<tr><td>${m.em} ${m.ar}</td><td>${catName(m.cat)}</td><td style="color:var(--or);font-weight:700;">${m.pr} EGP</td><td>${Math.floor(Math.random()*80+20)}</td><td>${m.pr*Math.floor(Math.random()*80+20)} EGP</td></tr>`).join('');
+}
+
+// ── Orders ──
+function orderRow(o){
+  const st={new:'st-new نشط جديد',pending:'st-pend قيد التنفيذ',done:'st-done مكتمل',cancelled:'st-canc ملغي'};
+  const [cls,...words]=st[o.status].split(' ');
+  return `<tr>
+    <td><strong style="color:var(--or);">${o.id}</strong></td>
+    <td>${o.cust}</td><td>${o.items}</td>
+    <td><strong>${o.total} EGP</strong></td>
+    <td><span class="st-badge ${cls}">${words.join(' ')}</span></td>
+    <td style="color:var(--muted);font-size:.74rem;">${o.time}</td>
+    <td>
+      <select style="background:var(--bg3);border:1px solid var(--bdr);border-radius:7px;padding:4px 7px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.72rem;" onchange="showT('✅ تم تحديث حالة الطلب!')">
+        <option>جديد</option><option>قيد التنفيذ</option><option>مكتمل</option><option>ملغي</option>
+      </select>
+    </td>
+  </tr>`;
+}
+function rOrders(filter){
+  orderFilter=filter;
+  const list=filter==='all'?ORDERS_DATA:ORDERS_DATA.filter(o=>o.status===filter);
+  document.getElementById('ordersList').innerHTML=list.length?list.map(orderRow).join(''):`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">لا توجد طلبات</td></tr>`;
+}
+function filterOrders(f,el){
+  document.querySelectorAll('#orderTabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  rOrders(f);
+}
+
+// ── Products ──
+function catName(id){const c=CATS.find(x=>x.id===id);return c?c.ar:id;}
+function rProds(filter){
+  const list=filter==='all'?MEALS:MEALS.filter(m=>m.cat===filter);
+  document.getElementById('prodGrid').innerHTML=list.map(m=>`
+    <div class="prod-card">
+      <div class="pc-img">${m.em}${m.badge?`<div class="pc-badge">${m.badge}</div>`:''}</div>
+      <div class="pc-body">
+        <div class="pc-name">${m.ar}</div>
+        <div class="pc-cat">${catName(m.cat)}</div>
+        <div class="pc-meta">
+          <div class="pc-price">${m.pr} EGP</div>
+          <div class="pc-actions">
+            <div class="pa-btn" onclick="openProdModal(${m.id})" title="تعديل">✏️</div>
+            <div class="pa-btn del" onclick="deleteProd(${m.id})" title="حذف">🗑️</div>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function filterProds(f,el){
+  document.querySelectorAll('#prodTabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  rProds(f);
+}
+function deleteProd(id){if(confirm('هل تريد حذف هذا المنتج؟')){MEALS=MEALS.filter(m=>m.id!==id);rProds('all');showT('🗑️ تم حذف المنتج!');}}
+
+// ── Product Modal ──
+function openProdModal(id){
+  editId=id;
+  document.getElementById('prodModalTitle').textContent=id?'تعديل المنتج':'إضافة منتج جديد';
+  if(id){
+    const m=MEALS.find(x=>x.id===id);
+    if(m){
+      document.getElementById('pAr').value=m.ar;
+      document.getElementById('pEn').value=m.en;
+      document.getElementById('pCat').value=m.cat;
+      document.getElementById('pEm').value=m.em;
+      document.getElementById('pPr').value=m.pr;
+      document.getElementById('pCal').value=m.cal;
+      document.getElementById('pTm').value=m.tm;
+      document.getElementById('pRt').value=m.r;
+      document.getElementById('pBdg').value=m.badge||'';
+    }
+  } else {
+    ['pAr','pEn','pEm','pPr','pCal','pTm','pRt','pBdg','pDa','pDe'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('pEm').value='🍕';
+  }
+  document.getElementById('prodModal').classList.add('open');
+}
+function closeProdModal(){document.getElementById('prodModal').classList.remove('open');}
+function saveProd(){
+  const ar=document.getElementById('pAr').value.trim();
+  const en=document.getElementById('pEn').value.trim();
+  const pr=parseFloat(document.getElementById('pPr').value);
+  if(!ar||!en||!pr){showT('❌ يرجى ملء الحقول المطلوبة!');return;}
+  if(editId){
+    const m=MEALS.find(x=>x.id===editId);
+    if(m){Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value});}
+    showT('✅ تم تعديل المنتج بنجاح!');
+  } else {
+    const newId=Math.max(...MEALS.map(m=>m.id))+1;
+    MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value});
+    showT('✅ تم إضافة المنتج بنجاح!');
+  }
+  closeProdModal();rProds('all');
+}
+
+// ── Categories ──
+function rCats(){
+  document.getElementById('catsList').innerHTML=CATS.filter(c=>c.id!=='all').map(c=>`
+    <tr>
+      <td style="font-size:1.5rem;">${c.em}</td>
+      <td><strong>${c.ar}</strong></td>
+      <td>${c.en}</td>
+      <td><span style="color:var(--or);font-weight:700;">${c.cnt}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <div class="pa-btn" onclick="showT('✏️ تعديل القسم قريباً!')" title="تعديل">✏️</div>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+function openCatModal(){document.getElementById('catModal').classList.add('open');}
+function saveCat(){
+  const ar=document.getElementById('cAr').value.trim();
+  const en=document.getElementById('cEn').value.trim();
+  if(!ar||!en){showT('❌ يرجى ملء الحقول!');return;}
+  CATS.push({id:document.getElementById('cId').value||en.toLowerCase(),ar,en,em:document.getElementById('cEm').value||'🍽️',cnt:0});
+  document.getElementById('catModal').classList.remove('open');
+  rCats();showT('✅ تم إضافة القسم بنجاح!');
+}
+
+// ── Promo ──
+function openPromoModal(){document.getElementById('promoModal').classList.add('open');}
+function savePromo(){
+  const code=document.getElementById('prCode').value.trim().toUpperCase();
+  if(!code){showT('❌ يرجى إدخال الكود!');return;}
+  document.getElementById('promoModal').classList.remove('open');
+  showT(`✅ تم إضافة كود ${code}!`);
+}
+
+// ── Toast ──
+function showT(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
+
+// ── Init ──
+rDash();
+</script>
+</body>
+</html>

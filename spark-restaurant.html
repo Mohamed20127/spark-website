@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>SPARK 🔥</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+[data-theme=dark]{--or:#FF6B00;--orb:#FF8C00;--bg:#0A0A0A;--bg2:#111;--bg3:#1A1A1A;--card:#161616;--txt:#FFF;--muted:#888;--bdr:#2A2A2A;--nav:rgba(10,10,10,.93);}
+[data-theme=light]{--or:#E85500;--orb:#FF6B00;--bg:#F5F0EA;--bg2:#EDE7DF;--bg3:#E2DAD0;--card:#FFF;--txt:#1A1010;--muted:#7A7070;--bdr:#D8D0C5;--nav:rgba(245,240,234,.96);}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:Outfit,sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;transition:background .3s,color .3s;}
+button{cursor:pointer;border:none;outline:none;background:none;}
+a{text-decoration:none;color:inherit;}
+[data-lang=ar]{direction:rtl;}
+[data-lang=ar] body,[data-lang=ar] button,[data-lang=ar] input,[data-lang=ar] select{font-family:Cairo,sans-serif!important;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--or);border-radius:2px;}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:900;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--nav);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);}
+.logo{font-family:Bebas Neue,sans-serif;font-size:1.55rem;letter-spacing:3px;color:var(--or);}
+.nlinks{display:flex;gap:22px;list-style:none;}
+.nlinks a{color:var(--muted);font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:color .2s;}
+.nlinks a:hover,.nlinks a.act{color:var(--or);}
+.nr{display:flex;align-items:center;gap:6px;}
+.blang{background:var(--card);border:1px solid var(--bdr);color:var(--txt);padding:5px 10px;border-radius:50px;font-size:.72rem;font-weight:700;}
+.blang:hover{border-color:var(--or);color:var(--or);}
+.tpill{display:flex;align-items:center;gap:4px;background:var(--card);border:1px solid var(--bdr);border-radius:50px;padding:5px 8px;cursor:pointer;}
+.ttrack{width:32px;height:18px;border-radius:50px;background:var(--bg3);position:relative;flex-shrink:0;}
+[data-theme=light] .ttrack{background:#FF6B0022;border:1px solid var(--or);}
+.tthumb{position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--muted);transition:transform .3s,background .3s;}
+[data-theme=light] .tthumb{transform:translateX(14px);background:var(--or);}
+.bcart{display:flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--bdr);color:var(--txt);padding:6px 11px;border-radius:50px;font-size:.75rem;font-weight:600;font-family:Outfit,Cairo,sans-serif;}
+.bcart:hover{border-color:var(--or);color:var(--or);}
+.cbdg{background:var(--or);color:#fff;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;}
+.border-btn{background:var(--or);color:#fff;padding:7px 14px;border-radius:50px;font-size:.76rem;font-weight:700;font-family:Outfit,Cairo,sans-serif;}
+.burger{display:none;flex-direction:column;gap:4px;padding:6px;background:var(--card);border:1px solid var(--bdr);border-radius:8px;}
+.burger span{width:17px;height:2px;background:var(--txt);border-radius:2px;transition:all .3s;display:block;}
+.burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.drawer{position:fixed;top:60px;left:0;right:0;z-index:899;background:var(--bg2);border-bottom:1px solid var(--bdr);padding:10px;display:none;flex-direction:column;gap:2px;}
+.drawer.open{display:flex;}
+.drawer a{padding:10px 13px;color:var(--txt);font-weight:600;font-size:.88rem;border-radius:9px;}
+.drawer a:hover{background:var(--bg3);color:var(--or);}
+.drw-f{display:flex;gap:7px;padding:7px 4px 3px;}
+
+/* ─── PAGES ─── */
+.pg{display:none;}
+.pg.active{display:block;}
+
+/* ─── HERO ─── */
+.hero{min-height:100svh;padding:68px 16px 36px;display:flex;align-items:center;position:relative;overflow:hidden;}
+.hbg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(255,107,0,.09),transparent 70%);}
+[data-theme=light] .hbg{background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(232,85,0,.07),transparent 70%);}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,107,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,.03) 1px,transparent 1px);background-size:48px 48px;}
+.hc{position:relative;z-index:1;max-width:600px;width:100%;animation:fadeUp .7s ease both;}
+.hbdg{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.25);padding:4px 12px;border-radius:50px;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:14px;}
+.hc h1{font-family:Bebas Neue,sans-serif;font-size:clamp(3.5rem,14vw,8rem);line-height:.88;letter-spacing:3px;margin-bottom:12px;}
+.hc h1 span{color:var(--or);}
+.hc p{color:var(--muted);font-size:clamp(.86rem,2.5vw,.98rem);line-height:1.7;margin-bottom:22px;max-width:400px;}
+.hbtns{display:flex;gap:9px;flex-wrap:wrap;}
+.bprim{background:var(--or);color:#fff;padding:12px 22px;border-radius:50px;font-weight:700;font-size:.84rem;font-family:Outfit,Cairo,sans-serif;transition:all .3s;display:inline-flex;align-items:center;gap:6px;}
+.bprim:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(255,107,0,.3);}
+.bsec{background:transparent;color:var(--txt);border:1px solid var(--bdr);padding:12px 22px;border-radius:50px;font-weight:600;font-size:.84rem;font-family:Outfit,Cairo,sans-serif;transition:all .3s;}
+.bsec:hover{border-color:var(--or);color:var(--or);}
+.hstats{display:flex;gap:16px;margin-top:26px;padding-top:20px;border-top:1px solid var(--bdr);flex-wrap:wrap;}
+.sn{font-family:Bebas Neue,sans-serif;font-size:1.8rem;color:var(--or);}
+.sl{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+
+/* ─── TICKER ─── */
+.ticker{background:var(--or);padding:10px 0;overflow:hidden;display:flex;}
+.tscrl{display:flex;gap:44px;animation:scrollL 24s linear infinite;white-space:nowrap;flex-shrink:0;}
+.titem{font-family:Bebas Neue,sans-serif;font-size:.88rem;letter-spacing:3px;color:#fff;}
+
+/* ─── SECTIONS ─── */
+.sec{padding:40px 16px;}
+.slbl{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);margin-bottom:3px;}
+.sttl{font-family:Bebas Neue,sans-serif;font-size:clamp(1.6rem,6vw,2.4rem);letter-spacing:2px;line-height:1;}
+.shead{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;gap:7px;flex-wrap:wrap;}
+.smore{color:var(--or);font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
+
+/* ─── BESTSELLER ─── */
+.bs{margin:0 12px;border-radius:18px;background:linear-gradient(135deg,#FF6B00,#C93000);padding:28px 18px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;position:relative;gap:12px;}
+.bs::before{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05);}
+.bstx{flex:1;position:relative;z-index:1;}
+.bslbl{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.8);margin-bottom:5px;}
+.bsttl{font-family:Bebas Neue,sans-serif;font-size:clamp(1.6rem,6vw,2.8rem);color:#fff;letter-spacing:2px;line-height:1;margin-bottom:8px;}
+.bssub{font-size:.8rem;color:rgba(255,255,255,.82);line-height:1.6;margin-bottom:16px;max-width:300px;}
+.bwh{background:#fff;color:var(--or);padding:9px 18px;border-radius:50px;font-weight:700;font-size:.8rem;font-family:Outfit,Cairo,sans-serif;transition:all .3s;}
+.bwh:hover{transform:translateY(-2px);}
+.bsem{font-size:clamp(3rem,11vw,6rem);animation:float 3.5s ease-in-out infinite;flex-shrink:0;position:relative;z-index:1;}
+
+/* ─── CATS ─── */
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.cc{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:14px 7px;text-align:center;cursor:pointer;transition:all .22s;}
+.cc:hover{border-color:var(--or);transform:translateY(-2px);}
+.cc.active{background:var(--or);border-color:var(--or);}
+.cc.active .cnm{color:#fff;}
+.cc.active .cct{color:rgba(255,255,255,.75);}
+.cem{font-size:1.9rem;margin-bottom:5px;display:block;}
+.cnm{font-weight:700;font-size:.78rem;color:var(--txt);}
+.cct{font-size:.64rem;color:var(--muted);margin-top:2px;}
+
+/* ─── MEALS ─── */
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.mc{background:var(--card);border:1px solid var(--bdr);border-radius:15px;overflow:hidden;transition:all .22s;cursor:pointer;}
+.mc:hover{border-color:rgba(255,107,0,.4);transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.14);}
+.mimg{height:140px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3.6rem;position:relative;}
+.mbdg{position:absolute;top:7px;left:7px;background:var(--or);color:#fff;padding:2px 7px;border-radius:50px;font-size:.56rem;font-weight:700;}
+[data-lang=ar] .mbdg{left:auto;right:7px;}
+.mfv{position:absolute;top:7px;right:7px;width:27px;height:27px;border-radius:50%;background:rgba(0,0,0,.35);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:.76rem;transition:all .2s;}
+[data-lang=ar] .mfv{right:auto;left:7px;}
+.mfv:hover,.mfv.fav{background:var(--or);border-color:var(--or);}
+.mbdy{padding:11px;}
+.mnm{font-weight:700;font-size:.84rem;margin-bottom:3px;}
+.mds{font-size:.68rem;color:var(--muted);line-height:1.45;margin-bottom:8px;}
+.mmeta{display:flex;gap:3px;margin-bottom:8px;flex-wrap:wrap;}
+.mp{font-size:.6rem;color:var(--muted);background:var(--bg3);padding:2px 6px;border-radius:50px;}
+.mft{display:flex;align-items:center;justify-content:space-between;}
+.mpr{font-family:Bebas Neue,sans-serif;font-size:1.3rem;color:var(--or);}
+.mpr small{font-size:.68rem;font-family:Outfit,Cairo,sans-serif;font-weight:400;}
+.badd{background:var(--or);color:#fff;padding:5px 12px;border-radius:50px;font-weight:700;font-size:.68rem;font-family:Outfit,Cairo,sans-serif;transition:all .22s;}
+.badd:hover{background:var(--orb);}
+
+/* ─── ABOUT ─── */
+.ab-hero{padding:76px 16px 42px;text-align:center;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(255,107,0,.08),transparent 60%);position:relative;overflow:hidden;}
+.ab-hero::before{content:"🔥";position:absolute;font-size:14rem;opacity:.025;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.ab-bdg{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.25);padding:4px 12px;border-radius:50px;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:14px;}
+.ab-hero h1{font-family:Bebas Neue,sans-serif;font-size:clamp(2.4rem,9vw,4.5rem);letter-spacing:4px;line-height:1;margin-bottom:12px;}
+.ab-hero h1 span{color:var(--or);}
+.ab-hero p{color:var(--muted);font-size:clamp(.86rem,2.5vw,.98rem);line-height:1.8;max-width:560px;margin:0 auto;}
+.ab-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px 40px;}
+.abcard{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:24px 18px;text-align:center;transition:all .3s;}
+.abcard:hover{border-color:rgba(255,107,0,.3);transform:translateY(-3px);}
+.abic{width:56px;height:56px;border-radius:14px;background:rgba(255,107,0,.12);display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin:0 auto 12px;}
+.abcard h3{font-family:Bebas Neue,sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--or);margin-bottom:6px;}
+.abcard p{font-size:.78rem;color:var(--muted);line-height:1.65;}
+.ab-story{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;padding:0 16px 40px;max-width:940px;margin:0 auto;}
+.ab-sl{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);margin-bottom:4px;}
+.ab-story h2{font-family:Bebas Neue,sans-serif;font-size:clamp(1.6rem,5vw,2.4rem);letter-spacing:2px;margin-bottom:13px;}
+.ab-story p{color:var(--muted);font-size:.8rem;line-height:1.78;margin-bottom:10px;}
+.ab-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.abst{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px;text-align:center;}
+.abstn{font-family:Bebas Neue,sans-serif;font-size:2.1rem;color:var(--or);}
+.abstl{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:11px;}
+.cocard{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:20px;transition:all .3s;}
+.cocard:hover{border-color:rgba(255,107,0,.3);}
+.coic{width:44px;height:44px;border-radius:12px;background:rgba(255,107,0,.12);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:11px;}
+.cocard h3{font-weight:700;font-size:.82rem;margin-bottom:4px;}
+.cocard p{font-size:.76rem;color:var(--muted);line-height:1.65;}
+
+/* ─── FOOTER ─── */
+footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 14px;}
+.ftg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:26px;margin-bottom:22px;}
+.ftlo{font-family:Bebas Neue,sans-serif;font-size:1.6rem;color:var(--or);letter-spacing:3px;}
+.ftde{color:var(--muted);font-size:.76rem;line-height:1.7;margin-top:7px;}
+.ftsoc{display:flex;gap:6px;margin-top:10px;}
+.ftsoc a{width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .22s;}
+.ftsoc a:hover{border-color:var(--or);}
+.ftcol h4{font-weight:700;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.ftcol ul{list-style:none;}
+.ftcol li{margin-bottom:6px;}
+.ftcol a{color:var(--muted);font-size:.76rem;transition:color .2s;}
+.ftcol a:hover{color:var(--or);}
+.ftbt{border-top:1px solid var(--bdr);padding-top:12px;display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted);flex-wrap:wrap;gap:5px;}
+
+/* ─── CART ─── */
+.cov{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .3s;}
+.cov.open{opacity:1;pointer-events:all;}
+.csb{position:fixed;top:0;right:-100%;bottom:0;width:min(380px,100%);z-index:951;background:var(--bg2);border-left:1px solid var(--bdr);padding:15px;overflow-y:auto;display:flex;flex-direction:column;transition:right .4s cubic-bezier(.4,0,.2,1);}
+.csb.open{right:0;}
+[data-lang=ar] .csb{right:auto;left:-100%;border-left:none;border-right:1px solid var(--bdr);}
+[data-lang=ar] .csb.open{left:0;}
+.chd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.cttl{font-family:Bebas Neue,sans-serif;font-size:1.45rem;letter-spacing:2px;}
+.ccl{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--bdr);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+.ci{display:flex;gap:7px;align-items:center;padding:9px;background:var(--card);border-radius:9px;margin-bottom:5px;border:1px solid var(--bdr);}
+.ciem{font-size:1.7rem;min-width:36px;text-align:center;}
+.ciin{flex:1;min-width:0;}
+.cinm{font-weight:600;font-size:.76rem;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cipr{color:var(--or);font-weight:700;font-size:.72rem;}
+.qcl{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.qb{width:22px;height:22px;border-radius:50%;border:1px solid var(--bdr);background:var(--bg3);color:var(--txt);display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;}
+.qb:hover{background:var(--or);border-color:var(--or);color:#fff;}
+.qn{font-weight:700;min-width:13px;text-align:center;font-size:.78rem;}
+.prow{display:flex;gap:5px;margin:8px 0;}
+.prow input{flex:1;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:8px 9px;color:var(--txt);font-family:Outfit,Cairo,sans-serif;font-size:.76rem;outline:none;min-width:0;}
+.prow input:focus{border-color:var(--or);}
+.prow input::placeholder{color:var(--muted);}
+.bap{background:var(--or);color:#fff;padding:8px 11px;border-radius:8px;font-weight:700;font-size:.72rem;font-family:Outfit,Cairo,sans-serif;flex-shrink:0;}
+.csum{background:var(--card);border-radius:9px;padding:11px;margin:8px 0;border:1px solid var(--bdr);}
+.srow{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-bottom:4px;}
+.stot{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--bdr);font-weight:700;font-size:.82rem;}
+.totp{font-family:Bebas Neue,sans-serif;font-size:1.35rem;color:var(--or);}
+.bco{background:var(--or);color:#fff;padding:12px;border-radius:10px;font-weight:700;font-size:.84rem;font-family:Outfit,Cairo,sans-serif;width:100%;transition:all .3s;margin-top:3px;}
+.bco:hover{background:var(--orb);}
+
+/* ─── MODALS ─── */
+.mov{position:fixed;inset:0;z-index:960;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.mov.open{opacity:1;pointer-events:all;}
+.dmod{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px 18px 0 0;width:100%;max-width:460px;max-height:90svh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
+.mov.open .dmod,.mov.open .comod{transform:translateY(0);}
+.dbar{width:34px;height:4px;background:var(--bdr);border-radius:2px;margin:9px auto 4px;}
+.dim{height:170px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:5.5rem;position:relative;}
+.dfv{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;}
+[data-lang=ar] .dfv{right:auto;left:10px;}
+.dbdy{padding:14px;}
+.dtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:6px;}
+.dnm{font-family:Bebas Neue,sans-serif;font-size:1.5rem;letter-spacing:2px;line-height:1;}
+.dqc{display:flex;align-items:center;gap:7px;background:var(--bg3);border-radius:50px;padding:5px 10px;flex-shrink:0;}
+.dpills{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;}
+.dpill{background:var(--bg3);border-radius:50px;padding:3px 7px;font-size:.63rem;color:var(--muted);}
+.ddes{color:var(--muted);font-size:.76rem;line-height:1.6;margin-bottom:12px;}
+.ottl{font-weight:700;margin-bottom:7px;font-size:.76rem;}
+.orow{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:8px;padding:8px 10px;margin-bottom:5px;}
+.onm{font-size:.76rem;}
+.opr{color:var(--or);font-weight:600;font-size:.72rem;}
+.ock{width:18px;height:18px;border-radius:5px;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:.62rem;flex-shrink:0;}
+.ock.ck{background:var(--or);border-color:var(--or);color:#fff;}
+.dft{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--bdr);margin-top:5px;gap:6px;}
+.dtlb{font-size:.68rem;color:var(--muted);margin-bottom:1px;}
+.dtp{font-family:Bebas Neue,sans-serif;font-size:1.5rem;color:var(--or);}
+.comod{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px 18px 0 0;width:100%;max-width:460px;max-height:90svh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
+.cohd{display:flex;justify-content:space-between;align-items:center;padding:13px 15px 0;}
+.cottl{font-family:Bebas Neue,sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--or);}
+.cobdy{padding:10px 15px 16px;}
+.coslb{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:7px;}
+.adc{background:var(--card);border:1px solid var(--bdr);border-radius:9px;padding:11px;margin-bottom:5px;cursor:pointer;display:flex;gap:9px;align-items:center;transition:all .22s;}
+.adc.sel{border-color:var(--or);background:rgba(255,107,0,.07);}
+.adic{width:34px;height:34px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+.adt{font-weight:600;font-size:.78rem;margin-bottom:1px;}
+.add{font-size:.68rem;color:var(--muted);}
+.popt{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:all .22s;}
+.popt.sel{border-color:var(--or);}
+.popl{display:flex;align-items:center;gap:7px;font-weight:500;font-size:.78rem;}
+.radio{width:15px;height:15px;border-radius:50%;border:2px solid var(--bdr);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.popt.sel .radio{border-color:var(--or);}
+.rdot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0;transition:opacity .2s;}
+.popt.sel .rdot{opacity:1;}
+.scr{text-align:center;padding:30px 16px;}
+.scic{font-size:3.5rem;margin-bottom:10px;}
+.scttl{font-family:Bebas Neue,sans-serif;font-size:1.8rem;color:var(--or);margin-bottom:7px;}
+.scsb{color:var(--muted);line-height:1.65;font-size:.8rem;}
+
+/* ─── TOAST ─── */
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg2);border:1px solid var(--or);border-radius:50px;padding:9px 19px;font-weight:600;z-index:9999;transition:transform .4s cubic-bezier(.4,0,.2,1);white-space:nowrap;color:var(--txt);font-size:.78rem;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ─── ANIMS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes scrollL{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,0,.4);}50%{box-shadow:0 0 0 8px rgba(255,107,0,0);}}
+.pulse{animation:pulse 2s infinite;}
+
+/* ─── TABLET ─── */
+@media(max-width:860px){
+  .nlinks,.border-btn{display:none;}
+  .burger{display:flex;}
+  .cgrid{grid-template-columns:repeat(4,1fr);}
+  .mgrid{grid-template-columns:repeat(2,1fr);}
+  .ab-cards{grid-template-columns:repeat(2,1fr);}
+  .ab-story{grid-template-columns:1fr;}
+  .ftg{grid-template-columns:1fr 1fr;gap:18px;}
+}
+/* ─── MOBILE ─── */
+@media(max-width:560px){
+  .cgrid{grid-template-columns:repeat(3,1fr);gap:6px;}
+  .cc{padding:11px 5px;border-radius:10px;}
+  .cem{font-size:1.55rem;margin-bottom:4px;}
+  .cnm{font-size:.7rem;}
+  .mgrid{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .mimg{height:118px;font-size:2.9rem;}
+  .mbdy{padding:10px;}
+  .mnm{font-size:.8rem;}
+  .mds{font-size:.66rem;}
+  .mpr{font-size:1.2rem;}
+  .badd{padding:5px 10px;font-size:.64rem;}
+  .bs{padding:22px 14px;margin:0 8px;}
+  .bsem{display:none;}
+  .ab-cards{grid-template-columns:1fr;}
+  .ftg{grid-template-columns:1fr;}
+  .hbtns{flex-direction:column;}
+  .hbtns a,.hbtns button{text-align:center;justify-content:center;}
+  .hstats{gap:11px;}
+  .cart-label{display:none;}
+}
+@media(max-width:320px){
+  .cgrid{grid-template-columns:repeat(2,1fr);}
+  .mgrid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">🔥 SPARK</div>
+  <ul class="nlinks" id="nlinks">
+    <li><a href="#" onclick="gp('home',this)" class="act" id="nH">Home</a></li>
+    <li><a href="#" onclick="gp('pgMenu',this)" id="nM">Menu</a></li>
+    <li><a href="#" onclick="gp('pgAbout',this)" id="nA">About</a></li>
+  </ul>
+  <div class="nr">
+    <button class="blang" id="langBtn" onclick="tLang()">🌐 AR</button>
+    <div class="tpill" onclick="tTheme()">
+      <span id="tLbl" style="font-size:.6rem;">🌙</span>
+      <div class="ttrack"><div class="tthumb" id="tTh"></div></div>
+    </div>
+    <button class="bcart" onclick="tCart()">
+      🛒 <span class="cart-label" id="nC">Cart</span>
+      <span class="cbdg" id="cBdg">0</span>
+    </button>
+    <button class="border-btn pulse" id="nO" onclick="tCart()">Order Now</button>
+    <button class="burger" id="hbg" onclick="tDrawer()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- DRAWER -->
+<div class="drawer" id="drw">
+  <a href="#" onclick="gp('home');cd()" id="dH">🏠 Home</a>
+  <a href="#" onclick="gp('pgMenu');cd()" id="dM">🍽️ Menu</a>
+  <a href="#" onclick="gp('pgAbout');cd()" id="dA">⭐ About</a>
+  <div class="drw-f">
+    <button class="border-btn" onclick="tCart();cd()" id="dO">Order Now</button>
+  </div>
+</div>
+
+<!-- ═══ HOME ═══ -->
+<div class="pg active" id="home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hbg"></div><div class="hgrid"></div>
+    <div class="hc">
+      <div class="hbdg" id="hBd">⚡ Hot &amp; Fresh Daily</div>
+      <h1 id="hH1">IGNITE<br><span>YOUR</span><br>TASTE</h1>
+      <p id="hSb">Bold flavors fired with passion. Every dish crafted to ignite your senses.</p>
+      <div class="hbtns">
+        <a href="#" class="bprim" onclick="gp('pgMenu')" id="hB1">🔥 Explore Menu</a>
+        <a href="#" class="bsec" onclick="gp('pgMenu')" id="hB2">Browse Categories</a>
+      </div>
+      <div class="hstats">
+        <div><div class="sn">4.9★</div><div class="sl" id="hs1">Rating</div></div>
+        <div><div class="sn">50K+</div><div class="sl" id="hs2">Customers</div></div>
+        <div><div class="sn">69+</div><div class="sl" id="hs3">Items</div></div>
+        <div><div class="sn">25m</div><div class="sl" id="hs4">Delivery</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker"><div style="overflow:hidden;flex:1;">
+    <div class="tscrl">
+      <span class="titem" id="ti1">🔥 FREE DELIVERY OVER 200 EGP</span>
+      <span class="titem" id="ti2">⚡ CODE: SPARK20 → 20% OFF</span>
+      <span class="titem" id="ti3">🍕 NEW CALZONE NOW AVAILABLE!</span>
+      <span class="titem" id="ti4">🎉 OPEN DAILY 2PM – 2AM</span>
+      <span class="titem">🔥 FREE DELIVERY OVER 200 EGP</span>
+      <span class="titem">⚡ CODE: SPARK20 → 20% OFF</span>
+      <span class="titem">🍕 NEW CALZONE NOW AVAILABLE!</span>
+      <span class="titem">🎉 OPEN DAILY 2PM – 2AM</span>
+    </div>
+  </div></div>
+
+  <!-- BESTSELLER -->
+  <div class="bs" style="margin-top:28px;">
+    <div class="bstx">
+      <div class="bslbl" id="bsL">🏆 Most Ordered</div>
+      <div class="bsttl" id="bsT">OUR BEST SELLER!</div>
+      <p class="bssub" id="bsS">Loved by thousands — signature pizza with fresh toppings and melted cheese.</p>
+      <button class="bwh" onclick="gp('pgMenu')" id="bsB">Order Now →</button>
+    </div>
+    <div class="bsem">🍕</div>
+  </div>
+
+  <!-- POPULAR -->
+  <section class="sec">
+    <div class="shead">
+      <div><div class="slbl" id="hML">Hand Picked</div><div class="sttl" id="hMT">POPULAR</div></div>
+      <a href="#" class="smore" onclick="gp('pgMenu')" id="hSA">See all →</a>
+    </div>
+    <div class="mgrid" id="homeGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="ftg">
+      <div>
+        <div class="ftlo">🔥 SPARK</div>
+        <p class="ftde" id="ftD">Ignite your taste with bold flavors. More than a restaurant.</p>
+        <div class="ftsoc"><a href="#">📘</a><a href="#">📸</a><a href="#">🐦</a></div>
+      </div>
+      <div class="ftcol">
+        <h4 id="ftH1">Quick Links</h4>
+        <ul>
+          <li><a href="#" onclick="gp('home')" id="fl1">Home</a></li>
+          <li><a href="#" onclick="gp('pgMenu')" id="fl2">Menu</a></li>
+          <li><a href="#" onclick="gp('pgAbout')" id="fl3">About</a></li>
+        </ul>
+      </div>
+      <div class="ftcol">
+        <h4 id="ftH2">Categories</h4>
+        <ul>
+          <li><a href="#" onclick="gp('pgMenu')">🍕 Pizza</a></li>
+          <li><a href="#" onclick="gp('pgMenu')">🫓 Calzone</a></li>
+          <li><a href="#" onclick="gp('pgMenu')">🥞 Crepe</a></li>
+          <li><a href="#" onclick="gp('pgMenu')">🌯 Roll</a></li>
+          <li><a href="#" onclick="gp('pgMenu')">🍟 Fries</a></li>
+        </ul>
+      </div>
+      <div class="ftcol">
+        <h4 id="ftH3">Contact</h4>
+        <ul>
+          <li><a href="#">📍 أولاد صقر - الشرقية</a></li>
+          <li><a href="tel:01020009617">📞 01020009617</a></li>
+          <li><a href="#">🕑 2PM – 2AM</a></li>
+          <li><a href="#">🌙 Ramadan: 9PM – 4AM</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftbt">
+      <div id="ftC">© 2025 SPARK Restaurant. All rights reserved.</div>
+      <div style="color:var(--or);font-weight:700;">🔥 Ignite Your Taste</div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ MENU ═══ -->
+<div class="pg" id="pgMenu">
+  <div style="padding-top:60px;">
+    <section class="sec">
+      <div class="shead"><div><div class="slbl" id="cL">Browse By</div><div class="sttl" id="cT">CATEGORIES</div></div></div>
+      <div class="cgrid" id="catsGrid"></div>
+    </section>
+    <section class="sec" style="padding-top:0;">
+      <div class="shead">
+        <div><div class="slbl" id="mL">Hand Picked</div><div class="sttl" id="mT">ALL MEALS</div></div>
+        <span id="mCnt" style="color:var(--muted);font-size:.72rem;"></span>
+      </div>
+      <div class="mgrid" id="mealsGrid"></div>
+    </section>
+  </div>
+</div>
+
+<!-- ═══ ABOUT ═══ -->
+<div class="pg" id="pgAbout">
+  <div style="padding-top:60px;">
+    <div class="ab-hero">
+      <div class="ab-bdg" id="abBdg">⭐ Our Story</div>
+      <h1 id="abH1">ABOUT <span>SPARK</span></h1>
+      <p id="abHT">SPARK isn&#39;t just a restaurant — it&#39;s a complete experience. The result of a long journey of hard work and dedication.</p>
+    </div>
+    <div class="ab-cards">
+      <div class="abcard"><div class="abic">❤️‍🔥</div><h3 id="ac1T">PASSION</h3><p id="ac1P">Every dish made with love. We put our heart into every item on the menu.</p></div>
+      <div class="abcard"><div class="abic">🌿</div><h3 id="ac2T">FRESH</h3><p id="ac2P">Only the freshest ingredients reach your plate. Quality is never compromised.</p></div>
+      <div class="abcard"><div class="abic">⭐</div><h3 id="ac3T">EXPERIENCE</h3><p id="ac3P">From first bite to last — a complete dining experience you won&#39;t forget.</p></div>
+    </div>
+    <div class="ab-story">
+      <div>
+        <div class="ab-sl" id="stL">Our Journey</div>
+        <h2 id="stH">A Long Road of Effort &amp; Passion</h2>
+        <p id="stP1">SPARK started as a dream — to create food that ignites the senses. Built from scratch with love and countless late nights.</p>
+        <p id="stP2">Today we serve thousands with a growing menu. Every product is the result of real passion and hard work.</p>
+      </div>
+      <div class="ab-stats">
+        <div class="abst"><div class="abstn">50K+</div><div class="abstl" id="ast1">Happy Customers</div></div>
+        <div class="abst"><div class="abstn">69+</div><div class="abstl" id="ast2">Menu Items</div></div>
+        <div class="abst"><div class="abstn">4.9★</div><div class="abstl" id="ast3">Avg Rating</div></div>
+        <div class="abst"><div class="abstn">1</div><div class="abstl" id="ast4">Big Goal</div></div>
+      </div>
+    </div>
+    <section class="sec" style="background:var(--bg2);border-top:1px solid var(--bdr);margin-top:36px;">
+      <div class="shead"><div><div class="slbl" id="coL">Find Us</div><div class="sttl" id="coT">CONTACT</div></div></div>
+      <div class="co-grid">
+        <div class="cocard"><div class="coic">📍</div><h3 id="co1T">Address</h3><p id="co1P">أولاد صقر - الشرقية - شارع البحر - بجوار صيدلية عثمان القديمة</p></div>
+        <div class="cocard"><div class="coic">📞</div><h3 id="co2T">Phone</h3><p><a href="tel:01020009617" style="color:var(--or);font-weight:700;font-size:.9rem;">01020009617</a></p></div>
+        <div class="cocard"><div class="coic">🕑</div><h3 id="co3T">Working Hours</h3><p id="co3P">Daily: 2PM – 2AM<br>Ramadan: 9PM – 4AM</p></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- CART -->
+<div class="cov" id="cOv" onclick="tCart()"></div>
+<div class="csb" id="cSb">
+  <div class="chd">
+    <div class="cttl" id="cTtl">🛒 MY CART</div>
+    <button class="ccl" onclick="tCart()">✕</button>
+  </div>
+  <div id="cList" style="flex:1;"></div>
+  <div id="cBot"></div>
+</div>
+
+<!-- DETAIL -->
+<div class="mov" id="dOv" onclick="if(event.target===this)closeD()">
+  <div class="dmod" id="dMod"><div class="dbar"></div></div>
+</div>
+
+<!-- CHECKOUT -->
+<div class="mov" id="coOv" onclick="if(event.target===this)closeCO()">
+  <div class="comod" id="coMod"><div class="dbar"></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════ DATA ══════════════════
+const CATS=[
+  {id:'all',en:'All',ar:'الكل',em:'🍽️',cnt:69},
+  {id:'pizza',en:'Pizza',ar:'بيتزا',em:'🍕',cnt:16},
+  {id:'calzone',en:'Calzone',ar:'كالزوني',em:'🫓',cnt:9},
+  {id:'crepe',en:'Crepe',ar:'كريب',em:'🥞',cnt:10},
+  {id:'roll',en:'Roll',ar:'رول',em:'🌯',cnt:8},
+  {id:'fries',en:'Fries',ar:'بطاطس',em:'🍟',cnt:7},
+  {id:'extras',en:'Extras',ar:'إضافات',em:'🧀',cnt:15},
+  {id:'drinks',en:'Drinks',ar:'مشروبات',em:'🧃',cnt:4},
+];
+const MEALS=[
+  // PIZZA
+  {id:1,cat:'pizza',em:'🍕',pr:89,cal:680,r:4.8,tm:'20-30',badge:'Classic',en:'Classic Margherita',ar:'مارغريتا كلاسيك',de:'San Marzano tomato, mozzarella and basil on thin crust.',da:'طماطم وموزاريلا وريحان على عجينة رفيعة.',opts:[{en:'Extra Mozzarella',ar:'موزاريلا إضافي',p:10},{en:'Stuffed Crust',ar:'حواف محشية',p:15}]},
+  {id:2,cat:'pizza',em:'🍕',pr:115,cal:820,r:4.9,tm:'25-35',badge:'Best Seller',fav:1,en:'SPARK Special Pizza',ar:'بيتزا سبارك',de:'Signature pizza with special toppings and secret sauce.',da:'بيتزا سبارك بتوبينج خاص وصلصة سرية.',opts:[{en:'Extra Toppings',ar:'توبينج إضافي',p:15},{en:'Stuffed Crust',ar:'حواف محشية',p:15}]},
+  {id:3,cat:'pizza',em:'🍕',pr:105,cal:790,r:4.7,tm:'25-35',badge:'Hot 🌶️',en:'BBQ Beef Pizza',ar:'بيتزا لحمة BBQ',de:'Smoky BBQ sauce, beef, caramelized onions and mozzarella.',da:'صلصة BBQ مع لحمة وبصل كرمل وموزاريلا.',opts:[{en:'Extra Beef',ar:'لحمة إضافي',p:20}]},
+  {id:4,cat:'pizza',em:'🍕',pr:95,cal:720,r:4.6,tm:'20-30',badge:'',en:'Tuna Pizza',ar:'بيتزا تونة',de:'Tuna, onions, olives and mozzarella.',da:'تونة وبصل وزيتون وموزاريلا.',opts:[{en:'Extra Tuna',ar:'تونة إضافي',p:15}]},
+  {id:5,cat:'pizza',em:'🍕',pr:99,cal:750,r:4.7,tm:'20-30',badge:'',en:'Pepperoni Pizza',ar:'بيتزا بيبروني',de:'Classic pepperoni with tomato sauce and mozzarella.',da:'بيبروني كلاسيك مع صلصة طماطم وموزاريلا.',opts:[{en:'Extra Pepperoni',ar:'بيبروني إضافي',p:12}]},
+  {id:6,cat:'pizza',em:'🍕',pr:109,cal:800,r:4.8,tm:'22-32',badge:'Popular',fav:1,en:'4-Cheese Pizza',ar:'بيتزا 4 جبن',de:'Mozzarella, cheddar, gouda and parmesan blend.',da:'موزاريلا وشيدر وجودا وبارميزان.',opts:[{en:'Extra Cheese',ar:'جبن إضافي',p:10}]},
+  {id:7,cat:'pizza',em:'🍕',pr:102,cal:760,r:4.7,tm:'25-35',badge:'',en:'Chicken Tikka Pizza',ar:'بيتزا تيكا دجاج',de:'Grilled chicken tikka, peppers and tikka sauce.',da:'دجاج تيكا مشوي وفلفل وصلصة تيكا.',opts:[{en:'Extra Chicken',ar:'دجاج إضافي',p:15}]},
+  {id:8,cat:'pizza',em:'🍕',pr:85,cal:650,r:4.5,tm:'20-30',badge:'Veggie 🌱',en:'Mushroom Pizza',ar:'بيتزا مشروم',de:'Mushrooms, garlic and mozzarella on white sauce.',da:'مشروم وثوم وموزاريلا على صلصة بيضاء.',opts:[{en:'Extra Mushrooms',ar:'مشروم إضافي',p:8}]},
+  {id:9,cat:'pizza',em:'🍕',pr:119,cal:810,r:4.8,tm:'25-35',badge:'',en:'Seafood Pizza',ar:'بيتزا مأكولات بحر',de:'Shrimp, tuna, crab sticks and seafood sauce.',da:'جمبري وتونة وعصا سرطان وصلصة بحرية.',opts:[{en:'Extra Shrimp',ar:'جمبري إضافي',p:20}]},
+  {id:10,cat:'pizza',em:'🍕',pr:82,cal:620,r:4.4,tm:'20-30',badge:'Veggie 🌱',en:'Veggie Supreme',ar:'بيتزا خضروات',de:'Bell peppers, olives, mushrooms and tomatoes.',da:'فلفل وزيتون ومشروم وطماطم.',opts:[{en:'Add Cheese',ar:'جبن إضافي',p:10}]},
+  {id:11,cat:'pizza',em:'🍕',pr:98,cal:770,r:4.6,tm:'22-32',badge:'🌶️ Hot',en:'Hot Sauce Pizza',ar:'بيتزا حارة',de:'Extra hot sauce, jalapeños and chili flakes.',da:'صلصة حارة وهالبينو وشيلي.',opts:[]},
+  {id:12,cat:'pizza',em:'🍕',pr:96,cal:730,r:4.6,tm:'22-32',badge:'',en:'Ranch Chicken Pizza',ar:'بيتزا دجاج رانش',de:'Crispy chicken, ranch sauce and mozzarella.',da:'دجاج مقرمش ورانش وموزاريلا.',opts:[{en:'Extra Ranch',ar:'رانش إضافي',p:8}]},
+  {id:13,cat:'pizza',em:'🍕',pr:120,cal:900,r:4.9,tm:'25-35',badge:'🔥 Loaded',fav:1,en:'Meat Lovers Pizza',ar:'بيتزا عشاق اللحوم',de:'Beef, chicken, pepperoni and sausage.',da:'لحمة ودجاج وبيبروني وسجق.',opts:[{en:'Extra Meat',ar:'لحمة إضافي',p:20}]},
+  {id:14,cat:'pizza',em:'🍕',pr:100,cal:745,r:4.7,tm:'23-33',badge:'',en:'Buffalo Chicken Pizza',ar:'بيتزا دجاج بافالو',de:'Spicy buffalo chicken and blue cheese.',da:'دجاج بافالو حار مع جبن أزرق.',opts:[{en:'Extra Sauce',ar:'صلصة إضافي',p:8}]},
+  {id:15,cat:'pizza',em:'🍕',pr:92,cal:700,r:4.5,tm:'22-32',badge:'',en:'Pesto Pizza',ar:'بيتزا بيستو',de:'Basil pesto, mozzarella and cherry tomatoes.',da:'بيستو ريحان وموزاريلا وطماطم.',opts:[{en:'Extra Pesto',ar:'بيستو إضافي',p:10}]},
+  {id:16,cat:'pizza',em:'🍕',pr:94,cal:710,r:4.6,tm:'22-32',badge:'',en:'Cream Mushroom Pizza',ar:'بيتزا كريمة مشروم',de:'Cream sauce, mushrooms, chicken and mozzarella.',da:'كريمة ومشروم ودجاج وموزاريلا.',opts:[{en:'Extra Cream',ar:'كريمة إضافي',p:8}]},
+  // CALZONE
+  {id:17,cat:'calzone',em:'🫓',pr:85,cal:750,r:4.8,tm:'22-32',badge:'Popular',fav:1,en:'4-Cheese Calzone',ar:'كالزوني 4 جبن',de:'Four-cheese filling in golden baked pocket.',da:'خليط 4 جبن في كالزوني محمص ذهبي.',opts:[{en:'Extra Cheese',ar:'جبن إضافي',p:10}]},
+  {id:18,cat:'calzone',em:'🫓',pr:79,cal:700,r:4.7,tm:'22-32',badge:'',en:'Chicken Calzone',ar:'كالزوني دجاج',de:'Grilled chicken, mushrooms and mozzarella.',da:'دجاج مشوي ومشروم وموزاريلا.',opts:[{en:'Extra Chicken',ar:'دجاج إضافي',p:15}]},
+  {id:19,cat:'calzone',em:'🫓',pr:88,cal:780,r:4.7,tm:'25-35',badge:'',en:'Meat Calzone',ar:'كالزوني لحمة',de:'Seasoned ground beef and three-cheese mix.',da:'لحمة مفرومة متبلة وخليط 3 جبن.',opts:[{en:'Extra Beef',ar:'لحمة إضافي',p:18}]},
+  {id:20,cat:'calzone',em:'🫓',pr:70,cal:620,r:4.4,tm:'20-30',badge:'Veggie 🌱',en:'Veggie Calzone',ar:'كالزوني خضروات',de:'Mushrooms, spinach, olives and ricotta.',da:'مشروم وسبانخ وزيتون وريكوتا.',opts:[]},
+  {id:21,cat:'calzone',em:'🫓',pr:83,cal:740,r:4.6,tm:'22-32',badge:'',en:'BBQ Calzone',ar:'كالزوني BBQ',de:'BBQ chicken, caramelized onions and sauce.',da:'دجاج BBQ وبصل كرمل وصلصة مدخنة.',opts:[{en:'Extra Sauce',ar:'صلصة إضافي',p:8}]},
+  {id:22,cat:'calzone',em:'🫓',pr:78,cal:720,r:4.6,tm:'20-30',badge:'',en:'Pepperoni Calzone',ar:'كالزوني بيبروني',de:'Pepperoni and mozzarella in golden dough.',da:'بيبروني وموزاريلا في عجينة ذهبية.',opts:[{en:'Extra Pepperoni',ar:'بيبروني إضافي',p:12}]},
+  {id:23,cat:'calzone',em:'🫓',pr:95,cal:800,r:4.9,tm:'25-35',badge:'Best Seller',fav:1,en:'Special Calzone',ar:'كالزوني سبيشال',de:'Chicken, beef, mushrooms and 4-cheese.',da:'دجاج ولحمة ومشروم وخليط 4 جبن.',opts:[{en:'Extra Filling',ar:'حشوة إضافي',p:15}]},
+  {id:24,cat:'calzone',em:'🫓',pr:75,cal:670,r:4.5,tm:'20-30',badge:'',en:'Tuna Calzone',ar:'كالزوني تونة',de:'Tuna, olives, onions and mozzarella.',da:'تونة وزيتون وبصل وموزاريلا.',opts:[]},
+  {id:25,cat:'calzone',em:'🫓',pr:65,cal:580,r:4.7,tm:'18-25',badge:'Sweet 🍫',en:'Nutella Calzone',ar:'كالزوني نوتيلا',de:'Sweet Nutella with strawberry and banana.',da:'نوتيلا مع فراولة وموز.',opts:[{en:'Extra Nutella',ar:'نوتيلا إضافي',p:8}]},
+  // CREPE
+  {id:26,cat:'crepe',em:'🥞',pr:35,cal:420,r:4.8,tm:'8-12',badge:'Best Seller',fav:1,en:'Nutella Crepe',ar:'كريب نوتيلا',de:'Warm crepe with Nutella and banana.',da:'كريب دافي بنوتيلا وموز.',opts:[{en:'Add Banana',ar:'موز إضافي',p:5},{en:'Add Strawberry',ar:'فراولة إضافي',p:7}]},
+  {id:27,cat:'crepe',em:'🥞',pr:38,cal:380,r:4.7,tm:'8-12',badge:'',en:'Strawberry Crepe',ar:'كريب فراولة',de:'Fresh strawberries, cream cheese and honey.',da:'فراولة طازجة وكريم جبن وعسل.',opts:[{en:'Extra Strawberry',ar:'فراولة إضافي',p:7}]},
+  {id:28,cat:'crepe',em:'🥞',pr:42,cal:450,r:4.6,tm:'10-15',badge:'',en:'Chicken Crepe',ar:'كريب دجاج',de:'Grilled chicken, mushrooms and cream sauce.',da:'دجاج مشوي ومشروم وكريم ساوس.',opts:[{en:'Extra Chicken',ar:'دجاج إضافي',p:12}]},
+  {id:29,cat:'crepe',em:'🥞',pr:45,cal:470,r:4.7,tm:'10-15',badge:'',en:'Mixed Crepe',ar:'كريب مكس',de:'Chicken, mushrooms, cheese and special sauce.',da:'دجاج ومشروم وجبن وصلصة خاصة.',opts:[]},
+  {id:30,cat:'crepe',em:'🥞',pr:40,cal:440,r:4.9,tm:'8-12',badge:'Popular',fav:1,en:'Lotus Crepe',ar:'كريب لوتس',de:'Lotus biscoff with cream and caramel.',da:'لوتس مع كريمة وكراميل.',opts:[{en:'Extra Lotus',ar:'لوتس إضافي',p:8}]},
+  {id:31,cat:'crepe',em:'🥞',pr:36,cal:390,r:4.6,tm:'8-12',badge:'',en:'Mango Crepe',ar:'كريب مانجو',de:'Fresh mango and cream.',da:'مانجو طازجة وكريمة.',opts:[]},
+  {id:32,cat:'crepe',em:'🥞',pr:37,cal:410,r:4.5,tm:'8-12',badge:'',en:'Caramel Crepe',ar:'كريب كراميل',de:'Creamy caramel sauce with vanilla cream.',da:'كراميل كريمي مع فانيليا.',opts:[{en:'Add Nuts',ar:'مكسرات إضافي',p:5}]},
+  {id:33,cat:'crepe',em:'🥞',pr:40,cal:430,r:4.5,tm:'10-15',badge:'',en:'Tuna Crepe',ar:'كريب تونة',de:'Tuna, tomatoes, cheese and mayo.',da:'تونة وطماطم وجبن ومايو.',opts:[]},
+  {id:34,cat:'crepe',em:'🥞',pr:32,cal:360,r:4.4,tm:'7-10',badge:'',en:'Cheese Crepe',ar:'كريب جبن',de:'Melted mozzarella and cheddar in warm crepe.',da:'موزاريلا وشيدر في كريب دافي.',opts:[{en:'Add Honey',ar:'عسل إضافي',p:4}]},
+  {id:35,cat:'crepe',em:'🥞',pr:48,cal:490,r:4.8,tm:'10-15',badge:'Chef Special',en:'Special Mixed Crepe',ar:'كريب مكس سبيشال',de:'Chicken, cheese, mushrooms and secret sauce.',da:'دجاج وجبن ومشروم وصلصة سرية.',opts:[{en:'Extra Sauce',ar:'صلصة إضافي',p:5}]},
+  // ROLL
+  {id:36,cat:'roll',em:'🌯',pr:45,cal:520,r:4.7,tm:'10-18',badge:'Popular',fav:1,en:'Chicken Roll',ar:'رول دجاج',de:'Grilled chicken, garlic sauce, lettuce and pickles.',da:'دجاج مشوي وثوم وخس ومخلل.',opts:[{en:'Extra Garlic',ar:'ثوم إضافي',p:5}]},
+  {id:37,cat:'roll',em:'🌯',pr:52,cal:560,r:4.7,tm:'12-20',badge:'',en:'Beef Roll',ar:'رول لحمة',de:'Seasoned beef strips, cheese and special sauce.',da:'شرائح لحمة وجبن وصلصة خاصة.',opts:[{en:'Extra Beef',ar:'لحمة إضافي',p:15}]},
+  {id:38,cat:'roll',em:'🌯',pr:58,cal:490,r:4.8,tm:'12-20',badge:'',en:'Shrimp Roll',ar:'رول جمبري',de:'Crispy shrimp, coleslaw and tartare.',da:'جمبري مقرمش وكولسلو وتارتار.',opts:[{en:'Extra Shrimp',ar:'جمبري إضافي',p:18}]},
+  {id:39,cat:'roll',em:'🌯',pr:38,cal:420,r:4.5,tm:'8-14',badge:'Veggie 🌱',en:'Falafel Roll',ar:'رول فلافل',de:'Crispy falafel, tahini and tomatoes.',da:'فلافل وطحينة وطماطم.',opts:[]},
+  {id:40,cat:'roll',em:'🌯',pr:42,cal:460,r:4.5,tm:'8-14',badge:'',en:'Tuna Roll',ar:'رول تونة',de:'Tuna, lettuce, tomatoes and mayo.',da:'تونة وخس وطماطم ومايو.',opts:[]},
+  {id:41,cat:'roll',em:'🌯',pr:50,cal:540,r:4.7,tm:'12-20',badge:'',en:'Kofta Roll',ar:'رول كفتة',de:'Grilled kofta, garlic yogurt and vegetables.',da:'كفتة مشوية وزبادي ثوم.',opts:[{en:'Extra Kofta',ar:'كفتة إضافي',p:15}]},
+  {id:42,cat:'roll',em:'🌯',pr:48,cal:510,r:4.6,tm:'10-18',badge:'',en:'Caesar Chicken Roll',ar:'رول دجاج سيزر',de:'Grilled chicken, parmesan and caesar dressing.',da:'دجاج وبارميزان وصلصة سيزر.',opts:[]},
+  {id:43,cat:'roll',em:'🌯',pr:60,cal:580,r:4.9,tm:'12-20',badge:'Best Seller',fav:1,en:'SPARK Special Roll',ar:'رول سبارك',de:'Chicken + kofta + cheese + special sauce.',da:'دجاج وكفتة وجبن وصلصة سرية.',opts:[{en:'Extra Sauce',ar:'صلصة إضافي',p:5}]},
+  // FRIES
+  {id:44,cat:'fries',em:'🍟',pr:25,cal:340,r:4.5,tm:'7-12',badge:'',en:'Classic Fries',ar:'بطاطس عادية',de:'Golden crispy fries, lightly salted.',da:'بطاطس ذهبية مقرمشة.',opts:[{en:'Add Sauce',ar:'صلصة إضافي',p:5}]},
+  {id:45,cat:'fries',em:'🍟',pr:55,cal:580,r:4.9,tm:'10-18',badge:'Best Seller',fav:1,en:'SPARK Loaded Fries',ar:'بطاطس سبارك',de:'Fries with cheese sauce, chicken and jalapeños.',da:'بطاطس بصلصة جبن ودجاج وهالبينو.',opts:[{en:'Extra Cheese Sauce',ar:'صلصة جبن إضافي',p:8}]},
+  {id:46,cat:'fries',em:'🍟',pr:35,cal:420,r:4.7,tm:'8-14',badge:'',en:'Cheese Fries',ar:'بطاطس جبن',de:'Crispy fries with melted cheese sauce.',da:'بطاطس مع صلصة جبن مذابة.',opts:[{en:'Extra Cheese',ar:'جبن إضافي',p:8}]},
+  {id:47,cat:'fries',em:'🍟',pr:28,cal:360,r:4.6,tm:'7-12',badge:'🌶️ Hot',en:'Spicy Fries',ar:'بطاطس حارة',de:'Seasoned fries with spicy blend.',da:'بطاطس بخلطة سبارك الحارة.',opts:[]},
+  {id:48,cat:'fries',em:'🍟',pr:45,cal:500,r:4.7,tm:'10-18',badge:'',en:'Chicken Fries',ar:'بطاطس دجاج',de:'Fries with grilled chicken and garlic sauce.',da:'بطاطس مع دجاج مشوي وثوم.',opts:[{en:'Extra Garlic',ar:'ثوم إضافي',p:5}]},
+  {id:49,cat:'fries',em:'🍟',pr:30,cal:380,r:4.5,tm:'10-16',badge:'',en:'Wedge Fries',ar:'ويدج فراي',de:'Thick cut wedge fries, seasoned.',da:'بطاطس ويدج سميكة ومتبلة.',opts:[]},
+  {id:50,cat:'fries',em:'🍟',pr:60,cal:620,r:4.8,tm:'12-20',badge:'Combo 🔥',fav:1,en:'Mixed Fries Plate',ar:'طبق بطاطس مكس',de:'Classic + cheese + spicy fries combo.',da:'عادية وجبن وحارة.',opts:[]},
+  // EXTRAS
+  {id:51,cat:'extras',em:'🧀',pr:35,cal:380,r:4.8,tm:'8-12',badge:'Popular',fav:1,en:'Mozzarella Sticks',ar:'موزاريلا ستيكس',de:'Golden mozzarella sticks with marinara.',da:'موزاريلا مقرمشة ذهبية مع مارينارا.',opts:[{en:'Extra Sauce',ar:'صلصة إضافي',p:5}]},
+  {id:52,cat:'extras',em:'🥖',pr:22,cal:280,r:4.6,tm:'5-8',badge:'',en:'Garlic Bread',ar:'خبز بالثوم',de:'Toasted garlic butter bread.',da:'خبز محمص بالثوم والزبدة.',opts:[{en:'Add Cheese',ar:'جبن إضافي',p:8}]},
+  {id:53,cat:'extras',em:'🍗',pr:45,cal:450,r:4.7,tm:'12-18',badge:'',en:'Chicken Wings',ar:'أجنحة دجاج',de:'Crispy wings in SPARK sauce.',da:'أجنحة مقرمشة بصلصة سبارك.',opts:[]},
+  {id:54,cat:'extras',em:'🥔',pr:28,cal:320,r:4.5,tm:'10-16',badge:'',en:'Potato Wedges',ar:'بطاطس ويدج',de:'Seasoned potato wedges.',da:'ويدج متبلة.',opts:[]},
+  {id:55,cat:'extras',em:'🧅',pr:25,cal:300,r:4.5,tm:'8-12',badge:'',en:'Onion Rings',ar:'حلقات بصل',de:'Crispy battered onion rings.',da:'حلقات بصل مقرمشة.',opts:[]},
+  {id:56,cat:'extras',em:'🌶️',pr:30,cal:350,r:4.6,tm:'8-12',badge:'🌶️ Hot',en:'Jalapeño Poppers',ar:'هالبينو بوبرز',de:'Cream cheese stuffed jalapeños, fried.',da:'هالبينو محشو كريم جبن مقلي.',opts:[]},
+  {id:57,cat:'extras',em:'🍅',pr:28,cal:240,r:4.4,tm:'5-8',badge:'',en:'Bruschetta',ar:'بروسكيتا',de:'Toasted bread with tomatoes and basil.',da:'خبز محمص بطماطم وريحان.',opts:[]},
+  {id:58,cat:'extras',em:'🥟',pr:32,cal:330,r:4.6,tm:'8-14',badge:'',en:'Spring Rolls',ar:'سبرينج رول',de:'Crispy vegetable spring rolls.',da:'سبرينج رول خضروات.',opts:[]},
+  {id:59,cat:'extras',em:'🧀',pr:30,cal:340,r:4.7,tm:'8-12',badge:'',en:'Cheese Balls',ar:'كرات جبن',de:'Crispy cheese balls with mozzarella inside.',da:'كرات جبن محشية موزاريلا.',opts:[]},
+  {id:60,cat:'extras',em:'🌽',pr:35,cal:400,r:4.5,tm:'6-10',badge:'',en:'Nachos',ar:'ناتشوز',de:'Nachos with cheese sauce and jalapeños.',da:'ناتشوز بصلصة جبن وهالبينو.',opts:[]},
+  {id:61,cat:'extras',em:'🥟',pr:25,cal:280,r:4.5,tm:'6-10',badge:'',en:'Samosa',ar:'سمبوسك',de:'Crispy fried samosa.',da:'سمبوسك مقلي.',opts:[]},
+  {id:62,cat:'extras',em:'🦐',pr:50,cal:390,r:4.8,tm:'10-16',badge:'',en:'Shrimp Bites',ar:'قطع جمبري',de:'Crispy shrimp bites with tartar.',da:'قطع جمبري مقرمشة مع تارتار.',opts:[]},
+  {id:63,cat:'extras',em:'🌽',pr:20,cal:210,r:4.4,tm:'8-14',badge:'',en:'Grilled Corn',ar:'ذرة مشوية',de:'Grilled corn with butter.',da:'ذرة مشوية بالزبدة.',opts:[]},
+  {id:64,cat:'extras',em:'🌽',pr:50,cal:520,r:4.7,tm:'8-12',badge:'Best Seller',en:'Loaded Nachos Plate',ar:'ناتشوز لودد',de:'Full nachos with chicken, cheese and guac.',da:'ناتشوز كامل بدجاج وجبن وجواكمولي.',opts:[]},
+  {id:65,cat:'extras',em:'🥖',pr:18,cal:240,r:4.3,tm:'3-5',badge:'',en:'Bread Basket',ar:'سلة خبز',de:'Assorted bread with garlic butter.',da:'تشكيلة خبز مع زبدة ثوم.',opts:[]},
+  // DRINKS
+  {id:66,cat:'drinks',em:'🍊',pr:28,cal:120,r:4.8,tm:'3-5',badge:'Fresh',en:'Fresh Orange Juice',ar:'عصير برتقال طازج',de:'Freshly squeezed orange juice.',da:'برتقال معصور طازج.',opts:[]},
+  {id:67,cat:'drinks',em:'🥭',pr:30,cal:150,r:4.8,tm:'3-5',badge:'',en:'Mango Juice',ar:'عصير مانجو',de:'Fresh mango blended to perfection.',da:'مانجو طازجة ممزوجة.',opts:[]},
+  {id:68,cat:'drinks',em:'🍋',pr:25,cal:80,r:4.9,tm:'3-5',badge:'Refreshing',fav:1,en:'Lemon Mint',ar:'ليمون بالنعناع',de:'Refreshing lemon mint, cold and zesty.',da:'ليمون بالنعناع منعش وبارد.',opts:[{en:'Extra Mint',ar:'نعناع إضافي',p:3}]},
+  {id:69,cat:'drinks',em:'🧃',pr:32,cal:180,r:4.9,tm:'3-5',badge:'Special',fav:1,en:'SPARK Special Drink',ar:'مشروب سبارك',de:'Our secret blend — fruity and fresh.',da:'خلطتنا السرية فاكهية وطازجة.',opts:[]},
+];
+
+// ══════════════════ TRANSLATIONS ══════════════════
+const TR={
+  en:{lb:'🌐 AR',nH:'Home',nM:'Menu',nA:'About',nC:'Cart',nO:'Order Now',dH:'🏠 Home',dM:'🍽️ Menu',dA:'⭐ About',dO:'Order Now',
+    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'Bold flavors fired with passion. Every dish crafted to ignite your senses.',
+    hB1:'🔥 Explore Menu',hB2:'Browse Categories',hs1:'Rating',hs2:'Customers',hs3:'Items',hs4:'Delivery',
+    ti1:'🔥 FREE DELIVERY OVER 200 EGP',ti2:'⚡ CODE: SPARK20 → 20% OFF',ti3:'🍕 NEW CALZONE NOW AVAILABLE!',ti4:'🎉 OPEN DAILY 2PM – 2AM',
+    bsL:'🏆 Most Ordered',bsT:'OUR BEST SELLER!',bsS:'Loved by thousands — signature pizza with fresh toppings and melted cheese.',bsB:'Order Now →',
+    hML:'Hand Picked',hMT:'POPULAR',hSA:'See all →',
+    ftD:'Ignite your taste with bold flavors. More than a restaurant.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
+    cL:'Browse By',cT:'CATEGORIES',mL:'Hand Picked',mT:'ALL MEALS',cu:'items',
+    cTtl:'🛒 MY CART',ce:'Cart is empty',ces:'Add some delicious items!',pp:'Enter Promo Code',ab:'Apply',sub:'Subtotal',del:'Delivery',tot:'Total',fd:'FREE',am:(n)=>`Add ${n} EGP for free delivery!`,chb:'🚀 Proceed To Checkout',
+    po:'🎉 20% discount applied!',pf:'❌ Invalid promo code',ad:(n)=>`🔥 ${n} added to cart!`,addB:'+ Add',cu2:'Cal',ot:'Additional Options:',tl:'Total:',acb:'🛒 Add to Cart',clb:'Close',
+    coTtl:'CHECKOUT',shl:'📍 Shipping Address',aad:'+ Add address',pyl:'💳 Payment Method',sul:'📋 Order Summary',
+    an:'Home',ad2:'Awlad Saqr, El Bahr St.',wn:'Work',wd:'Enter your address',p1:'💵 Cash on Delivery',p2:'💳 Credit Card',p3:'📱 E-Wallet',cfb:'🎉 Confirm Order',
+    scT:'ORDER CONFIRMED!',scS:'Your order is on the way. Estimated: <strong style="color:var(--or)">25–35 min</strong>.<br><br>Thank you for choosing SPARK 🔥',bkb:'Back to Home',
+    abBdg:'⭐ Our Story',abH1:'ABOUT <span>SPARK</span>',abHT:'SPARK is not just a restaurant — it is a complete experience. The result of hard work and dedication.',
+    ac1T:'PASSION',ac1P:'Every dish made with love. We put our heart into every item on the menu.',ac2T:'FRESH',ac2P:'Only the freshest ingredients. Quality is never compromised.',ac3T:'EXPERIENCE',ac3P:'From first bite to last — an experience you will never forget.',
+    stL:'Our Journey',stH:'A Long Road of Effort & Passion',stP1:'SPARK started as a dream — to create food that ignites the senses. Built from scratch with love.',stP2:'Today we serve thousands with a growing menu. Every product is real passion.',
+    ast1:'Happy Customers',ast2:'Menu Items',ast3:'Avg Rating',ast4:'Big Goal',coL:'Find Us',coT:'CONTACT',
+    co1T:'Address',co1P:'Awlad Saqr - El Sharqia - El Bahr St. - next to Old Othman Pharmacy',co2T:'Phone',co3T:'Working Hours',co3P:'Daily: 2PM – 2AM | Ramadan: 9PM – 4AM'},
+  ar:{lb:'🌐 EN',nH:'الرئيسية',nM:'القائمة',nA:'عن سبارك',nC:'سلتي',nO:'اطلب الآن',dH:'🏠 الرئيسية',dM:'🍽️ القائمة',dA:'⭐ عن سبارك',dO:'اطلب الآن',
+    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'نكهات جريئة مصنوعة بعشق. كل صنف في سبارك بيشعل حواسك.',
+    hB1:'🔥 استعرض القائمة',hB2:'تصفح الأقسام',hs1:'التقييم',hs2:'عميل',hs3:'صنف',hs4:'توصيل',
+    ti1:'🔥 توصيل مجاني فوق 200 جنيه',ti2:'⚡ كود SPARK20 خصم 20%',ti3:'🍕 كالزوني الجديد متاح الآن!',ti4:'🎉 مفتوح 2م – 2ص يومياً',
+    bsL:'🏆 الأكثر طلباً',bsT:'!الأكثر مبيعاً',bsS:'محبوب من آلاف الزباين. بيتزا سبارك بتوبينج خاص وجبن مذاب.',bsB:'← اطلب الآن',
+    hML:'مختارة بعناية',hMT:'الأشهر',hSA:'← عرض الكل',
+    ftD:'أشعل ذوقك بنكهات جريئة. إحنا مش مجرد مطعم.',ftH1:'روابط سريعة',ftH2:'الأقسام',ftH3:'تواصل',fl1:'الرئيسية',fl2:'القائمة',fl3:'عن سبارك',ftC:'.© 2025 مطعم سبارك. جميع الحقوق محفوظة',
+    cL:'تصفح حسب',cT:'الأقسام',mL:'مختارة بعناية',mT:'كل الأصناف',cu:'صنف',
+    cTtl:'🛒 سلتي',ce:'سلتك فاضية',ces:'ضيف أصناف لذيذة!',pp:'كود الخصم',ab:'تطبيق',sub:'الإجمالي',del:'التوصيل',tot:'الإجمالي الكلي',fd:'مجاني',am:(n)=>`ضيف ${n} جنيه للتوصيل المجاني!`,chb:'🚀 إتمام الطلب',
+    po:'🎉 تم تطبيق خصم 20%!',pf:'❌ كود خاطئ',ad:(n)=>`🔥 ${n} أضيف للسلة!`,addB:'+ أضف',cu2:'سعرة',ot:':خيارات إضافية',tl:':الإجمالي',acb:'🛒 أضف للسلة',clb:'إغلاق',
+    coTtl:'إتمام الطلب',shl:'📍 عنوان التوصيل',aad:'+ إضافة عنوان',pyl:'💳 طريقة الدفع',sul:'📋 ملخص الطلب',
+    an:'المنزل',ad2:'أولاد صقر، شارع البحر',wn:'العمل',wd:'أدخل عنوانك',p1:'💵 كاش عند الاستلام',p2:'💳 بطاقة ائتمان',p3:'📱 محفظة إلكترونية',cfb:'🎉 تأكيد الطلب',
+    scT:'!تم تأكيد طلبك',scS:'طلبك في الطريق. الوقت المتوقع: <strong style="color:var(--or)">25–35 دقيقة</strong>.<br><br>شكراً لاختيارك سبارك 🔥',bkb:'العودة للرئيسية',
+    abBdg:'⭐ قصتنا',abH1:'عن <span>سبارك</span>',abHT:'سبارك مش مجرد مطعم — هو تجربة كاملة. وتاج لرحلة كبيرة من المجهود والتعب.',
+    ac1T:'شغف',ac1P:'كل صنف بنعمله بحب ومجهود. بنحط قلبنا في كل حاجة على القائمة.',ac2T:'طازج',ac2P:'بس المكونات الأطزج اللي بتوصل لطبقك. الجودة مبتتنازلش عليها.',ac3T:'تجربة',ac3P:'من أول لقمة لآخر لقمة — تجربة أكل مش هتنساها.',
+    stL:'رحلتنا',stH:'طريق طويل من المجهود والشغف',stP1:'سبارك بدأ كحلم — نعمل أكل بيشعل الحواس. اتبنى من الصفر بحب وسهر.',stP2:'النهارده بنخدم آلاف الزباين بقائمة بتكبر باستمرار.',
+    ast1:'عميل سعيد',ast2:'صنف متاح',ast3:'متوسط التقييم',ast4:'هدف كبير',coL:'تواصل معنا',coT:'اتصل بنا',
+    co1T:'العنوان',co1P:'أولاد صقر - الشرقية - شارع البحر - بجوار صيدلية عثمان القديمة',co2T:'التليفون',co3T:'ساعات العمل',co3P:'يومياً: 2م – 2ص | رمضان: 9م – 4ص'},
+};
+let L='en', theme='dark', cat='all', curPg='home';
+let cart=[], favs=new Set(MEALS.filter(m=>m.fav).map(m=>m.id));
+let cMeal=null, dQ=1, sOpts={}, selA='home', selP='cash';
+function T(k,...a){const v=TR[L][k];return typeof v==='function'?v(...a):(v!=null?v:k);}
+
+// ── Pages ──
+function gp(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nlinks a').forEach(a=>a.classList.remove('act'));
+  if(el)el.classList.add('act');
+  else{const map={home:'nH',pgMenu:'nM',pgAbout:'nA'};const x=document.getElementById(map[id]);if(x)x.classList.add('act');}
+  curPg=id; window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='pgMenu'){rCats();rMeals(cat);}
+  if(id==='home'){rHome();}
+  cd();
+}
+// ── Theme ──
+function tTheme(){
+  theme=theme==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',theme);
+  const ic=theme==='dark'?'🌙':'☀️';
+  document.getElementById('tLbl').textContent=ic;
+  document.getElementById('tTh').textContent=ic;
+}
+// ── Lang ──
+function tLang(){
+  L=L==='en'?'ar':'en';
+  document.documentElement.setAttribute('lang',L);
+  document.documentElement.setAttribute('data-lang',L);
+  apTR();
+  if(curPg==='pgMenu'){rCats();rMeals(cat);}
+  if(curPg==='home'){rHome();}
+  rCart();
+}
+function apTR(){
+  const ids=['langBtn:lb','nH:nH','nM:nM','nA:nA','nC:nC','nO:nO','dH:dH','dM:dM','dA:dA','dO:dO',
+    'hBd:hBd','hSb:hSb','hB1:hB1','hB2:hB2','hs1:hs1','hs2:hs2','hs3:hs3','hs4:hs4',
+    'ti1:ti1','ti2:ti2','ti3:ti3','ti4:ti4','bsL:bsL','bsT:bsT','bsS:bsS','bsB:bsB',
+    'hML:hML','hMT:hMT','hSA:hSA','ftD:ftD','ftH1:ftH1','ftH2:ftH2','ftH3:ftH3','fl1:fl1','fl2:fl2','fl3:fl3','ftC:ftC',
+    'cL:cL','cT:cT','mL:mL','mT:mT','cTtl:cTtl',
+    'abBdg:abBdg','abHT:abHT','ac1T:ac1T','ac1P:ac1P','ac2T:ac2T','ac2P:ac2P','ac3T:ac3T','ac3P:ac3P',
+    'stL:stL','stH:stH','stP1:stP1','stP2:stP2','ast1:ast1','ast2:ast2','ast3:ast3','ast4:ast4',
+    'coL:coL','coT:coT','co1T:co1T','co1P:co1P','co2T:co2T','co3T:co3T','co3P:co3P'];
+  ids.forEach(x=>{const[id,k]=x.split(':');const el=document.getElementById(id);if(el)el.textContent=T(k);});
+  const h=document.getElementById('hH1');if(h)h.innerHTML=T('hH1');
+  const ah=document.getElementById('abH1');if(ah)ah.innerHTML=T('abH1');
+}
+// ── Drawer ──
+function tDrawer(){document.getElementById('drw').classList.toggle('open');document.getElementById('hbg').classList.toggle('open');}
+function cd(){document.getElementById('drw').classList.remove('open');document.getElementById('hbg').classList.remove('open');}
+// ── Home ──
+function rHome(){const g=document.getElementById('homeGrid');if(!g)return;g.innerHTML=MEALS.filter(m=>favs.has(m.id)).slice(0,6).map(mC).join('');}
+// ── Cats ──
+function rCats(){const g=document.getElementById('catsGrid');if(!g)return;g.innerHTML=CATS.map(c=>`<div class="cc${cat===c.id?' active':''}" onclick="fC('${c.id}',this)"><span class="cem">${c.em}</span><div class="cnm">${L==='en'?c.en:c.ar}</div><div class="cct">${c.cnt} ${T('cu')}</div></div>`).join('');}
+function fC(id,el){cat=id;document.querySelectorAll('.cc').forEach(c=>c.classList.remove('active'));el.classList.add('active');rMeals(id);document.getElementById('mealsGrid')?.scrollIntoView({behavior:'smooth',block:'start'});}
+// ── Meal Card ──
+function mC(m){
+  const nm=L==='en'?m.en:m.ar;
+  const ds=(L==='en'?m.de:m.da).slice(0,62)+'...';
+  return `<div class="mc" onclick="openD(${m.id})">
+  <div class="mimg">
+    ${m.badge?`<div class="mbdg">${m.badge}</div>`:''}
+    <div class="mfv${favs.has(m.id)?' fav':''}" onclick="event.stopPropagation();tFav(${m.id},this)">${favs.has(m.id)?'❤️':'🤍'}</div>
+    ${m.em}
+  </div>
+  <div class="mbdy">
+    <div class="mnm">${nm}</div>
+    <div class="mds">${ds}</div>
+    <div class="mmeta"><div class="mp">🔥${m.cal}${T('cu2')}</div><div class="mp">⭐${m.r}</div><div class="mp">⏱${m.tm}m</div></div>
+    <div class="mft">
+      <div class="mpr">${m.pr}<small> EGP</small></div>
+      <button class="badd" onclick="event.stopPropagation();addC(${m.id})">${T('addB')}</button>
+    </div>
+  </div></div>`;}
+function rMeals(c){const g=document.getElementById('mealsGrid');if(!g)return;const list=c==='all'?MEALS:MEALS.filter(m=>m.cat===c);g.innerHTML=list.map(mC).join('');const cnt=document.getElementById('mCnt');if(cnt)cnt.textContent=list.length+' '+T('cu');}
+function tFav(id,el){if(favs.has(id)){favs.delete(id);el.textContent='🤍';el.classList.remove('fav');}else{favs.add(id);el.textContent='❤️';el.classList.add('fav');}}
+// ── Cart ──
+function addC(id,qty=1){const m=MEALS.find(x=>x.id===id);const ex=cart.find(c=>c.id===id);if(ex)ex.qty+=qty;else cart.push({...m,qty});updB();showT(T('ad',L==='en'?m.en:m.ar));rCart();}
+function remC(id){cart=cart.filter(c=>c.id!==id);updB();rCart();}
+function chQ(id,d){const it=cart.find(c=>c.id===id);if(!it)return;it.qty+=d;if(it.qty<=0)remC(id);else{updB();rCart();}}
+function updB(){document.getElementById('cBdg').textContent=cart.reduce((s,c)=>s+c.qty,0);}
+function cTot(){return cart.reduce((s,c)=>s+c.pr*c.qty,0);}
+function rCart(){
+  const list=document.getElementById('cList'),bot=document.getElementById('cBot');
+  if(!cart.length){list.innerHTML=`<div style="text-align:center;padding:44px 14px;color:var(--muted)"><div style="font-size:3.2rem;margin-bottom:11px">🛒</div><div style="font-weight:600;margin-bottom:4px">${T('ce')}</div><div style="font-size:.74rem">${T('ces')}</div></div>`;bot.innerHTML='';return;}
+  list.innerHTML=cart.map(it=>`<div class="ci"><div class="ciem">${it.em}</div><div class="ciin"><div class="cinm">${L==='en'?it.en:it.ar}</div><div class="cipr">${it.pr*it.qty} EGP</div></div><div class="qcl"><button class="qb" onclick="chQ(${it.id},-1)">−</button><span class="qn">${it.qty}</span><button class="qb" onclick="chQ(${it.id},1)">+</button></div></div>`).join('');
+  const sub=cTot(),del=sub>=200?0:15;
+  bot.innerHTML=`<div class="prow"><input type="text" placeholder="${T('pp')}" id="pIn"><button class="bap" onclick="apPr()">${T('ab')}</button></div>
+  <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div>${sub&&del?`<div style="font-size:.66rem;color:var(--or);margin-bottom:4px">${T('am',200-sub)}</div>`:''}<div class="stot"><span>${T('tot')}</span><span class="totp">${sub+del} EGP</span></div></div>
+  <button class="bco" onclick="openCO()">${T('chb')}</button>`;}
+function apPr(){const v=document.getElementById('pIn')?.value;showT(v?.toUpperCase()==='SPARK20'?T('po'):T('pf'));}
+function tCart(){document.getElementById('cOv').classList.toggle('open');document.getElementById('cSb').classList.toggle('open');rCart();}
+// ── Detail ──
+function openD(id){cMeal=MEALS.find(m=>m.id===id);if(!cMeal)return;dQ=1;sOpts={};cMeal.opts.forEach((_,i)=>sOpts[i]=true);document.getElementById('dMod').innerHTML='<div class="dbar"></div>'+bldD();document.getElementById('dOv').classList.add('open');}
+function bldD(){const m=cMeal,nm=L==='en'?m.en:m.ar,ds=L==='en'?m.de:m.da;const oT=m.opts.reduce((s,o,i)=>s+(sOpts[i]?o.p:0),0);const tot=(m.pr+oT)*dQ;
+return `<div class="dim"><div class="dfv" onclick="tFav(${m.id},this)">${favs.has(m.id)?'❤️':'🤍'}</div>${m.em}</div>
+<div class="dbdy"><div class="dtop"><div class="dnm">${nm}</div><div class="dqc"><button class="qb" onclick="dQch(-1)">−</button><span class="qn" id="dQEl">${dQ}</span><button class="qb" onclick="dQch(1)">+</button></div></div>
+<div class="dpills"><div class="dpill">🔥${m.cal}${T('cu2')}</div><div class="dpill">⭐${m.r}</div><div class="dpill">⏱${m.tm}m</div></div>
+<div class="ddes">${ds}</div>
+${m.opts.length?`<div class="ottl">${T('ot')}</div>`:''}
+${m.opts.map((o,i)=>`<div class="orow"><span class="onm">${L==='en'?o.en:o.ar}</span><div style="display:flex;align-items:center;gap:8px;"><span class="opr">+${o.p} EGP</span><div class="ock${sOpts[i]?' ck':''}" onclick="tO(${i},this)">${sOpts[i]?'✓':''}</div></div></div>`).join('')}
+<div class="dft"><div><div class="dtlb">${T('tl')}</div><div class="dtp" id="dTP">${tot} <small style="font-size:.68rem;font-family:Outfit,Cairo,sans-serif;">EGP</small></div></div>
+<button class="badd" style="padding:9px 16px;" onclick="addC(${m.id},${dQ});closeD()">${T('acb')}</button></div>
+<button onclick="closeD()" style="width:100%;margin-top:8px;background:var(--bg3);border:1px solid var(--bdr);color:var(--muted);padding:9px;border-radius:9px;cursor:pointer;font-family:Outfit,Cairo,sans-serif;font-size:.78rem;">${T('clb')}</button>
+</div>`;}
+function dQch(d){dQ=Math.max(1,dQ+d);document.getElementById('dQEl').textContent=dQ;udT();}
+function tO(i,el){sOpts[i]=!sOpts[i];el.classList.toggle('ck');el.textContent=sOpts[i]?'✓':'';udT();}
+function udT(){if(!cMeal)return;const oT=cMeal.opts.reduce((s,o,i)=>s+(sOpts[i]?o.p:0),0);const el=document.getElementById('dTP');if(el)el.innerHTML=`${(cMeal.pr+oT)*dQ} <small style="font-size:.68rem;font-family:Outfit,Cairo,sans-serif;">EGP</small>`;}
+function closeD(){document.getElementById('dOv').classList.remove('open');}
+// ── Checkout ──
+function openCO(){
+  if(!cart.length){showT('❌ '+T('ce'));return;}
+  tCart();
+  const sub=cTot(),del=sub>=200?0:15,tot=sub+del;
+  document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
+  <div class="cohd"><div class="cottl">${T('coTtl')}</div><button class="ccl" onclick="closeCO()">✕</button></div>
+  <div class="cobdy">
+  <div class="coslb">${T('shl')} <a href="#" style="color:var(--or);font-size:.68rem;margin-inline-start:7px;">${T('aad')}</a></div>
+  <div class="adc${selA==='home'?' sel':''}" onclick="sA('home',this)"><div class="adic">🏠</div><div><div class="adt">${T('an')}</div><div class="add">${T('ad2')}</div></div></div>
+  <div class="adc${selA==='work'?' sel':''}" onclick="sA('work',this)"><div class="adic">💼</div><div><div class="adt">${T('wn')}</div><div class="add">${T('wd')}</div></div></div>
+  <div class="coslb" style="margin-top:12px;">${T('pyl')}</div>
+  <div class="popt${selP==='cash'?' sel':''}" onclick="sP('cash',this)"><div class="popl">${T('p1')}</div><div class="radio"><div class="rdot"></div></div></div>
+  <div class="popt${selP==='card'?' sel':''}" onclick="sP('card',this)"><div class="popl">${T('p2')}</div><div class="radio"><div class="rdot"></div></div></div>
+  <div class="popt${selP==='wallet'?' sel':''}" onclick="sP('wallet',this)"><div class="popl">${T('p3')}</div><div class="radio"><div class="rdot"></div></div></div>
+  <div class="coslb" style="margin-top:12px;">${T('sul')}</div>
+  <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div><div class="stot"><span>${T('tot')}</span><span class="totp">${tot} EGP</span></div></div>
+  <button class="bco" onclick="confO()">${T('cfb')}</button></div>`;
+  document.getElementById('coOv').classList.add('open');
+}
+function sA(v,el){selA=v;document.querySelectorAll('#coMod .adc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function sP(v,el){selP=v;document.querySelectorAll('#coMod .popt').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
+function confO(){document.getElementById('coMod').innerHTML=`<div class="dbar"></div><div class="scr"><div class="scic">🎉</div><div class="scttl">${T('scT')}</div><div class="scsb">${T('scS')}</div><button class="bprim" style="margin-top:22px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button></div>`;cart=[];updB();}
+function closeCO(){document.getElementById('coOv').classList.remove('open');}
+// ── Toast ──
+function showT(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
+// ── Init ──
+rHome();
+</script>
+</body>
+</html>
