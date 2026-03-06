@@ -103,6 +103,15 @@ export const Users = {
   async save(uid,data){ await setDoc(doc(db,'users',uid),data,{merge:true}); }
 };
 
+// ── FCM TOKENS ────────────────────────────────────
+export const FCMTokens = {
+  async save(uid, token, role, name) {
+    await setDoc(doc(db, 'fcm_tokens', uid), {
+      token, role, name, updatedAt: Date.now()
+    }, { merge: true });
+  }
+};
+
 // ── OFFLINE QUEUE ─────────────────────────────────
 export const OfflineQueue = {
   KEY: 'spark_offline_queue',
