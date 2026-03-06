@@ -1,14 +1,5 @@
 {
   "redirects": [
-    {
-      "source": "/spark-admin.html",
-      "destination": "/admin.html",
-      "permanent": true
-    },
-    {
-      "source": "/spark-restaurant.html",
-      "destination": "/index.html",
-      "permanent": true
-    }
+    { "source": "/spark-admin.html", "destination": "/admin.html", "permanent": true }
   ]
 }

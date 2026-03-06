@@ -303,11 +303,6 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
 <body>
 
 <!-- NAV -->
-<!-- OFFLINE BANNER -->
-<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#c62828;color:#fff;text-align:center;padding:7px;font-size:.78rem;font-weight:700;">
-  📵 أنت أوفلاين — الطلبات ستُحفظ وتُرسل عند عودة النت
-</div>
-
 <nav>
   <div class="logo" onclick="gp('home',document.getElementById('nH'))" style="cursor:pointer;">🔥 SPARK</div>
   <ul class="nlinks" id="nlinks">
@@ -631,12 +626,12 @@ const MEALS=[
 // ══════════════════ TRANSLATIONS ══════════════════
 const TR={
   en:{lb:'🌐 AR',nH:'Home',nM:'Menu',nA:'About',nC:'Cart',nO:'Order Now',dH:'🏠 Home',dM:'🍽️ Menu',dA:'⭐ About',dO:'Order Now',
-    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'FIRE UP YOUR HUNGER 🔥',
+    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'Bold flavors fired with passion. Every dish crafted to ignite your senses.',
     hB1:'🔥 Explore Menu',hB2:'Browse Categories',hs1:'Rating',hs2:'Customers',hs3:'Items',hs4:'Delivery',
     ti1:'🔥 FREE DELIVERY OVER 200 EGP',ti2:'⚡ CODE: SPARK20 → 20% OFF',ti3:'🍕 NEW CALZONE NOW AVAILABLE!',ti4:'🎉 OPEN DAILY 2PM – 2AM',
     bsL:'🏆 Most Ordered',bsT:'OUR BEST SELLER!',bsS:'Loved by thousands — signature pizza with fresh toppings and melted cheese.',bsB:'Order Now →',
     hML:'Hand Picked',hMT:'POPULAR',hSA:'See all →',
-    ftD:'FIRE UP YOUR HUNGER 🔥 — More than a restaurant.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
+    ftD:'Ignite your taste with bold flavors. More than a restaurant.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
     cL:'Browse By',cT:'CATEGORIES',mL:'Hand Picked',mT:'ALL MEALS',cu:'items',
     cTtl:'🛒 MY CART',ce:'Cart is empty',ces:'Add some delicious items!',pp:'Enter Promo Code',ab:'Apply',sub:'Subtotal',del:'Delivery',tot:'Total',fd:'FREE',am:(n)=>`Add ${n} EGP for free delivery!`,chb:'🚀 Proceed To Checkout',
     po:'🎉 20% discount applied!',pf:'❌ Invalid promo code',ad:(n)=>`🔥 ${n} added to cart!`,addB:'+ Add',cu2:'Cal',ot:'Additional Options:',tl:'Total:',acb:'🛒 Add to Cart',clb:'Close',
@@ -649,7 +644,7 @@ const TR={
     ast1:'Happy Customers',ast2:'Menu Items',ast3:'Avg Rating',ast4:'Big Goal',coL:'Find Us',coT:'CONTACT',
     co1T:'Address',co1P:'Awlad Saqr - El Sharqia - El Bahr St. - next to Old Othman Pharmacy',co2T:'Phone',co3T:'Working Hours',co3P:'Daily: 2PM – 2AM | Ramadan: 9PM – 4AM'},
   ar:{lb:'🌐 EN',nH:'الرئيسية',nM:'القائمة',nA:'عن سبارك',nC:'سلتي',nO:'اطلب الآن',dH:'🏠 الرئيسية',dM:'🍽️ القائمة',dA:'⭐ عن سبارك',dO:'اطلب الآن',
-    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'FIRE UP YOUR HUNGER 🔥',
+    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'نكهات جريئة مصنوعة بعشق. كل صنف في سبارك بيشعل حواسك.',
     hB1:'🔥 استعرض القائمة',hB2:'تصفح الأقسام',hs1:'التقييم',hs2:'عميل',hs3:'صنف',hs4:'توصيل',
     ti1:'🔥 توصيل مجاني فوق 200 جنيه',ti2:'⚡ كود SPARK20 خصم 20%',ti3:'🍕 كالزوني الجديد متاح الآن!',ti4:'🎉 مفتوح 2م – 2ص يومياً',
     bsL:'🏆 الأكثر طلباً',bsT:'!الأكثر مبيعاً',bsS:'محبوب من آلاف الزباين. بيتزا سبارك بتوبينج خاص وجبن مذاب.',bsB:'← اطلب الآن',
@@ -872,7 +867,6 @@ function openCO(){
   document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
   <div class="cohd"><div class="cottl">${T('coTtl')}</div><button class="ccl" onclick="closeCO()">✕</button></div>
   <div class="cobdy">
-  ${(()=>{const cartCats=[...new Set(cart.map(c=>c.cat))];const inCart=new Set(cart.map(c=>c.id));const sugg=MEALS.filter(m=>cartCats.includes(m.cat)&&!inCart.has(m.id)&&!m.soldOut).slice(0,4);return sugg.length?`<div style="font-size:.76rem;font-weight:700;color:var(--or);margin-bottom:8px;">⚡ ${L==='ar'?'يعجبك كمان':'You might also like'}</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;margin-bottom:12px;">${sugg.map(m=>`<div onclick="qAdd(${m.id},this);document.getElementById('coOv').classList.remove('open');openCO();" style="min-width:85px;background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:9px 7px;text-align:center;cursor:pointer;flex-shrink:0;">${m.em}<div style="font-size:.62rem;font-weight:700;margin:3px 0 2px">${L==='ar'?m.ar:m.en}</div><div style="font-size:.6rem;color:var(--or);font-weight:700">${m.pr} EGP</div></div>`).join('')}</div>`:'';})()}
   <div class="coslb">${T('shl')} <a href="#" style="color:var(--or);font-size:.68rem;margin-inline-start:7px;">${T('aad')}</a></div>
   <div class="adc${selA==='home'?' sel':''}" onclick="sA('home',this)"><div class="adic">🏠</div><div><div class="adt">${L==='ar'?'المنزل':'Home'}</div><div class="add">${L==='ar'?'التوصيل لمنزلك':'Deliver to my home'}</div></div></div>
   <div class="adc${selA==='custom'?' sel':''}" onclick="sA('custom',this);setTimeout(()=>document.getElementById('customAddrInp')?.focus(),100)"><div class="adic">📍</div><div><div class="adt">${L==='ar'?'عنوان مخصص':'Custom Address'}</div><div class="add">${L==='ar'?'ادخل عنوانك يدوياً':'Enter your address manually'}</div></div></div>
@@ -901,7 +895,7 @@ function openCO(){
     </div>`;
   })()}
   <button class="bco" onclick="confO()">${T('cfb')}</button></div>`;
-  document.getElementById('coOv').classList.add('open');rUpsell();
+  document.getElementById('coOv').classList.add('open');
 }
 function sA(v,el){
   selA=v;
@@ -924,37 +918,13 @@ async function confO(){
     time: new Date().toLocaleString('ar-EG'),
     timestamp: Date.now()
   };
-  // Save to Firebase with order number
-  let orderNum = '';
-  const isOnline = navigator.onLine;
-  const orderPayload = {
-    items: cart.map(c=>({id:c.id, name:L==='ar'?c.ar:c.en, qty:c.qty, price:c.pr, sz:c.szLabel||'', extras:(c.extras||[]).map(e=>e.en||e.ar||'')})),
-    total: order.total, subtotal: order.subtotal, delivery: order.delivery,
-    address: window._tableId?('طاولة '+window._tableId):order.address,
-    tableId: window._tableId||null, payment: selP,
-    promo: activePromo?.code||null, time: order.time, lang: L
-  };
-  if(!isOnline){
-    OfflineQ.push(orderPayload);
-    showT('تم الحفظ محلياً 💾');
-    orderNum = 'OFFLINE';
-  } else {
-    try {
-      const res = await submitOrder(orderPayload);
-      orderNum = '#' + res.orderNumber;
-      try{new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3').play();}catch{}
-    } catch(e){
-      OfflineQ.push(orderPayload);
-      orderNum = 'QUEUED';
-    }
-  }
-  document.getElementById('confNum').textContent = orderNum;
-  const cs = document.getElementById('confScreen');
-  cs.style.opacity='1'; cs.style.pointerEvents='all';
-  cart.splice(0,cart.length); activePromo=null; updB(); closeCO();
-  setTimeout(()=>{cs.style.opacity='0';cs.style.pointerEvents='none';gp('home',document.querySelector('.nlinks li:nth-child(1) a'));},5000);
-  return; // prevent old success screen
-  // Show success (OLD — replaced above)
+  // Save to Firebase
+  try {
+    const {db} = await initFB();
+    const {collection, addDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await addDoc(collection(db,'orders'), order);
+  } catch(e){ console.warn('Firebase error:', e); }
+  // Show success
   document.getElementById('coMod').innerHTML=`<div class="dbar"></div><div class="scr"><div class="scic">🎉</div><div class="scttl">${T('scT')}</div><div class="scsb">${T('scS')}</div><button class="bprim" style="margin-top:22px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button></div>`;
   cart=[];updB();
 }
@@ -1073,272 +1043,13 @@ async function loadProdSizes(){
     });
   }catch(e){console.warn('loadProdSizes:',e);}
 }
-// ── QR TABLE DETECTION ──
-function detectTable(){
-  const t=new URLSearchParams(window.location.search).get('table');
-  if(t){
-    window._tableId=t;
-    const numEl=document.getElementById('qrTableNum');
-    const nameEl=document.getElementById('qrTableName');
-    if(numEl) numEl.textContent=t;
-    if(nameEl) nameEl.textContent='طاولة '+t;
-    // Show QR page
-    document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
-    const qrPg=document.getElementById('pgQr');
-    if(qrPg) qrPg.classList.add('active');
-    window.scrollTo({top:0});
-  }
-}
-
-// ── CALL WAITER ──
-async function callWaiter(){
-  if(!window._tableId) return;
-  try{
-    const {db}=await initFB();
-    const {collection,addDoc,serverTimestamp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await addDoc(collection(db,'waiter_calls'),{
-      tableId:window._tableId, tableName:'طاولة '+window._tableId,
-      timestamp:serverTimestamp(), handled:false
-    });
-    showToast('تم إرسال طلب للنادل ✅');
-  }catch(e){ showToast('خطأ في الاتصال'); }
-}
-window.callWaiter=callWaiter;
-
-// ── OFFLINE MODE ──
-const OfflineQ = {
-  KEY:'spark_offline_queue',
-  push(o){ const q=this.get(); q.push({...o,_at:Date.now()}); localStorage.setItem(this.KEY,JSON.stringify(q)); },
-  get(){ try{return JSON.parse(localStorage.getItem(this.KEY)||'[]');}catch{return[];} },
-  clear(){ localStorage.removeItem(this.KEY); },
-  async flush(){
-    const pending=this.get(); if(!pending.length) return 0;
-    let sent=0;
-    for(const o of pending){ try{ await submitOrder(o); sent++; }catch{} }
-    if(sent===pending.length) this.clear();
-    return sent;
-  }
-};
-
-async function submitOrder(orderData){
-  const {db}=await initFB();
-  const {collection,addDoc,doc,getDoc,setDoc,serverTimestamp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const counterRef=doc(db,'config','orderCounter');
-  const counter=await getDoc(counterRef);
-  const num=(counter.exists()?counter.data().next:1);
-  await setDoc(counterRef,{next:num+1},{merge:true});
-  const ref=await addDoc(collection(db,'orders'),{...orderData,orderNumber:num,timestamp:serverTimestamp(),status:'new'});
-  return {id:ref.id,orderNumber:num};
-}
-
-window.addEventListener('online', async ()=>{
-  document.getElementById('offlineBanner').classList.remove('show');
-  showToast('رجع النت ✅');
-  const sent=await OfflineQ.flush();
-  if(sent) showToast('تم إرسال '+sent+' طلب 📤');
-});
-window.addEventListener('offline',()=>{
-  document.getElementById('offlineBanner').classList.add('show');
-});
-if(!navigator.onLine) document.getElementById('offlineBanner').classList.add('show');
-
-// ── ORDER SUBMIT (override old confO) ──
-const _oldConfO = window.confO;
-window.confO = async function(){
-  // Validate
-  if(!cart.length) return;
-  if(selA==='custom'){
-    const custInp=document.getElementById('custAddrInp');
-    if(custInp&&!custInp.value.trim()){ showToast('⚠️ أدخل عنوانك من فضلك'); return; }
-  }
-  const sub=cart.reduce((s,c)=>s+c.pr*c.qty,0);
-  const disc=activePromo?Math.round(sub*activePromo.disc/100):0;
-  const custInp=document.getElementById('custAddrInp');
-  const orderData={
-    items:cart.map(c=>({id:c.id,name:L==='ar'?c.ar:c.en,qty:c.qty,price:c.pr,sz:c.szLabel||'',extras:(c.extras||[]).map(e=>e.en||e.ar)})),
-    total:sub-disc+20, subtotal:sub, discount:disc, delivery:20,
-    address:window._tableId?('طاولة '+window._tableId):(selA==='custom'?(custInp?.value||''):(L==='ar'?'المنزل':'Home')),
-    tableId:window._tableId||null, payment:selP, promo:activePromo?.code||null,
-    time:new Date().toLocaleTimeString('ar-EG'), lang:L,
-  };
-  // Close sheets
-  document.getElementById('coOv')?.classList.remove('open');
-  document.body.style.overflow='';
-  let orderNum;
-  if(!navigator.onLine){
-    OfflineQ.push(orderData);
-    showToast('تم الحفظ محلياً — سيُرسل عند عودة النت 📵');
-    orderNum='OFFLINE';
-  } else {
-    try{
-      const res=await submitOrder(orderData);
-      orderNum=res.orderNumber;
-    }catch(e){
-      OfflineQ.push(orderData);
-      showToast('تم الحفظ محلياً 💾');
-      orderNum='QUEUED';
-    }
-  }
-  // Show confirm screen
-  document.getElementById('confNum').textContent='#'+orderNum;
-  const cs=document.getElementById('confScreen');
-  cs.style.opacity='1'; cs.style.pointerEvents='all';
-  // Play confirm sound
-  try{new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3').play();}catch{}
-  // Reset cart
-  cart.splice(0,cart.length);
-  activePromo=null;
-  updCartBadge();
-  setTimeout(()=>{ cs.style.opacity='0'; cs.style.pointerEvents='none'; gp('home',document.querySelector('.nlinks li:nth-child(1) a')); },5000);
-};
-
-// ── CART FLY ANIMATION ──
-function flyToCart(srcEl){
-  const cartBtn=document.querySelector('.bcart');
-  if(!srcEl||!cartBtn) return;
-  const from=srcEl.getBoundingClientRect();
-  const to=cartBtn.getBoundingClientRect();
-  const dot=document.createElement('div');
-  dot.style.cssText=`position:fixed;width:12px;height:12px;border-radius:50%;background:var(--or);z-index:9999;pointer-events:none;left:${from.left+from.width/2}px;top:${from.top+from.height/2}px;transition:all .55s cubic-bezier(.4,0,.2,1);`;
-  document.body.appendChild(dot);
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    dot.style.left=to.left+to.width/2+'px';
-    dot.style.top=to.top+to.height/2+'px';
-    dot.style.opacity='0';
-    dot.style.transform='scale(.2)';
-  }));
-  setTimeout(()=>dot.remove(),600);
-}
-
-// ── UPSELL in checkout ──
-function rUpsell(){
-  const cartCats=[...new Set(cart.map(c=>c.cat))];
-  const inCart=new Set(cart.map(c=>c.id));
-  const sugg=MEALS.filter(m=>cartCats.includes(m.cat)&&!inCart.has(m.id)&&!m.soldOut).slice(0,4);
-  const wrap=document.getElementById('upsellRow');
-  if(!wrap) return;
-  if(!sugg.length){wrap.closest('.ups-section')?.remove();return;}
-  wrap.innerHTML=sugg.map(m=>`
-    <div onclick="qAdd(${m.id},this)" style="min-width:90px;background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:9px 7px;text-align:center;cursor:pointer;flex-shrink:0;transition:border-color .2s;" onmouseover="this.style.borderColor='var(--or)'" onmouseout="this.style.borderColor='var(--bdr)'">
-      <div style="font-size:1.5rem">${m.em}</div>
-      <div style="font-size:.65rem;font-weight:700;margin:3px 0 2px;line-height:1.2">${L==='ar'?m.ar:m.en}</div>
-      <div style="font-size:.62rem;color:var(--or);font-weight:700">${m.pr} EGP</div>
-    </div>`).join('');
-}
-
-// Quick add (for upsell) - if sizes exist open drawer
-function qAdd(id,btn){
-  const m=MEALS.find(x=>x.id===id); if(!m||m.soldOut) return;
-  if(PROD_SIZES[id]?.length){openD(m,btn);return;}
-  const key=id+'_def';
-  const ex=cart.find(c=>c.cartKey===key);
-  if(ex) ex.qty+=1; else cart.push({...m,szLabel:'',extras:[],cartKey:key,pr:m.pr,qty:1});
-  try{new Audio('https://www.soundjay.com/buttons/sounds/button-50.mp3').play();}catch{}
-  flyToCart(btn);
-  updCartBadge();
-  showToast('✅ '+(L==='ar'?m.ar:m.en)+' أُضيف للسلة');
-}
-window.qAdd=qAdd;
-
-// ── ORDER TRACKER ──
-let _trackUnsub=null;
-function openTracker(){
-  const num=prompt(L==='ar'?'أدخل رقم طلبك:':'Enter your order number:');
-  if(!num) return;
-  trackOrder(Number(num));
-}
-window.openTracker=openTracker;
-
-async function trackOrder(num){
-  if(_trackUnsub){_trackUnsub();_trackUnsub=null;}
-  const {db}=await initFB();
-  const {query,collection,where,onSnapshot}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const q2=query(collection(db,'orders'),where('orderNumber','==',num));
-  _trackUnsub=onSnapshot(q2,snap=>{
-    if(snap.empty){showToast('الطلب مش موجود');return;}
-    const o={...snap.docs[0].data()};
-    const steps=[
-      {k:'new',ar:'تم الاستلام',en:'Received',ic:'✅'},
-      {k:'preparing',ar:'قيد التحضير',en:'Preparing',ic:'👨‍🍳'},
-      {k:'cooking',ar:'بيتطبخ',en:'Cooking',ic:'🍳'},
-      {k:'ready',ar:'جاهز!',en:'Ready!',ic:'🎉'},
-    ];
-    const si=steps.findIndex(s=>s.k===o.status);
-    const html=`<div style="max-width:400px;margin:0 auto;background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:24px;margin-top:20px;">
-      <div style="font-size:.75rem;color:var(--muted)">رقم الطلب</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--or);">#${o.orderNumber||num}</div>
-      <div style="font-size:.78rem;color:var(--muted);margin-top:2px">${o.address||''}</div>
-      <div style="margin-top:20px;">${steps.map((s,i)=>`
-        <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;position:relative;">
-          ${i<steps.length-1?`<div style="position:absolute;left:12px;top:34px;bottom:0;width:2px;background:${i<si?'var(--or)':'var(--bdr)'};"></div>`:''}
-          <div style="width:26px;height:26px;border-radius:50%;border:2px solid ${i<=si?'var(--or)':'var(--bdr)'};background:${i<=si?'var(--or)':'var(--bg3)'};display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;z-index:1;">${i<=si?s.ic:i+1}</div>
-          <div style="padding-top:2px;">
-            <div style="font-size:.86rem;font-weight:700;color:${i===si?'var(--or)':'var(--txt)'}">${L==='ar'?s.ar:s.en}</div>
-            ${i===si?`<div style="font-size:.7rem;color:var(--muted)">الحالة الحالية</div>`:''}
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-    let trackDiv=document.getElementById('trackResultDiv');
-    if(!trackDiv){
-      trackDiv=document.createElement('div');
-      trackDiv.id='trackResultDiv';
-      document.getElementById('pgHome').appendChild(trackDiv);
-    }
-    trackDiv.innerHTML=html;
-    showToast('تم تحديث حالة الطلب');
-  });
-}
-
 // ── Init ──
-detectTable();
-if(!window._tableId){
-  rHome();
-  loadFromFirebase().then(()=>{
-    loadRamadanConfig();
-    loadSocialConfig();
-  });
-}
+rHome();
+loadFromFirebase().then(()=>{
+  loadRamadanConfig();
+  loadSocialConfig();
+});
 </script>
-
-
-<!-- ═══ QR TABLE PAGE ═══ -->
-<div id="pgQr" class="pg" style="padding-top:70px;">
-  <div style="max-width:500px;margin:0 auto;padding:20px 16px;">
-    <div style="background:linear-gradient(135deg,#FF6B00,#e55e00);color:#fff;border-radius:16px;padding:24px;text-align:center;margin-bottom:20px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;opacity:.85;margin-bottom:4px;">SPARK RESTAURANT</div>
-      <div id="qrTableNum" style="font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;"></div>
-      <div id="qrTableName" style="font-size:.85rem;opacity:.85;margin-top:4px;"></div>
-    </div>
-    <p style="font-size:.88rem;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.6;">
-      مرحبًا بك في SPARK! تصفح القائمة واطلب مباشرة من طاولتك.
-    </p>
-    <button onclick="gp('pgMenu')" 
-      style="width:100%;padding:14px;background:var(--or);color:#fff;border:none;border-radius:50px;font-size:.92rem;font-weight:700;font-family:Cairo,Outfit,sans-serif;cursor:pointer;">
-      🍽️ تصفح القائمة
-    </button>
-    <button id="callWaiterQrBtn" onclick="callWaiter()" 
-      style="width:100%;padding:13px;margin-top:10px;background:transparent;border:2px solid var(--or);color:var(--or);border-radius:50px;font-size:.88rem;font-weight:700;font-family:Cairo,Outfit,sans-serif;cursor:pointer;">
-      🔔 نادي النادل
-    </button>
-  </div>
-</div>
-
-<!-- ORDER CONFIRMED SCREEN -->
-<div id="confScreen" style="position:fixed;inset:0;z-index:9900;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;">
-  <div style="font-size:4rem;animation:bncA .6s ease;">✅</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--or);margin:12px 0 6px;">تم الطلب!</div>
-  <div style="font-size:.88rem;color:var(--muted);margin-bottom:16px;line-height:1.6;">طلبك في الطريق إليك. شكراً لاختيارك SPARK 🔥</div>
-  <div id="confNum" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--or);margin-bottom:20px;"></div>
-  <button onclick="document.getElementById('confScreen').style.opacity=0;document.getElementById('confScreen').style.pointerEvents='none';gp('home',document.querySelector('.nlinks li:nth-child(1) a'))"
-    style="padding:12px 28px;background:var(--or);color:#fff;border:none;border-radius:50px;font-size:.9rem;font-weight:700;font-family:Cairo,Outfit,sans-serif;cursor:pointer;">
-    العودة للرئيسية
-  </button>
-</div>
-<style>
-@keyframes bncA{0%,100%{transform:scale(1)}30%{transform:scale(1.3)}60%{transform:scale(.9)}}
-#offlineBanner.show{display:block!important;}
-</style>
 
 <!-- WhatsApp Float Button -->
 <a id="waBtn" href="https://wa.me/201020009617" target="_blank" rel="noopener"
