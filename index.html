@@ -631,12 +631,12 @@ const MEALS=[
 // ══════════════════ TRANSLATIONS ══════════════════
 const TR={
   en:{lb:'🌐 AR',nH:'Home',nM:'Menu',nA:'About',nC:'Cart',nO:'Order Now',dH:'🏠 Home',dM:'🍽️ Menu',dA:'⭐ About',dO:'Order Now',
-    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'Bold flavors fired with passion. Every dish crafted to ignite your senses.',
+    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'FIRE UP YOUR HUNGER 🔥',
     hB1:'🔥 Explore Menu',hB2:'Browse Categories',hs1:'Rating',hs2:'Customers',hs3:'Items',hs4:'Delivery',
     ti1:'🔥 FREE DELIVERY OVER 200 EGP',ti2:'⚡ CODE: SPARK20 → 20% OFF',ti3:'🍕 NEW CALZONE NOW AVAILABLE!',ti4:'🎉 OPEN DAILY 2PM – 2AM',
     bsL:'🏆 Most Ordered',bsT:'OUR BEST SELLER!',bsS:'Loved by thousands — signature pizza with fresh toppings and melted cheese.',bsB:'Order Now →',
     hML:'Hand Picked',hMT:'POPULAR',hSA:'See all →',
-    ftD:'Ignite your taste with bold flavors. More than a restaurant.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
+    ftD:'FIRE UP YOUR HUNGER 🔥 — More than a restaurant.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
     cL:'Browse By',cT:'CATEGORIES',mL:'Hand Picked',mT:'ALL MEALS',cu:'items',
     cTtl:'🛒 MY CART',ce:'Cart is empty',ces:'Add some delicious items!',pp:'Enter Promo Code',ab:'Apply',sub:'Subtotal',del:'Delivery',tot:'Total',fd:'FREE',am:(n)=>`Add ${n} EGP for free delivery!`,chb:'🚀 Proceed To Checkout',
     po:'🎉 20% discount applied!',pf:'❌ Invalid promo code',ad:(n)=>`🔥 ${n} added to cart!`,addB:'+ Add',cu2:'Cal',ot:'Additional Options:',tl:'Total:',acb:'🛒 Add to Cart',clb:'Close',
@@ -649,7 +649,7 @@ const TR={
     ast1:'Happy Customers',ast2:'Menu Items',ast3:'Avg Rating',ast4:'Big Goal',coL:'Find Us',coT:'CONTACT',
     co1T:'Address',co1P:'Awlad Saqr - El Sharqia - El Bahr St. - next to Old Othman Pharmacy',co2T:'Phone',co3T:'Working Hours',co3P:'Daily: 2PM – 2AM | Ramadan: 9PM – 4AM'},
   ar:{lb:'🌐 EN',nH:'الرئيسية',nM:'القائمة',nA:'عن سبارك',nC:'سلتي',nO:'اطلب الآن',dH:'🏠 الرئيسية',dM:'🍽️ القائمة',dA:'⭐ عن سبارك',dO:'اطلب الآن',
-    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'نكهات جريئة مصنوعة بعشق. كل صنف في سبارك بيشعل حواسك.',
+    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'FIRE UP YOUR HUNGER 🔥',
     hB1:'🔥 استعرض القائمة',hB2:'تصفح الأقسام',hs1:'التقييم',hs2:'عميل',hs3:'صنف',hs4:'توصيل',
     ti1:'🔥 توصيل مجاني فوق 200 جنيه',ti2:'⚡ كود SPARK20 خصم 20%',ti3:'🍕 كالزوني الجديد متاح الآن!',ti4:'🎉 مفتوح 2م – 2ص يومياً',
     bsL:'🏆 الأكثر طلباً',bsT:'!الأكثر مبيعاً',bsS:'محبوب من آلاف الزباين. بيتزا سبارك بتوبينج خاص وجبن مذاب.',bsB:'← اطلب الآن',
@@ -1078,9 +1078,15 @@ function detectTable(){
   const t=new URLSearchParams(window.location.search).get('table');
   if(t){
     window._tableId=t;
-    document.getElementById('qrTableNum').textContent=t;
-    document.getElementById('qrTableName').textContent='طاولة '+t;
-    gp('pgQr',null);
+    const numEl=document.getElementById('qrTableNum');
+    const nameEl=document.getElementById('qrTableName');
+    if(numEl) numEl.textContent=t;
+    if(nameEl) nameEl.textContent='طاولة '+t;
+    // Show QR page
+    document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+    const qrPg=document.getElementById('pgQr');
+    if(qrPg) qrPg.classList.add('active');
+    window.scrollTo({top:0});
   }
 }
 
@@ -1307,7 +1313,7 @@ if(!window._tableId){
     <p style="font-size:.88rem;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.6;">
       مرحبًا بك في SPARK! تصفح القائمة واطلب مباشرة من طاولتك.
     </p>
-    <button onclick="gp('pgMenu',document.querySelector('.nlinks li:nth-child(2) a'))" 
+    <button onclick="gp('pgMenu')" 
       style="width:100%;padding:14px;background:var(--or);color:#fff;border:none;border-radius:50px;font-size:.92rem;font-weight:700;font-family:Cairo,Outfit,sans-serif;cursor:pointer;">
       🍽️ تصفح القائمة
     </button>
