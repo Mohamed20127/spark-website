@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SPARK — لوحة التحكم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap">
+<link rel="stylesheet" href="styles/admin.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">🔥 SPARK</div>
+    <div class="auth-sub">لوحة تحكم المطعم</div>
+    <input id="loginEmail" class="auth-inp" type="email" placeholder="الإيميل" autocomplete="username">
+    <input id="loginPass"  class="auth-inp" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+    <button id="loginBtn" class="auth-btn" onclick="doLogin()">دخول</button>
+    <div id="loginErr" class="auth-err"></div>
+  </div>
+</div>
+
+<!-- NEW ORDER ALERT -->
+<div id="newOrderAlert">🔔 طلب جديد وصل!</div>
+
+<!-- SIDEBAR -->
+<div class="sb">
+  <div class="sb-logo">
+    <div>
+      <div class="sb-logo-txt">🔥 SPARK</div>
+      <div class="sb-logo-sub">Admin Panel</div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">الرئيسية</div>
+    <div class="sb-item" data-v="dashboard" onclick="goV('dashboard',this)"><span class="ic">📊</span>لوحة التحكم</div>
+    <div class="sb-item" data-v="orders"    onclick="goV('orders',this)"><span class="ic">📋</span>الطلبات</div>
+    <div class="sb-sec">المنيو</div>
+    <div class="sb-item" data-v="products"   onclick="goV('products',this)"><span class="ic">🍕</span>المنتجات</div>
+    <div class="sb-item" data-v="categories" onclick="goV('categories',this)"><span class="ic">📁</span>الأقسام</div>
+    <div class="sb-item" data-v="ramadan"    onclick="goV('ramadan',this)"><span class="ic">🌙</span>قائمة رمضان</div>
+    <div class="sb-sec">التسويق</div>
+    <div class="sb-item" data-v="promo"   onclick="goV('promo',this)"><span class="ic">🏷️</span>كوبونات الخصم</div>
+    <div class="sb-item" data-v="popups"  onclick="goV('popups',this)"><span class="ic">💬</span>إشعارات منبثقة</div>
+    <div class="sb-item" data-v="social"  onclick="goV('social',this)"><span class="ic">📱</span>السوشيال ميديا</div>
+    <div class="sb-sec">الإدارة</div>
+    <div class="sb-item" data-v="analytics" onclick="goV('analytics',this)"><span class="ic">📈</span>التحليلات</div>
+    <div class="sb-item" data-v="tables"    onclick="goV('tables',this)"><span class="ic">🪑</span>الطاولات & QR</div>
+    <div class="sb-item" data-v="users"     onclick="goV('users',this)"><span class="ic">👥</span>المستخدمين</div>
+    <div class="sb-item" data-v="settings"  onclick="goV('settings',this)"><span class="ic">⚙️</span>الإعدادات</div>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-av" id="sbAvatar">👑</div>
+      <div>
+        <div class="sb-uname" id="sbName">—</div>
+        <div id="sbBadge" class="rbdg rbdg-super">—</div>
+      </div>
+    </div>
+    <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:7px;border-radius:8px;background:var(--bg3);border:1px solid var(--bdr);color:var(--muted);font-family:'Cairo',sans-serif;font-size:.76rem;cursor:pointer;">⏻ تسجيل الخروج</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="top-title" id="topTitle">لوحة التحكم</div>
+    <div class="top-actions">
+      <button class="tb-btn primary" id="topAction" onclick="handleTopAction()" style="display:none">+ جديد</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="view act" id="v-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="sc-label">طلبات اليوم</div><div class="sc-num" id="sc-orders">0</div></div>
+        <div class="stat-card"><div class="sc-label">إيرادات اليوم</div><div class="sc-num" id="sc-revenue">0</div></div>
+        <div class="stat-card"><div class="sc-label">طلبات قيد التنفيذ</div><div class="sc-num" id="sc-pending">0</div></div>
+        <div class="stat-card"><div class="sc-label">متوسط الطلب</div><div class="sc-num" id="sc-avg">0</div></div>
+      </div>
+      <div style="font-size:.82rem;font-weight:700;margin-bottom:12px">آخر الطلبات</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>رقم</th><th>العنوان</th><th>الإجمالي</th><th>الحالة</th><th>الوقت</th></tr></thead>
+        <tbody id="dashRecentOrders"></tbody>
+      </table></div>
+    </div>
+
+    <!-- ══ ORDERS ══ -->
+    <div class="view" id="v-orders">
+      <div class="filter-row">
+        <div class="fpill act" data-f="all"       onclick="rOrders('all')">الكل</div>
+        <div class="fpill"     data-f="new"       onclick="rOrders('new')">🆕 جديد</div>
+        <div class="fpill"     data-f="preparing" onclick="rOrders('preparing')">👨‍🍳 يُحضَّر</div>
+        <div class="fpill"     data-f="cooking"   onclick="rOrders('cooking')">🍳 يُطبخ</div>
+        <div class="fpill"     data-f="ready"     onclick="rOrders('ready')">✅ جاهز</div>
+        <div class="fpill"     data-f="done"      onclick="rOrders('done')">🏁 منتهي</div>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>رقم</th><th>العنوان</th><th>الأصناف</th><th>الإجمالي</th><th>الحالة</th><th>الوقت</th></tr></thead>
+        <tbody id="ordersTable"></tbody>
+      </table></div>
+    </div>
+
+    <!-- ══ PRODUCTS ══ -->
+    <div class="view" id="v-products">
+      <div class="prod-grid" id="prodsGrid"></div>
+    </div>
+
+    <!-- ══ CATEGORIES ══ -->
+    <div class="view" id="v-categories">
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>أيقونة</th><th>اسم عربي</th><th>اسم إنجليزي</th><th>ID</th><th>إجراءات</th></tr></thead>
+        <tbody id="catsList"></tbody>
+      </table></div>
+    </div>
+
+    <!-- ══ ANALYTICS ══ -->
+    <div class="view" id="v-analytics">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="sc-label">إجمالي الطلبات</div><div class="sc-num" id="analTotalOrders">0</div></div>
+        <div class="stat-card"><div class="sc-label">إجمالي الإيرادات</div><div class="sc-num" id="analTotalRev">0</div></div>
+        <div class="stat-card"><div class="sc-label">متوسط قيمة الطلب</div><div class="sc-num" id="analAvgVal">0</div></div>
+        <div class="stat-card"><div class="sc-label">الأكثر طلباً</div><div class="sc-num" style="font-size:1rem" id="analTopItem">—</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;flex-wrap:wrap;">
+        <div class="chart-wrap"><div class="chart-ttl">📊 الإيرادات (آخر 7 أيام)</div><canvas id="revChart" height="90"></canvas></div>
+        <div class="chart-wrap"><div class="chart-ttl">🥧 توزيع الطلبات</div><canvas id="stChart"></canvas></div>
+      </div>
+      <div class="chart-wrap" style="margin-top:16px;"><div class="chart-ttl">🏆 الأصناف الأكثر طلباً</div><div id="topItemsList"></div></div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="view" id="v-settings">
+      <div style="max-width:600px;">
+        <div class="field"><label>اسم المطعم</label><input id="restName" type="text" placeholder="SPARK Restaurant"></div>
+        <div class="field"><label>رقم الهاتف</label><input id="phone" type="text" placeholder="01020009617"></div>
+        <div class="field"><label>العنوان</label><input id="address" type="text" placeholder="القاهرة، مصر"></div>
+        <div class="field"><label>ساعات العمل</label><input id="hours" type="text" placeholder="12 ظهراً — 12 منتصف الليل"></div>
+        <div class="field"><label>رسوم التوصيل (EGP)</label><input id="deliveryFee" type="number" placeholder="20"></div>
+        <button class="btn-save" onclick="saveSettings()">💾 حفظ الإعدادات</button>
+      </div>
+    </div>
+
+    <!-- ══ PROMO ══ -->
+    <div class="view" id="v-promo">
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="field" style="margin:0;flex:1"><label>كود الخصم</label><input id="promoCode" type="text" placeholder="SPARK20" style="text-transform:uppercase"></div>
+        <div class="field" style="margin:0;width:100px"><label>نسبة الخصم %</label><input id="promoDisc" type="number" placeholder="20"></div>
+        <button class="btn-save" onclick="addPromo()">+ إضافة كود</button>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody id="promoList"></tbody>
+      </table></div>
+    </div>
+
+    <!-- ══ RAMADAN ══ -->
+    <div class="view" id="v-ramadan">
+      <div style="max-width:600px;">
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="ramToggle"><span class="tog-sl"></span></label>
+          <span style="font-size:.84rem;font-weight:700">تفعيل قائمة رمضان</span>
+        </div>
+        <div class="field"><label>عنوان القسم</label><input id="ramTitle" type="text" placeholder="عروض رمضان الكريم 🌙"></div>
+        <div class="field"><label>وصف</label><textarea id="ramDescInp" placeholder="أوصاف إضافية..."></textarea></div>
+        <div style="font-size:.78rem;font-weight:700;color:var(--or);margin:12px 0 8px">اختر الأصناف المتاحة في رمضان:</div>
+        <div id="ramItemsList" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;"></div>
+        <button class="btn-save" onclick="saveRamadan()">💾 حفظ</button>
+      </div>
+    </div>
+
+    <!-- ══ USERS ══ -->
+    <div class="view" id="v-users">
+      <div class="user-grid" id="userGrid"></div>
+    </div>
+
+    <!-- ══ TABLES & QR ══ -->
+    <div class="view" id="v-tables">
+      <div class="qr-table-grid" id="tablesGrid"></div>
+    </div>
+
+    <!-- ══ POPUPS ══ -->
+    <div class="view" id="v-popups">
+      <div style="max-width:500px;">
+        <div class="tog-wrap">
+          <label class="tog"><input type="checkbox" id="popEnabled"><span class="tog-sl"></span></label>
+          <span style="font-size:.84rem;font-weight:700">تفعيل الرسالة المنبثقة</span>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>أيقونة</label><input id="popIcon2" type="text" placeholder="🔥"></div>
+          <div class="field"><label>تأخير الظهور (ثانية)</label><input id="popDelay" type="number" placeholder="2"></div>
+        </div>
+        <div class="field"><label>العنوان</label><input id="popTitle2" type="text" placeholder="عرض خاص!"></div>
+        <div class="field"><label>المحتوى</label><textarea id="popBody2" placeholder="اطلب الآن واستمتع بخصم 20%..."></textarea></div>
+        <div class="field"><label>إغلاق تلقائي (ثانية — 0 لإيقاف)</label><input id="popAutoClose" type="number" placeholder="0"></div>
+        <button class="btn-save" onclick="savePopup()">💾 حفظ</button>
+      </div>
+    </div>
+
+    <!-- ══ SOCIAL ══ -->
+    <div class="view" id="v-social">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px;">
+        <div>
+          <div style="font-size:.82rem;font-weight:800;margin-bottom:12px;color:var(--or)">🔗 روابط السوشيال ميديا</div>
+          <div class="field"><label>📸 Instagram</label><input id="smIg" type="url" placeholder="https://instagram.com/sprk_eg" value="https://www.instagram.com/sprk_eg"></div>
+          <div class="field"><label>👤 Facebook</label><input id="smFb" type="url" placeholder="https://facebook.com/..." value="https://www.facebook.com/share/1FYyfSHFW7/"></div>
+          <div class="field"><label>🎵 TikTok</label><input id="smTk" type="url" placeholder="https://tiktok.com/@sprk_eg" value="https://www.tiktok.com/@sprk_eg"></div>
+          <div class="field"><label>💬 WhatsApp</label><input id="smWa" type="text" placeholder="201020009617" value="201020009617"></div>
+          <button class="btn-save" onclick="saveSocial()">💾 حفظ السوشيال</button>
+        </div>
+        <div>
+          <div style="font-size:.82rem;font-weight:800;margin-bottom:12px;color:var(--or)">⚡ الزر العائم</div>
+          <div class="tog-wrap">
+            <label class="tog"><input type="checkbox" id="fbEnabled"><span class="tog-sl"></span></label>
+            <span style="font-size:.82rem">إظهار الزر العائم</span>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>أيقونة</label><input id="fbIcon" type="text" placeholder="⚡"></div>
+            <div class="field"><label>نص الزر</label><input id="fbText" type="text" placeholder="اطلب الآن"></div>
+          </div>
+          <div class="field"><label>الإجراء</label>
+            <select id="fbAction">
+              <option value="menu">فتح القائمة</option>
+              <option value="whatsapp">واتساب</option>
+              <option value="checkout">إتمام طلب</option>
+            </select>
+          </div>
+          <button class="btn-save" onclick="saveFloatBtn()">💾 حفظ الزر</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══ MODALS ══ -->
+
+<!-- Product Modal -->
+<div class="modal-bg" id="prodModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="prodModalTitle">منتج جديد</div>
+      <button class="modal-cl" onclick="closeProdModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>الاسم بالعربي *</label><input id="pAr" type="text" placeholder="مارغريتا كلاسيك"></div>
+        <div class="field"><label>الاسم بالإنجليزي *</label><input id="pEn" type="text" placeholder="Classic Margherita"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>وصف عربي</label><input id="pDa" type="text" placeholder="وصف المنتج بالعربي"></div>
+        <div class="field"><label>وصف إنجليزي</label><input id="pDe" type="text" placeholder="Product description"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>السعر (EGP) *</label><input id="pPr" type="number" placeholder="89"></div>
+        <div class="field"><label>القسم *</label><select id="pCat"></select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>السعرات</label><input id="pCal" type="number" placeholder="500"></div>
+        <div class="field"><label>التقييم</label><input id="pRt" type="number" step=".1" placeholder="4.5"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>وقت التحضير</label><input id="pTm" type="text" placeholder="15-20"></div>
+        <div class="field"><label>أيقونة (emoji)</label><input id="pEm" type="text" placeholder="🍕"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>رسالة مميزة</label><input id="pBdg" type="text" placeholder="Best Seller"></div>
+        <div class="field"><label>رابط صورة (URL)</label><input id="pImg" type="url" placeholder="https://..."></div>
+      </div>
+      <div style="font-size:.75rem;font-weight:700;color:var(--or);margin-bottom:8px">الأحجام (فعّل ما يناسب)</div>
+      <div class="size-check-row">
+        <div class="sc-item">
+          <label><input type="checkbox" id="sz_sm"> صغير</label>
+          <input class="field input" id="sz_p_sm" type="number" placeholder="سعر EGP" style="width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg);color:var(--txt);font-size:.76rem;">
+        </div>
+        <div class="sc-item">
+          <label><input type="checkbox" id="sz_md"> وسط</label>
+          <input class="field input" id="sz_p_md" type="number" placeholder="سعر EGP" style="width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg);color:var(--txt);font-size:.76rem;">
+        </div>
+        <div class="sc-item">
+          <label><input type="checkbox" id="sz_lg"> كبير</label>
+          <input class="field input" id="sz_p_lg" type="number" placeholder="سعر EGP" style="width:100%;padding:5px 8px;border-radius:6px;border:1px solid var(--bdr);background:var(--bg);color:var(--txt);font-size:.76rem;">
+        </div>
+      </div>
+      <div class="field" style="margin-top:8px"><label>الإضافات (سطر لكل إضافة: اسم_عربي|اسم_إنجليزي|سعر)</label>
+        <textarea id="pOpts" placeholder="جبنة إضافية|Extra Cheese|15&#10;بيكون|Bacon|20" style="height:80px"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeProdModal()">إلغاء</button>
+      <button class="btn-save" onclick="saveProd()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-bg" id="catModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head"><div class="modal-title" id="catModalTitle">قسم جديد</div><button class="modal-cl" onclick="closeCatModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>ID (بالإنجليزي، بدون مسافات)</label><input id="cId" type="text" placeholder="pizza"></div>
+      <div class="field"><label>الاسم بالعربي</label><input id="cAr" type="text" placeholder="بيتزا"></div>
+      <div class="field"><label>الاسم بالإنجليزي</label><input id="cEn" type="text" placeholder="Pizza"></div>
+      <div class="field"><label>أيقونة</label><input id="cEm" type="text" placeholder="🍕"></div>
+    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeCatModal()">إلغاء</button><button class="btn-save" onclick="saveCat()">💾 حفظ</button></div>
+  </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-bg" id="userModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><div class="modal-title" id="userModalTitle">مستخدم جديد</div><button class="modal-cl" onclick="closeUserModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>الاسم</label><input id="uName" type="text" placeholder="أحمد محمود"></div>
+      <div class="field"><label>الإيميل</label><input id="uEmail" type="email" placeholder="ahmed@spark.com"></div>
+      <div class="field"><label>كلمة المرور</label><input id="uPass" type="password" placeholder="كلمة المرور"></div>
+      <div class="field"><label>الرتبة</label>
+        <select id="uRole" onchange="updPermPreview()">
+          <option value="super">👑 Super Admin</option>
+          <option value="branch">🏪 مدير الفرع</option>
+          <option value="cashier">💼 كاشير</option>
+          <option value="delivery">🚗 توصيل</option>
+        </select>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:6px">الصلاحيات:</div>
+      <div class="perm-grid" id="permPreview"></div>
+    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeUserModal()">إلغاء</button><button class="btn-save" onclick="saveUser()">💾 حفظ</button></div>
+  </div>
+</div>
+
+<!-- Table Modal -->
+<div class="modal-bg" id="tableModal">
+  <div class="modal" style="max-width:320px">
+    <div class="modal-head"><div class="modal-title">إضافة طاولة</div><button class="modal-cl" onclick="closeTableModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>رقم الطاولة</label><input id="tNum" type="text" placeholder="1 أو VIP1 أو ..."></div>
+    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeTableModal()">إلغاء</button><button class="btn-save" onclick="saveTable()">💾 إضافة</button></div>
+  </div>
+</div>
+
+<script type="module" src="src/admin/app.js"></script>
+</body>
+</html>
