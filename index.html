@@ -107,7 +107,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;height:60px;display:flex;ali
 .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .mc{background:var(--card);border:1px solid var(--bdr);border-radius:15px;overflow:hidden;transition:all .22s;cursor:pointer;}
 .mc:hover{border-color:rgba(255,107,0,.4);transform:translateY(-3px);box-shadow:0 10px 26px rgba(0,0,0,.14);}
-.mimg{height:140px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3.6rem;position:relative;}
+.mimg{height:140px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3.6rem;position:relative;overflow:hidden;}
 .mbdg{position:absolute;top:7px;left:7px;background:var(--or);color:#fff;padding:2px 7px;border-radius:50px;font-size:.56rem;font-weight:700;}
 [data-lang=ar] .mbdg{left:auto;right:7px;}
 .mfv{position:absolute;top:7px;right:7px;width:27px;height:27px;border-radius:50%;background:rgba(0,0,0,.35);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:.76rem;transition:all .2s;}
@@ -204,7 +204,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
 .dmod{background:var(--bg2);border:1px solid var(--bdr);border-radius:18px 18px 0 0;width:100%;max-width:460px;max-height:90svh;overflow-y:auto;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
 .mov.open .dmod,.mov.open .comod{transform:translateY(0);}
 .dbar{width:34px;height:4px;background:var(--bdr);border-radius:2px;margin:9px auto 4px;}
-.dim{height:170px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:5.5rem;position:relative;}
+.dim{height:170px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:5.5rem;position:relative;overflow:hidden;}
 .dfv{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.4);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;}
 [data-lang=ar] .dfv{right:auto;left:10px;}
 .dbdy{padding:14px;}
@@ -311,8 +311,9 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   <ul class="nlinks" id="nlinks">
     <li><a href="#" onclick="gp('home',this)" class="act" id="nH">Home</a></li>
     <li><a href="#" onclick="gp('pgMenu',this)" id="nM">Menu</a></li>
-    <li id="navRamadan" style="display:none;"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
+    <li id="navRamadan"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
     <li><a href="#" onclick="gp('pgAbout',this)" id="nA">About</a></li>
+    <li><a href="#" onclick="gp('pgFavs',this)" id="nFav" style="display:none;">❤️ <span id="favNavLbl">Favorites</span></a></li>
   </ul>
   <div class="nr">
     <button class="blang" id="langBtn" onclick="tLang()">🌐 AR</button>
@@ -336,6 +337,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   <a href="#" onclick="gp('home');cd()" id="dH">🏠 Home</a>
   <a href="#" onclick="gp('pgMenu');cd()" id="dM">🍽️ Menu</a>
   <a href="#" onclick="gp('pgAbout');cd()" id="dA">⭐ About</a>
+  <a href="#" onclick="gp('pgFavs');cd()" id="dFav" style="display:none;">❤️ <span id="favDrawerLbl">Favorites</span></a>
   <div class="drw-f">
     <button class="border-btn" onclick="tCart();cd()" id="dO">Order Now</button>
   </div>
@@ -399,18 +401,6 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   </section>
 
   <!-- FOOTER -->
-  <!-- ═══ RAMADAN PAGE ═══ -->
-<div id="pgRamadan" class="pg" style="display:none;padding-top:60px;">
-  <div style="max-width:900px;margin:0 auto;padding:30px 16px;">
-    <div style="text-align:center;margin-bottom:30px;">
-      <div style="font-size:3rem;">🌙</div>
-      <h2 id="ramTitle" style="font-size:2rem;font-weight:900;color:#C8A400;margin:8px 0;">رمضان كريم</h2>
-      <p id="ramDesc" style="color:var(--muted);font-size:.95rem;">أكلات السحور والإفطار — عروض رمضانية حصرية</p>
-    </div>
-    <div class="mgrid" id="ramGrid"></div>
-  </div>
-</div>
-
 <footer>
     <div class="ftg">
       <div>
@@ -513,11 +503,59 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   </div>
 </div>
 
+
+<!-- ═══ RAMADAN PAGE ═══ -->
+<div id="pgRamadan" class="pg" style="padding-top:60px;">
+  <div style="max-width:900px;margin:0 auto;padding:30px 16px;">
+    <div style="text-align:center;margin-bottom:30px;">
+      <div style="font-size:3.5rem;margin-bottom:8px;">🌙</div>
+      <h2 id="ramTitle" style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:3px;color:#C8A400;margin:8px 0;line-height:1;">رمضان كريم</h2>
+      <p id="ramDesc" style="color:var(--muted);font-size:.92rem;max-width:480px;margin:0 auto;line-height:1.7;">أكلات السحور والإفطار — عروض رمضانية حصرية</p>
+    </div>
+    <div class="mgrid" id="ramGrid"></div>
+  </div>
+</div>
+
+<!-- ═══ FAVORITES PAGE ═══ -->
+<div class="pg" id="pgFavs" style="padding-top:60px;">
+  <div style="max-width:900px;margin:0 auto;padding:30px 16px;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:3rem;margin-bottom:8px;">❤️</div>
+      <h2 id="favTitle" style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:3px;color:var(--or);margin-bottom:6px;">MY FAVORITES</h2>
+      <p id="favSub" style="color:var(--muted);font-size:.88rem;">Your saved favorites — ready to order</p>
+    </div>
+    <div class="mgrid" id="favsGrid"></div>
+    <div id="favsEmpty" style="display:none;text-align:center;padding:60px 16px;color:var(--muted);">
+      <div style="font-size:4rem;margin-bottom:14px;">💔</div>
+      <div style="font-size:1rem;font-weight:600;margin-bottom:6px;" id="favEmptyT">No favorites yet</div>
+      <div style="font-size:.8rem;" id="favEmptyS">Tap ❤️ on any item to save it here</div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ CUSTOM PAGE ═══ -->
 <div class="pg" id="pgCustom" style="padding-top:60px;">
   <div style="max-width:820px;margin:0 auto;padding:32px 16px 60px;">
     <div id="pgCustomTitle" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;margin-bottom:8px;color:var(--or);"></div>
     <div id="pgCustomContent" style="color:var(--txt);line-height:1.9;font-size:.9rem;"></div>
+  </div>
+</div>
+
+<!-- ═══ FAVORITES PAGE ═══ -->
+<div class="pg" id="pgFavs" style="padding-top:60px;">
+  <div class="sec" style="max-width:1100px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div class="slbl" style="color:var(--or);">❤️ MY LIST</div>
+      <div class="sttl" id="favsTtl">FAVORITES</div>
+      <p style="color:var(--muted);font-size:.82rem;margin-top:8px;" id="favsCount"></p>
+    </div>
+    <div class="mgrid" id="favsGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:60px 16px;color:var(--muted);">
+        <div style="font-size:4rem;margin-bottom:12px;">💔</div>
+        <div style="font-weight:700;font-size:.92rem;margin-bottom:6px;" id="favsEmptyTtl">No favorites yet</div>
+        <div style="font-size:.78rem;" id="favsEmptyTxt">Tap ❤️ on any item to save it here</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -637,7 +675,7 @@ const MEALS=[
 
 // ══════════════════ TRANSLATIONS ══════════════════
 const TR={
-  en:{lb:'🌐 AR',nH:'Home',nM:'Menu',nA:'About',nC:'Cart',nO:'Order Now',dH:'🏠 Home',dM:'🍽️ Menu',dA:'⭐ About',dO:'Order Now',
+  en:{lb:'🌐 AR',nH:'Home',nM:'Menu',nA:'About',nFav:'❤️ Favorites',nC:'Cart',nO:'Order Now',dH:'🏠 Home',dM:'🍽️ Menu',dA:'⭐ About',dO:'Order Now',
     hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'Fire up your hunger — bold flavors, real passion, zero compromise. 🔥',
     hB1:'🔥 Explore Menu',hB2:'Browse Categories',hs1:'Rating',hs2:'Customers',hs3:'Items',hs4:'Delivery',
     ti1:'🔥 FREE DELIVERY OVER 200 EGP',ti2:'⚡ CODE: SPARK20 → 20% OFF',ti3:'🍕 NEW CALZONE NOW AVAILABLE!',ti4:'🎉 OPEN DAILY 2PM – 2AM',
@@ -655,7 +693,7 @@ const TR={
     stL:'Our Journey',stH:'A Long Road of Effort & Passion',stP1:'SPARK started as a dream — to create food that ignites the senses. Built from scratch with love.',stP2:'Today we serve thousands with a growing menu. Every product is real passion.',
     ast1:'Happy Customers',ast2:'Menu Items',ast3:'Avg Rating',ast4:'Big Goal',coL:'Find Us',coT:'CONTACT',
     co1T:'Address',co1P:'Awlad Saqr - El Sharqia - El Bahr St. - next to Old Othman Pharmacy',co2T:'Phone',co3T:'Working Hours',co3P:'Daily: 2PM – 2AM | Ramadan: 9PM – 4AM'},
-  ar:{lb:'🌐 EN',nH:'الرئيسية',nM:'القائمة',nA:'عن سبارك',nC:'سلتي',nO:'اطلب الآن',dH:'🏠 الرئيسية',dM:'🍽️ القائمة',dA:'⭐ عن سبارك',dO:'اطلب الآن',
+  ar:{lb:'🌐 EN',nH:'الرئيسية',nM:'القائمة',nA:'عن سبارك',nFav:'❤️ المفضلة',nC:'سلتي',nO:'اطلب الآن',dH:'🏠 الرئيسية',dM:'🍽️ القائمة',dA:'⭐ عن سبارك',dO:'اطلب الآن',
     hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'أشعل جوعك — نكهات جريئة، شغف حقيقي، لا تنازل. 🔥',
     hB1:'🔥 استعرض القائمة',hB2:'تصفح الأقسام',hs1:'التقييم',hs2:'عميل',hs3:'صنف',hs4:'توصيل',
     ti1:'🔥 توصيل مجاني فوق 200 جنيه',ti2:'⚡ كود SPARK20 خصم 20%',ti3:'🍕 كالزوني الجديد متاح الآن!',ti4:'🎉 مفتوح 2م – 2ص يومياً',
@@ -679,7 +717,9 @@ const TR={
 let PROD_SIZES={};
 
 let L='en', theme='dark', cat='all', curPg='home';
-let cart=[], favs=new Set(MEALS.filter(m=>m.fav).map(m=>m.id));
+let cart=[], favs=new Set(MEALS.filter(m=>m.fav||m.featured).map(m=>m.id));
+// Load persisted favorites
+try{const sf=localStorage.getItem('spark_favs');if(sf){const ids=JSON.parse(sf);if(ids.length)favs=new Set(ids);}}catch(e){}
 let cMeal=null, dQ=1, sOpts={}, selA='home', selP='cash', selSz=null;
 function T(k,...a){const v=TR[L][k];return typeof v==='function'?v(...a):(v!=null?v:k);}
 
@@ -689,13 +729,14 @@ function gp(id,el){
   const pg=document.getElementById(id); if(pg) pg.classList.add('active');
   document.querySelectorAll('.nlinks a').forEach(a=>a.classList.remove('act'));
   if(el)el.classList.add('act');
-  else{const map={home:'nH',pgMenu:'nM',pgAbout:'nA',pgRamadan:'nR'};const x=document.getElementById(map[id]);if(x)x.classList.add('act');}
+  else{const map={home:'nH',pgMenu:'nM',pgAbout:'nA',pgRamadan:'nR',pgFavs:'nFav'};const x=document.getElementById(map[id]);if(x)x.classList.add('act');}
   curPg=id; window.scrollTo({top:0,behavior:'smooth'});
   if(id==='pgMenu'){rCats();rMeals(cat);}
   if(id==='home'){rHome();}
+  if(id==='pgFavs'){rFavs();}
   if(id==='pgRamadan'){
     const grid=document.getElementById('ramGrid');
-    if(grid&&!grid.innerHTML){
+    if(grid){
       const meals=ramItems.length?MEALS.filter(m=>ramItems.includes(m.id)):MEALS;
       grid.innerHTML=meals.map(m=>mC(m)).join('');
     }
@@ -737,19 +778,30 @@ function apTR(){
 function tDrawer(){document.getElementById('drw').classList.toggle('open');document.getElementById('hbg').classList.toggle('open');}
 function cd(){document.getElementById('drw').classList.remove('open');document.getElementById('hbg').classList.remove('open');}
 // ── Home ──
-function rHome(){const g=document.getElementById('homeGrid');if(!g)return;g.innerHTML=MEALS.filter(m=>favs.has(m.id)).slice(0,6).map(mC).join('');}
+function rHome(){
+  const g=document.getElementById('homeGrid');
+  if(!g)return;
+  // Show favorited items; fallback to top-rated 6
+  let list=MEALS.filter(m=>favs.has(m.id)||m.fav||m.featured).slice(0,6);
+  if(!list.length) list=[...MEALS].sort((a,b)=>b.r-a.r).slice(0,6);
+  g.innerHTML=list.map(mC).join('');
+}
 // ── Cats ──
 function rCats(){const g=document.getElementById('catsGrid');if(!g)return;g.innerHTML=CATS.map(c=>`<div class="cc${cat===c.id?' active':''}" onclick="fC('${c.id}',this)"><span class="cem">${c.em}</span><div class="cnm">${L==='en'?c.en:c.ar}</div><div class="cct">${c.cnt} ${T('cu')}</div></div>`).join('');}
 function fC(id,el){cat=id;document.querySelectorAll('.cc').forEach(c=>c.classList.remove('active'));el.classList.add('active');rMeals(id);document.getElementById('mealsGrid')?.scrollIntoView({behavior:'smooth',block:'start'});}
 // ── Meal Card ──
 function mC(m){
   const nm=L==='en'?m.en:m.ar;
-  const ds=(L==='en'?m.de:m.da).slice(0,62)+'...';
+  const ds=((L==='en'?m.de:m.da)||'').slice(0,62)+(((L==='en'?m.de:m.da)||'').length>62?'...':'');
+  // Support product image: if m.img exists render <img>, else emoji
+  const imgContent=m.img
+    ?`<img src="${m.img}" alt="${nm}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.parentElement.innerHTML='<span style=\"font-size:3.6rem;\">${m.em}</span>'">`
+    :`<span style="font-size:3.6rem;">${m.em}</span>`;
   return `<div class="mc" onclick="openD(${m.id})">
-  <div class="mimg">
+  <div class="mimg" style="${m.img?'padding:0;overflow:hidden;':''}">
     ${m.badge?`<div class="mbdg">${m.badge}</div>`:''}
     <div class="mfv${favs.has(m.id)?' fav':''}" onclick="event.stopPropagation();tFav(${m.id},this)">${favs.has(m.id)?'❤️':'🤍'}</div>
-    ${m.em}
+    ${imgContent}
   </div>
   <div class="mbdy">
     <div class="mnm">${nm}</div>
@@ -761,7 +813,32 @@ function mC(m){
     </div>
   </div></div>`;}
 function rMeals(c){const g=document.getElementById('mealsGrid');if(!g)return;const list=c==='all'?MEALS:MEALS.filter(m=>m.cat===c);g.innerHTML=list.map(mC).join('');const cnt=document.getElementById('mCnt');if(cnt)cnt.textContent=list.length+' '+T('cu');}
-function tFav(id,el){if(favs.has(id)){favs.delete(id);el.textContent='🤍';el.classList.remove('fav');}else{favs.add(id);el.textContent='❤️';el.classList.add('fav');}}
+function tFav(id,el){
+  if(favs.has(id)){favs.delete(id);}
+  else{favs.add(id);}
+  // Update all fav buttons for this product
+  document.querySelectorAll('.mfv,.dfv').forEach(btn=>{
+    if(btn.getAttribute('onclick')&&btn.getAttribute('onclick').includes('tFav('+id)){
+      btn.textContent=favs.has(id)?'❤️':'🤍';
+      favs.has(id)?btn.classList.add('fav'):btn.classList.remove('fav');
+    }
+  });
+  // Save to localStorage
+  try{localStorage.setItem('spark_favs',JSON.stringify([...favs]));}catch(e){}
+  // Show/hide favs nav link
+  const fn=document.getElementById('nFav');const fd=document.getElementById('dFav');
+  if(fn)fn.style.display=favs.size?'':'none';
+  if(fd)fd.style.display=favs.size?'':'none';
+  if(curPg==='pgFavs')rFavs();
+}
+function rFavs(){
+  const g=document.getElementById('favsGrid');
+  const empty=document.getElementById('favsEmpty');
+  if(!g)return;
+  const list=MEALS.filter(m=>favs.has(m.id));
+  if(list.length){g.innerHTML=list.map(mC).join('');if(empty)empty.style.display='none';}
+  else{g.innerHTML='';if(empty)empty.style.display='block';}
+}
 // ── Cart ──
 function addC(id,qty=1){const m=MEALS.find(x=>x.id===id);const ex=cart.find(c=>c.id===id);if(ex)ex.qty+=qty;else cart.push({...m,qty});updB();showT(T('ad',L==='en'?m.en:m.ar));rCart();}
 function remC(id){cart=cart.filter(c=>c.id!==id);updB();rCart();}
@@ -769,7 +846,11 @@ function chQ(id,d){const it=cart.find(c=>c.id===id);if(!it)return;it.qty+=d;if(i
 function updB(){document.getElementById('cBdg').textContent=cart.reduce((s,c)=>s+c.qty,0);}
 function cTot(){
   const raw=cart.reduce((s,c)=>s+c.pr*c.qty,0);
-  if(window._activePromo) return Math.round(raw*(1-window._activePromo.disc/100));
+  if(window._activePromo){
+    const pr=window._activePromo;
+    if(pr.type==='fixed') return Math.max(0,Math.round(raw-pr.disc));
+    return Math.round(raw*(1-pr.disc/100));
+  }
   return raw;
 }
 function rCart(){
@@ -778,23 +859,29 @@ function rCart(){
   list.innerHTML=cart.map(it=>`<div class="ci"><div class="ciem">${it.em}</div><div class="ciin"><div class="cinm">${L==='en'?it.en:it.ar}</div><div class="cipr">${it.pr*it.qty} EGP</div></div><div class="qcl"><button class="qb" onclick="chQ(${it.id},-1)">−</button><span class="qn">${it.qty}</span><button class="qb" onclick="chQ(${it.id},1)">+</button></div></div>`).join('');
   const sub=cTot(),del=sub>=(window._delFreeMin||200)?0:(window._delPrice||15);
   bot.innerHTML=`<div class="prow"><input type="text" placeholder="${T('pp')}" id="pIn"><button class="bap" onclick="apPr()">${T('ab')}</button></div>
-  <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div>${sub&&del?`<div style="font-size:.66rem;color:var(--or);margin-bottom:4px">${T('am',200-sub)}</div>`:''}<div class="stot"><span>${T('tot')}</span><span class="totp">${sub+del} EGP</span></div></div>
+  <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div>${sub&&del?`<div style="font-size:.66rem;color:var(--or);margin-bottom:4px">${T('am',(window._delFreeMin||200)-sub)}</div>`:''}<div class="stot"><span>${T('tot')}</span><span class="totp">${sub+del} EGP</span></div></div>
   <button class="bco" onclick="openCO()">${T('chb')}</button>`;}
 function apPr(){
-  const v=document.getElementById('pIn')?.value?.toUpperCase();
+  const v=document.getElementById('pIn')?.value?.toUpperCase().trim();
   if(!v) return;
-  const promos=window._PROMOS||[{code:'SPARK20',disc:20},{code:'WELCOME10',disc:10}];
+  const promos=window._PROMOS||[];
   const found=promos.find(p=>p.code===v&&p.active!==false);
-  if(found){
-    window._activePromo=found;
-    showT('✅ كود '+v+' — خصم '+found.disc+'%');
-    // Update total in checkout if open
-    const totEl=document.getElementById('coMod');
-    if(totEl) openCO();
-  } else {
-    window._activePromo=null;
-    showT(T('pf'));
-  }
+  if(!found){window._activePromo=null;showT(T('pf')||'❌ كود خاطئ');return;}
+  // Check expiry — supports both expiresAt (timestamp) and expiry (string)
+  const expTs=found.expiresAt||(found.expiry?new Date(found.expiry).getTime():null);
+  if(expTs&&Date.now()>expTs){showT('❌ انتهت صلاحية هذا الكود');window._activePromo=null;return;}
+  // Check min order — supports both minOrder and prMin
+  const sub=cTot();
+  const minOrd=found.minOrder||found.prMin||0;
+  if(minOrd&&sub<minOrd){showT(`❌ الحد الأدنى للطلب ${minOrd} جنيه`);window._activePromo=null;return;}
+  // Check usage limit
+  const maxUses=found.uses!=='∞'?parseInt(found.uses):null;
+  const used=found.usageCount||found.usedCount||0;
+  if(maxUses&&used>=maxUses){showT('❌ تم استنفاد هذا الكود');window._activePromo=null;return;}
+  window._activePromo=found;
+  const msg=(found.type==='fixed')?`خصم ${found.disc} جنيه`:`خصم ${found.disc}%`;
+  showT('✅ كود '+v+' — '+msg);
+  openCO();
 }
 function tCart(){document.getElementById('cOv').classList.toggle('open');document.getElementById('cSb').classList.toggle('open');rCart();}
 // ── Detail ──
@@ -818,7 +905,11 @@ function bldD(){
   const sizeNames={small:'صغير',medium:'وسط',large:'كبير'};
   const sizeNamesEn={small:'Small',medium:'Medium',large:'Large'};
 
-  return `<div class="dim"><div class="dfv" onclick="tFav(${m.id},this)">${favs.has(m.id)?'❤️':'🤍'}</div>${m.em}</div>
+  const detailImg=m.img
+    ?`<img src="${m.img}" alt="${nm}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
+    :``;
+  const detailEmoji=m.img?`<span style="display:none;font-size:5rem;">${m.em}</span>`:`<span style="font-size:5rem;">${m.em}</span>`;
+  return `<div class="dim" style="${m.img?'padding:0;overflow:hidden;':''}"><div class="dfv" onclick="tFav(${m.id},this)">${favs.has(m.id)?'❤️':'🤍'}</div>${detailImg}${detailEmoji}</div>
 <div class="dbdy">
 <div class="dtop"><div class="dnm">${nm}</div><div class="dqc"><button class="qb" onclick="dQch(-1)">−</button><span class="qn" id="dQEl">${dQ}</span><button class="qb" onclick="dQch(1)">+</button></div></div>
 <div class="dpills"><div class="dpill">🔥${m.cal}${T('cu2')}</div><div class="dpill">⭐${m.r}</div><div class="dpill">⏱${m.tm}m</div></div>
@@ -875,7 +966,7 @@ function closeD(){document.getElementById('dOv').classList.remove('open');}
 function openCO(){
   if(!cart.length){showT('❌ '+T('ce'));return;}
   tCart();
-  const sub=cTot(),del=sub>=200?0:15,tot=sub+del;
+  const sub=cTot(),del=sub>=(window._delFreeMin||200)?0:(window._delPrice||15),tot=sub+del;
   document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
   <div class="cohd"><div class="cottl">${T('coTtl')}</div><button class="ccl" onclick="closeCO()">✕</button></div>
   <div class="cobdy">
@@ -938,11 +1029,19 @@ function sA(v,el){
 function sP(v,el){selP=v;document.querySelectorAll('#coMod .popt').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
 async function confO(){
   // Build order object
-  const sub=cTot(), del=sub>=200?0:15, tot=sub+del;
+  const sub=cTot(), del=sub>=(window._delFreeMin||200)?0:(window._delPrice||(window._deliveryRegions?.length?window._deliveryRegions[0]?.price:15)||15), tot=sub+del;
+  const promoInfo=window._activePromo?{
+    code:window._activePromo.code,
+    disc:window._activePromo.disc,
+    type:window._activePromo.type||'percent',
+    savings:sub-tot+del
+  }:null;
   const order={
     id:'ORD-'+Date.now(),
-    items:cart.map(c=>({id:c.id, name:c.ar||c.en, emoji:c.em, price:c.pr, qty:c.qty})),
+    items:cart.map(c=>({id:c.id, name:c.ar||c.en, emoji:c.em, price:c.pr, qty:c.qty, opts:c.selOpts||[]})),
     subtotal:sub, delivery:del, total:tot,
+    promo:promoInfo,
+    deliveryRegion:window._selRegionName||'',
     address:window._tableId?('طاولة '+window._tableId):(selA==='custom'?(document.getElementById('customAddrInp')?.value||'عنوان مخصص'):(selA==='home'?'المنزل':'عنوان آخر')),
     payment:selP==='cash'?'كاش عند الاستلام':selP==='card'?'بطاقة ائتمان':'محفظة إلكترونية',
     status:'new',
@@ -955,6 +1054,19 @@ async function confO(){
     const {collection, addDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     await addDoc(collection(db,'orders'), order);
   } catch(e){ console.warn('Firebase error:', e); }
+  // Increment promo usage
+  if(window._activePromo&&window._PROMOS){
+    const pi=window._PROMOS.findIndex(p=>p.code===window._activePromo.code);
+    if(pi>=0){
+      window._PROMOS[pi].usageCount=(window._PROMOS[pi].usageCount||0)+1;
+      try{
+        const {db:db2}=await initFB();
+        const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        await setDoc(doc(db2,'config','promos'),{promos:window._PROMOS,updatedAt:Date.now()});
+      }catch(e){console.warn('promo sync:',e);}
+    }
+    window._activePromo=null;
+  }
   // Show success
   document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
   <div class="scr">
@@ -1000,24 +1112,34 @@ async function loadRamadanConfig(){
     const {db}=await initFB();
     const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const snap=await getDoc(doc(db,'config','ramadan'));
-    if(snap.exists()){
-      const data=snap.data();
-      ramActive=!!data.active;
-      ramItems=data.items||[];
-      if(ramActive){
-        document.getElementById('navRamadan').style.display='';
-        // Build ramadan page
-        const grid=document.getElementById('ramGrid');
-        if(grid){
-          if(data.title) document.getElementById('ramTitle').textContent=data.title;
-          if(data.desc) document.getElementById('ramDesc').textContent=data.desc;
-          // Show either specific items or all meals
-          const meals=ramItems.length?MEALS.filter(m=>ramItems.includes(m.id)):MEALS;
-          grid.innerHTML=meals.map(m=>mC(m)).join('');
-        }
-      }
+    // Default: show Ramadan section; only hide if explicitly disabled
+    const data=snap.exists()?snap.data():{active:true,items:[],title:'رمضان كريم 🌙',desc:''};
+    ramActive = snap.exists() ? !!data.active : true;
+    ramItems = data.items||[];
+    // Show nav by default; hide only if admin explicitly deactivated
+    const navEl=document.getElementById('navRamadan');
+    // Ramadan nav always visible; ramActive controls the curated product list
+    const grid=document.getElementById('ramGrid');
+    if(grid){
+      if(data.title) { const t=document.getElementById('ramTitle'); if(t) t.textContent=data.title; }
+      if(data.desc)  { const d=document.getElementById('ramDesc');  if(d) d.textContent=data.desc; }
+      // Re-render always so any product change is reflected
+      rRamGrid();
     }
-  }catch(e){console.warn('Ramadan config:',e);}
+  }catch(e){
+    // On error: show ramadan with all meals as default
+    console.warn('Ramadan config:',e);
+    const navEl=document.getElementById('navRamadan');
+    if(navEl) navEl.style.display='';
+    rRamGrid();
+  }
+}
+
+function rRamGrid(){
+  const grid=document.getElementById('ramGrid');
+  if(!grid) return;
+  const meals=ramItems&&ramItems.length?MEALS.filter(m=>ramItems.includes(m.id)):MEALS;
+  grid.innerHTML=meals.map(m=>mC(m)).join('');
 }
 
 // ── Load From Firebase ──
@@ -1059,10 +1181,22 @@ async function loadFromFirebase(){
       }
     }
 
-    // Refresh UI
-    if(curPg==='pgMenu'){rCats();rMeals(cat);}
-    else if(curPg==='home') rHome();
+    // Refresh UI + update favs from loaded meal data
+    favs=new Set(MEALS.filter(m=>m.fav||m.featured).map(m=>m.id));
+    syncAllViews();
   }catch(e){console.warn('loadFromFirebase:',e);}
+}
+
+function syncAllViews(){
+  // Re-render everywhere so any product change is reflected instantly
+  rHome();
+  if(curPg==='pgMenu'){rCats();rMeals(cat);}
+  if(curPg==='pgFavs'){rFavs();}
+  if(curPg==='pgRamadan'){const rg=document.getElementById('ramGrid');if(rg){const meals=window._ramItems?.length?MEALS.filter(m=>window._ramItems.includes(m.id)):MEALS;rg.innerHTML=meals.map(mC).join('');}}
+  // Update category counts
+  CATS.forEach(c=>{if(c.id!=='all') c.cnt=MEALS.filter(m=>m.cat===c.id).length;});
+  // Sync ramadan grid
+  rRamGrid();
   // Load custom pages into footer nav
   loadCustomPages();
   // Load delivery config

@@ -400,6 +400,7 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
               3️⃣ الصقه هنا واضغط حفظ<br>
               📐 المقاس المثالي: 200×60px أو أي صورة PNG شفافة
             </div>
+            <div style="margin-top:10px;"><label style="font-size:.74rem;color:var(--muted);display:block;margin-bottom:6px;">📁 أو ارفع الصورة مباشرة</label><input type="file" id="logoFileInp" accept="image/*" onchange="uploadLogoFile(this)" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.78rem;cursor:pointer;"></div>
             <div id="logoPreviewBox" style="margin-top:10px;display:none;">
               <img id="logoPreview" src="" style="max-height:50px;border-radius:6px;border:1px solid var(--bdr);padding:4px;background:#fff;">
             </div>
@@ -665,7 +666,71 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
       </div>
     </div>
 
-  </div><!-- content -->
+  
+
+<!-- ═══ TABLES & QR ═══ -->
+<div class="view" id="v-tables">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-size:1.1rem;font-weight:800;">🪑 الطاولات & QR Code</div>
+      <div style="font-size:.76rem;color:var(--muted);margin-top:3px;">أضف طاولة وأنشئ QR code — العميل يمسحه ويطلب مباشرة</div>
+    </div>
+    <button class="tb-btn primary" onclick="openTableModal()">+ إضافة طاولة</button>
+  </div>
+  <div id="tablesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
+</div>
+
+<!-- ═══ SOCIAL MEDIA ═══ -->
+<div class="view" id="v-social">
+  <div style="font-size:1.1rem;font-weight:800;margin-bottom:20px;">📱 إعدادات السوشيال ميديا</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px;">
+    <div class="settings-card">
+      <h3>🔗 روابط التواصل</h3>
+      <div class="field"><label>📸 Instagram</label><input type="url" id="smIg2" placeholder="https://instagram.com/..."></div>
+      <div class="field"><label>👤 Facebook</label><input type="url" id="smFb2" placeholder="https://facebook.com/..."></div>
+      <div class="field"><label>🎵 TikTok</label><input type="url" id="smTk2" placeholder="https://tiktok.com/..."></div>
+      <div class="field"><label>💬 واتساب (رقم بدون +)</label><input type="text" id="smWa2" placeholder="201020009617"></div>
+      <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveSocialConfig()">💾 حفظ</button>
+    </div>
+    <div class="settings-card">
+      <h3>⚡ زر الطلب العائم</h3>
+      <div class="toggle-row">
+        <div><div class="toggle-lbl">تفعيل الزر العائم</div></div>
+        <div class="toggle on" id="floatBtnToggle" onclick="this.classList.toggle('on');saveFloatBtn()"><div class="toggle-dot"></div></div>
+      </div>
+      <div class="field" style="margin-top:12px;"><label>نص الزر</label><input type="text" id="floatBtnText" placeholder="اطلب الآن 🔥"></div>
+      <div class="field"><label>الإجراء عند الضغط</label>
+        <select id="floatBtnAction">
+          <option value="menu">فتح القائمة</option>
+          <option value="whatsapp">فتح واتساب</option>
+          <option value="cart">فتح السلة</option>
+        </select>
+      </div>
+      <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveFloatBtn()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CUSTOM PAGES ═══ -->
+<div class="view" id="v-pages">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-size:1.1rem;font-weight:800;">📄 الصفحات المخصصة</div>
+      <div style="font-size:.76rem;color:var(--muted);margin-top:3px;">أنشئ صفحات مخصصة تظهر في الموقع مثل: العروض، السياسات، الاتصال</div>
+    </div>
+    <button class="tb-btn primary" onclick="openPageModal()">+ صفحة جديدة</button>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>العنوان</th><th>الرابط</th><th>الحالة</th><th>آخر تعديل</th><th>إجراء</th></tr></thead>
+      <tbody id="pagesBody">
+        <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">جاري التحميل...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- content -->
 </div><!-- main -->
 
 <!-- USER MODAL -->
@@ -745,6 +810,12 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
       <div class="field"><label>الوصف (عربي)</label><textarea id="pDa" placeholder="وصف المنتج بالعربي..."></textarea></div>
       <div class="field"><label>الوصف (إنجليزي)</label><textarea id="pDe" placeholder="Product description..."></textarea></div>
       <div class="field"><label>الشارة (اختياري)</label><input type="text" id="pBdg" placeholder="Best Seller / Popular / Hot 🌶️"></div>
+      <div class="field">
+        <label>🖼️ رابط صورة المنتج (اختياري)</label>
+        <input type="url" id="pImg" placeholder="https://example.com/image.jpg" oninput="previewProdImg()">
+        <div id="prodImgPreview" style="margin-top:8px;display:none;"><img id="prodImgEl" src="" style="height:80px;border-radius:8px;border:1px solid var(--bdr);object-fit:cover;max-width:100%;" onerror="this.parentElement.style.display='none'"></div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:5px;">💡 ارفع على <a href="https://imgbb.com" target="_blank" style="color:var(--or);">imgBB.com</a> وانسخ الرابط المباشر</div>
+      </div>
 
       <!-- ─── SIZES ─── -->
       <div style="margin-top:8px;">
@@ -820,89 +891,29 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 
 <!-- PROMO MODAL -->
 <div class="modal-bg" id="promoModal">
-  <div class="modal">
-    <div class="modal-head">
-      <div class="modal-title">إضافة كود خصم</div>
-      <button class="modal-cl" onclick="document.getElementById('promoModal').classList.remove('open')">✕</button>
-    </div>
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-head"><div class="modal-title">🏷️ إضافة كود خصم</div><button class="modal-cl" onclick="document.getElementById('promoModal').classList.remove('open')">✕</button></div>
     <div class="modal-body">
+      <div class="field"><label>كود الخصم</label><input type="text" id="prCode" placeholder="SPARK20" style="text-transform:uppercase;letter-spacing:2px;font-weight:700;"></div>
       <div class="field-row">
-        <div class="field"><label>الكود</label><input type="text" id="prCode" placeholder="SPARK30" style="text-transform:uppercase;"></div>
-        <div class="field"><label>نسبة الخصم %</label><input type="number" id="prDisc" placeholder="20" min="1" max="100"></div>
+        <div class="field"><label>نوع الخصم</label><select id="prType" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;" onchange="updatePromoTypeLabel()"><option value="percent">نسبة مئوية %</option><option value="fixed">مبلغ ثابت EGP</option></select></div>
+        <div class="field"><label id="prDiscLabel">قيمة الخصم</label><input type="number" id="prDisc" placeholder="20" min="1" max="100" value="10"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>عدد الاستخدامات</label><input type="number" id="prUse" placeholder="∞ اتركه فارغ"></div>
-        <div class="field"><label>الحد الأدنى للطلب</label><input type="number" id="prMin" placeholder="0"></div>
+        <div class="field"><label>عدد الاستخدامات (فارغ = ∞)</label><input type="number" id="prUse" placeholder="∞" min="1"></div>
+        <div class="field"><label>الحد الأدنى للطلب (EGP)</label><input type="number" id="prMin" placeholder="0" min="0" value="0"></div>
       </div>
+      <div class="field"><label>تاريخ الانتهاء (اختياري)</label><input type="date" id="prExpiry" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;"></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn-cancel" onclick="document.getElementById('promoModal').classList.remove('open')">إلغاء</button>
-      <button class="btn-save" onclick="savePromo()">💾 إضافة الكود</button>
-    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="document.getElementById('promoModal').classList.remove('open')">إلغاء</button><button class="btn-save" onclick="savePromo()">💾 حفظ الكود</button></div>
   </div>
 </div>
 
-<!-- ═══ TABLES & QR ═══ -->
-<div class="view" id="v-tables">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-    <div>
-      <div style="font-size:1.1rem;font-weight:800;">🪑 الطاولات & QR Code</div>
-      <div style="font-size:.76rem;color:var(--muted);margin-top:3px;">أضف طاولة وأنشئ QR code — العميل يمسحه ويطلب مباشرة</div>
-    </div>
-    <button class="tb-btn primary" onclick="openTableModal()">+ إضافة طاولة</button>
-  </div>
-  <div id="tablesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
-</div>
 
-<!-- ═══ SOCIAL MEDIA ═══ -->
-<div class="view" id="v-social">
-  <div style="font-size:1.1rem;font-weight:800;margin-bottom:20px;">📱 إعدادات السوشيال ميديا</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px;">
-    <div class="settings-card">
-      <h3>🔗 روابط التواصل</h3>
-      <div class="field"><label>📸 Instagram</label><input type="url" id="smIg2" placeholder="https://instagram.com/..."></div>
-      <div class="field"><label>👤 Facebook</label><input type="url" id="smFb2" placeholder="https://facebook.com/..."></div>
-      <div class="field"><label>🎵 TikTok</label><input type="url" id="smTk2" placeholder="https://tiktok.com/..."></div>
-      <div class="field"><label>💬 واتساب (رقم بدون +)</label><input type="text" id="smWa2" placeholder="201020009617"></div>
-      <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveSocialConfig()">💾 حفظ</button>
-    </div>
-    <div class="settings-card">
-      <h3>⚡ زر الطلب العائم</h3>
-      <div class="toggle-row">
-        <div><div class="toggle-lbl">تفعيل الزر العائم</div></div>
-        <div class="toggle on" id="floatBtnToggle" onclick="this.classList.toggle('on');saveFloatBtn()"><div class="toggle-dot"></div></div>
-      </div>
-      <div class="field" style="margin-top:12px;"><label>نص الزر</label><input type="text" id="floatBtnText" placeholder="اطلب الآن 🔥"></div>
-      <div class="field"><label>الإجراء عند الضغط</label>
-        <select id="floatBtnAction">
-          <option value="menu">فتح القائمة</option>
-          <option value="whatsapp">فتح واتساب</option>
-          <option value="cart">فتح السلة</option>
-        </select>
-      </div>
-      <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveFloatBtn()">💾 حفظ</button>
-    </div>
-  </div>
-</div>
 
-<!-- ═══ CUSTOM PAGES ═══ -->
-<div class="view" id="v-pages">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
-    <div>
-      <div style="font-size:1.1rem;font-weight:800;">📄 الصفحات المخصصة</div>
-      <div style="font-size:.76rem;color:var(--muted);margin-top:3px;">أنشئ صفحات مخصصة تظهر في الموقع مثل: العروض، السياسات، الاتصال</div>
-    </div>
-    <button class="tb-btn primary" onclick="openPageModal()">+ صفحة جديدة</button>
-  </div>
-  <div class="card">
-    <table class="tbl">
-      <thead><tr><th>العنوان</th><th>الرابط</th><th>الحالة</th><th>آخر تعديل</th><th>إجراء</th></tr></thead>
-      <tbody id="pagesBody">
-        <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">جاري التحميل...</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+
+
+
 
 <!-- TABLE MODAL -->
 <div class="modal-bg" id="tableModal">
@@ -1147,7 +1158,7 @@ function rProds(filter){
   const list=filter==='all'?MEALS:MEALS.filter(m=>m.cat===filter);
   document.getElementById('prodGrid').innerHTML=list.map(m=>`
     <div class="prod-card">
-      <div class="pc-img">${m.em}${m.badge?`<div class="pc-badge">${m.badge}</div>`:''}</div>
+      <div class="pc-img" style="${m.img?'padding:0;overflow:hidden;':''}">${m.img?`<img src="${m.img}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy" onerror="this.style.display='none'">`:`${m.em||'🍕'}`}${m.badge?`<div class="pc-badge">${m.badge}</div>`:''}</div>
       <div class="pc-body">
         <div class="pc-name">${m.ar}</div>
         <div class="pc-cat">${catName(m.cat)}</div>
@@ -1227,6 +1238,8 @@ function openProdModal(id){
       document.getElementById('pTm').value=m.tm;
       document.getElementById('pRt').value=m.r;
       document.getElementById('pBdg').value=m.badge||'';
+      document.getElementById('pImg').value=m.img||'';
+      const pb=document.getElementById('prodImgPreview'),pe=document.getElementById('prodImgEl');if(m.img&&pb&&pe){pe.src=m.img;pb.style.display='block';}else if(pb){pb.style.display='none';}
       document.getElementById('pDa').value=m.da||'';
       document.getElementById('pDe').value=m.de||'';
       // Load saved sizes
@@ -1235,7 +1248,7 @@ function openProdModal(id){
       (m.opts||[]).forEach(opt=>addOptRow(opt));
     }
   } else {
-    ['pAr','pEn','pEm','pPr','pCal','pTm','pRt','pBdg','pDa','pDe'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';});
+    ['pAr','pEn','pEm','pPr','pCal','pTm','pRt','pBdg','pImg','pDa','pDe'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';}); const pb2=document.getElementById('prodImgPreview');if(pb2)pb2.style.display='none';
     document.getElementById('pEm').value='🍕';
   }
   document.getElementById('prodModal').classList.add('open');
@@ -1280,7 +1293,7 @@ async function saveProd(){
   const sizes=getSizesFromModal();
   if(editId){
     const m=MEALS.find(x=>x.id===editId);
-    if(m){Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||'',opts:getOptsFromModal()});}
+    if(m){const imgUrl=document.getElementById('pImg')?.value.trim()||'';Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value,img:imgUrl,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||'',opts:getOptsFromModal()});}
     // Save sizes to Firebase
     if(window._db&&sizes.length>=0){
       try{
@@ -1293,7 +1306,7 @@ async function saveProd(){
     showT('✅ تم تعديل المنتج بنجاح!');
   } else {
     const newId=Math.max(...MEALS.map(m=>m.id))+1;
-    MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,opts:getOptsFromModal(),badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});
+    const nImg=document.getElementById('pImg')?.value.trim()||'';MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,opts:getOptsFromModal(),badge:document.getElementById('pBdg').value,img:nImg,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});
     if(window._db&&sizes.length>0){
       try{
         const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
@@ -1337,14 +1350,27 @@ async function saveCat(){
 function openPromoModal(){document.getElementById('promoModal').classList.add('open');}
 async function savePromo(){
   const code=document.getElementById('prCode').value.trim().toUpperCase();
-  const disc=parseInt(document.getElementById('prDisc').value)||10;
-  if(!code){showT('❌ يرجى إدخال الكود!');return;}
-  if(!window._PROMOS) window._PROMOS=[];
-  window._PROMOS.push({code, disc, uses:document.getElementById('prUse').value||'∞', active:true});
+  const disc=parseFloat(document.getElementById('prDisc').value)||10;
+  const type=document.getElementById('prType')?.value||'percent';
+  const usesVal=document.getElementById('prUse').value.trim();
+  const uses=usesVal?parseInt(usesVal)||1:'∞';
+  const minOrder=parseFloat(document.getElementById('prMin').value)||0;
+  const expiryVal=document.getElementById('prExpiry')?.value;
+  const expiresAt=expiryVal?new Date(expiryVal).getTime():null;
+  if(!code){showT('❌ أدخل كود الخصم');return;}
+  if(!window._PROMOS)window._PROMOS=[];
+  window._PROMOS.push({code,disc,type,uses,minOrder,expiresAt,active:true,usageCount:0,createdAt:Date.now()});
   await syncPromosToFirebase();
   document.getElementById('promoModal').classList.remove('open');
-  rPromos();
-  showT(`✅ تم إضافة كود ${code}!`);
+  ['prCode','prDisc','prUse','prMin','prExpiry'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const sel=document.getElementById('prType');if(sel)sel.value='percent';
+  rPromos();showT('✅ تم إضافة كود '+code+'!');
+}
+function updatePromoTypeLabel(){
+  const t=document.getElementById('prType')?.value;
+  const lbl=document.getElementById('prDiscLabel');
+  if(lbl)lbl.textContent=t==='fixed'?'المبلغ (EGP)':'نسبة الخصم %';
+  const inp=document.getElementById('prDisc');if(inp)inp.max=t==='fixed'?99999:100;
 }
 
 // ── Toast ──
@@ -1548,7 +1574,7 @@ async function syncMealsToFirebase(){
   if(!window._db) return;
   try{
     const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await setDoc(doc(window._db,'config','meals'),{meals:MEALS.map(m=>({id:m.id,cat:m.cat,em:m.em||'🍕',pr:m.pr,cal:m.cal||500,r:m.r||4.5,tm:m.tm||'15-25',badge:m.badge||'',en:m.en,ar:m.ar,de:m.de||'',da:m.da||'',opts:m.opts||[]})),updatedAt:Date.now()});
+    await setDoc(doc(window._db,'config','meals'),{meals:MEALS.map(m=>({id:m.id,cat:m.cat,em:m.em||'🍕',pr:m.pr,cal:m.cal||500,r:m.r||4.5,tm:m.tm||'15-25',badge:m.badge||'',en:m.en,ar:m.ar,de:m.de||'',da:m.da||'',img:m.img||'',fav:m.fav||false,opts:m.opts||[]})),updatedAt:Date.now()});
   }catch(e){console.warn('syncMeals:',e);}
 }
 async function syncCatsToFirebase(){
@@ -1587,6 +1613,22 @@ async function saveSettings(){
   }catch(e){showT('❌ خطأ في الحفظ: '+e.message);}
 }
 
+// Product image preview
+function previewProdImg(){
+  const url=document.getElementById('pImg')?.value;
+  const box=document.getElementById('prodImgPreview');
+  const img=document.getElementById('prodImgEl');
+  if(url&&box&&img){img.src=url;box.style.display='block';}
+  else if(box){box.style.display='none';}
+}
+// Logo file upload
+function uploadLogoFile(inp){
+  const file=inp.files[0];if(!file)return;
+  if(file.size>500000){showT('⚠️ حجم الصورة كبير جداً (الحد 500KB)');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{const b64=e.target.result;const ui=document.getElementById('stLogoUrl');if(ui){ui.value=b64;previewLogo();}showT('✅ تم رفع الصورة — اضغط حفظ الإعدادات');};
+  reader.readAsDataURL(file);
+}
 // Logo preview
 function previewLogo(){
   const url=document.getElementById('stLogoUrl')?.value;
@@ -1604,7 +1646,7 @@ function toggleRamadan(){
   const dot=document.getElementById('ramDot');
   const st=document.getElementById('ramStatus');
   if(tog){ tog.style.background=ramadanActive?'var(--or)':'var(--bg3)'; tog.style.borderColor=ramadanActive?'var(--or)':'var(--bdr)'; }
-  if(dot){ dot.style.right=ramadanActive?'2px':'22px'; dot.style.background=ramadanActive?'#fff':'var(--muted)'; }
+  if(dot){ dot.style.right=ramadanActive?'22px':'2px'; dot.style.background=ramadanActive?'#fff':'var(--muted)'; }
   if(st){ st.textContent=ramadanActive?'مفعّل':'متوقف'; st.style.color=ramadanActive?'var(--or)':'var(--muted)'; }
 }
 
@@ -2394,19 +2436,15 @@ async function deleteCat(id){
 function rPromos(){
   const tbody=document.getElementById('promosBody');
   if(!tbody||!window._PROMOS)return;
-  tbody.innerHTML=window._PROMOS.map((p,i)=>`
-    <tr>
-      <td><strong style="color:var(--or);">${p.code}</strong></td>
-      <td>${p.disc}%</td>
-      <td>${p.uses||'∞'}</td>
-      <td><span class="st-badge ${p.active?'st-done':'st-canc'}">${p.active?'نشط':'متوقف'}</span></td>
-      <td>
-        <div style="display:flex;gap:5px;">
-          <div class="pa-btn" onclick="togglePromo(${i})" title="تفعيل/إيقاف">⏯</div>
-          <div class="pa-btn del" onclick="deletePromo(${i})" title="حذف">🗑️</div>
-        </div>
-      </td>
-    </tr>`).join('');
+  tbody.innerHTML=window._PROMOS.map((p,i)=>{
+    const discStr=(p.type==='fixed')?`${p.disc} EGP`:`${p.disc}%`;
+    const expired=p.expiresAt&&Date.now()>p.expiresAt;
+    const expStr=p.expiresAt?new Date(p.expiresAt).toLocaleDateString('ar-EG'):'بلا انتهاء';
+    const used=p.usageCount||p.usedCount||0;
+    const usageStr=p.uses==='∞'?`∞ (${used} مستخدم)`:`${used}/${p.uses}`;
+    const minStr=(p.minOrder||p.prMin)?`${p.minOrder||p.prMin} EGP`:'—';
+    return `<tr style="${expired?'opacity:.55;':''}"><td><strong style="color:var(--or);letter-spacing:1px;">${p.code}</strong></td><td style="color:var(--gr);">${discStr}</td><td style="font-size:.74rem;">${usageStr}</td><td style="font-size:.74rem;color:var(--muted);">${minStr}</td><td style="font-size:.72rem;color:${expired?'var(--red)':'var(--muted)'};">${expired?'⚠️ منتهي':expStr}</td><td><span class="st-badge ${(p.active&&!expired)?'st-done':'st-canc'}">${(p.active&&!expired)?'نشط':'متوقف'}</span></td><td><div style="display:flex;gap:5px;"><div class="pa-btn" onclick="togglePromo(${i})">⏯</div><div class="pa-btn del" onclick="deletePromo(${i})">🗑️</div></div></td></tr>`;
+  }).join('');
 }
 
 async function togglePromo(idx){
@@ -2425,15 +2463,15 @@ async function deletePromo(idx){
 // ═══════════════════════════════════════════════════════
 // PATCH goV to load new views on navigate
 // ═══════════════════════════════════════════════════════
-const _origGoV = window.goV || goV;
-goV = function(id, el) {
-  _origGoV(id, el);
-  if(id==='tables')    loadTables();
-  if(id==='social')    loadSocialConfig2();
-  if(id==='pages')     loadPages();
-  if(id==='promo')     rPromos();
-  if(id==='settings')  { loadDeliveryRegions(); loadSettingsFromFirebase(); }
-};
+const _goV_orig = goV;
+function goV(id, el){
+  _goV_orig(id, el);
+  if(id==='tables')   loadTables();
+  if(id==='social')   loadSocialConfig2();
+  if(id==='pages')    loadPages();
+  if(id==='promo')    { if(window._PROMOS) rPromos(); }
+  if(id==='settings') { loadDeliveryRegions(); loadSettingsFromFirebase(); }
+}
 window.goV = goV;
 
 
@@ -2530,6 +2568,10 @@ async function loadSettingsFromFirebase(){
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
 }
+
+
+// Extend goV
+(function(){var _go=typeof goV==='function'?goV:null;window.goV=function(id,el){if(_go)_go(id,el);if(id==='tables'&&window._db)loadTables();if(id==='social'&&window._db)loadSocialConfig2();if(id==='pages'&&window._db)loadPages();if(id==='promo')rPromos();if(id==='settings'&&window._db){loadDeliveryRegions();loadSettingsFromFirebase();}};})();
 </script>
 </body>
 </html>
