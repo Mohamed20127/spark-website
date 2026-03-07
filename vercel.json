@@ -1,5 +1,15 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
+    }
+  ],
   "redirects": [
-    { "source": "/spark-admin.html", "destination": "/admin.html", "permanent": true }
+    { "source": "/spark-admin.html", "destination": "/admin.html", "permanent": true },
+    { "source": "/spark-restaurant.html", "destination": "/index.html", "permanent": true }
   ]
 }

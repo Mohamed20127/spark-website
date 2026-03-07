@@ -404,7 +404,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
       <h2 id="ramTitle" style="font-size:2rem;font-weight:900;color:#C8A400;margin:8px 0;">رمضان كريم</h2>
       <p id="ramDesc" style="color:var(--muted);font-size:.95rem;">أكلات السحور والإفطار — عروض رمضانية حصرية</p>
     </div>
-    <div class="meal-grid" id="ramGrid"></div>
+    <div class="mgrid" id="ramGrid"></div>
   </div>
 </div>
 
@@ -912,7 +912,7 @@ async function confO(){
     id:'ORD-'+Date.now(),
     items:cart.map(c=>({id:c.id, name:c.ar||c.en, emoji:c.em, price:c.pr, qty:c.qty})),
     subtotal:sub, delivery:del, total:tot,
-    address:selA==='custom'?(document.getElementById('customAddrInp')?.value||'عنوان مخصص'):(selA==='home'?'المنزل':'عنوان آخر'),
+    address:window._tableId?('طاولة '+window._tableId):(selA==='custom'?(document.getElementById('customAddrInp')?.value||'عنوان مخصص'):(selA==='home'?'المنزل':'عنوان آخر')),
     payment:selP==='cash'?'كاش عند الاستلام':selP==='card'?'بطاقة ائتمان':'محفظة إلكترونية',
     status:'new',
     time: new Date().toLocaleString('ar-EG'),
@@ -925,7 +925,18 @@ async function confO(){
     await addDoc(collection(db,'orders'), order);
   } catch(e){ console.warn('Firebase error:', e); }
   // Show success
-  document.getElementById('coMod').innerHTML=`<div class="dbar"></div><div class="scr"><div class="scic">🎉</div><div class="scttl">${T('scT')}</div><div class="scsb">${T('scS')}</div><button class="bprim" style="margin-top:22px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button></div>`;
+  document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
+  <div class="scr">
+    <div class="scic">🎉</div>
+    <div class="scttl">${T('scT')}</div>
+    <div class="scsb">${T('scS')}</div>
+    <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:12px;padding:12px 16px;margin:14px 0;text-align:center;">
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;">رقم طلبك</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--or);letter-spacing:3px;">#${order.id.slice(-6).toUpperCase()}</div>
+    </div>
+    <div style="font-size:.74rem;color:var(--muted);">📞 سنتواصل معك لتأكيد الطلب</div>
+    <button class="bprim" style="margin-top:20px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button>
+  </div>`;
   cart=[];updB();
 }
 function closeCO(){document.getElementById('coOv').classList.remove('open');}
@@ -1044,6 +1055,25 @@ async function loadProdSizes(){
   }catch(e){console.warn('loadProdSizes:',e);}
 }
 // ── Init ──
+// ── QR Table Detection ──
+(function detectTableFromURL(){
+  const params=new URLSearchParams(window.location.search);
+  const tableId=params.get('table');
+  if(tableId){
+    window._tableId=tableId;
+    // Show menu directly with table context banner
+    document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+    const menuPg=document.getElementById('pgMenu');
+    if(menuPg){menuPg.classList.add('active');}
+    curPg='pgMenu';
+    // Show table banner
+    const banner=document.createElement('div');
+    banner.style.cssText='position:fixed;top:60px;left:0;right:0;z-index:800;background:var(--or);color:#fff;text-align:center;padding:8px 16px;font-size:.82rem;font-weight:700;font-family:Cairo,Outfit,sans-serif;';
+    banner.innerHTML=`🪑 أنت على طاولة رقم <strong>${tableId}</strong> — اختر ما تريد وأضف للسلة`;
+    document.body.prepend(banner);
+  }
+})();
+
 rHome();
 loadFromFirebase().then(()=>{
   loadRamadanConfig();

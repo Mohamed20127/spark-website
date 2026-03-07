@@ -185,13 +185,6 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 /* Tracking view restriction */
 .restricted-view{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;color:var(--muted);}
 .restricted-icon{font-size:4rem;}
-
-.sw{position:relative;width:42px;height:24px;flex-shrink:0;}
-.sw input{opacity:0;width:0;height:0;position:absolute;}
-.sw-sl{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--bdr);border-radius:24px;cursor:pointer;transition:.25s;}
-.sw-sl::before{content:'';position:absolute;width:17px;height:17px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.25s;}
-.sw input:checked+.sw-sl{background:var(--or);border-color:var(--or);}
-.sw input:checked+.sw-sl::before{transform:translateX(18px);background:#fff;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -242,10 +235,10 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
     <div class="sb-sec">الإعدادات</div>
     <div class="sb-item" onclick="goV('ramadan',this)"><div class="icon">🌙</div> قسم رمضان</div>
     <div class="sb-item" onclick="goV('settings',this)"><div class="icon">⚙️</div> إعدادات الموقع</div>
-    <div class="sb-item" onclick="goV('tables',this)"><div class="icon">🪑</div> الطاولات & QR</div>
-    <div class="sb-item" onclick="goV('popups',this)"><div class="icon">💬</div> إشعارات منبثقة</div>
-    <div class="sb-item" onclick="goV('social',this)"><div class="icon">📱</div> السوشيال ميديا</div>
     <div class="sb-item" onclick="goV('promo',this)"><div class="icon">🎁</div> كودات الخصم</div>
+    <div class="sb-item" onclick="goV('tables',this)"><div class="icon">🪑</div> الطاولات & QR</div>
+    <div class="sb-item" onclick="goV('social',this)"><div class="icon">📱</div> السوشيال ميديا</div>
+    <div class="sb-item" id="navPages" onclick="goV('pages',this)"><div class="icon">📄</div> الصفحات المخصصة</div>
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
@@ -435,9 +428,8 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
         <div style="overflow-x:auto;">
           <table class="tbl">
             <thead><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الحالة</th><th>إجراء</th></tr></thead>
-            <tbody>
-              <tr><td><strong style="color:var(--or);">SPARK20</strong></td><td>20%</td><td>∞</td><td><span class="st-badge st-done">نشط</span></td><td><button class="pa-btn del" onclick="showT('🗑️ تم الحذف!')">🗑️</button></td></tr>
-              <tr><td><strong style="color:var(--or);">WELCOME10</strong></td><td>10%</td><td>1 لكل عميل</td><td><span class="st-badge st-done">نشط</span></td><td><button class="pa-btn del" onclick="showT('🗑️ تم الحذف!')">🗑️</button></td></tr>
+            <tbody id="promosBody">
+              <!-- Dynamic rows rendered by rPromos() -->
             </tbody>
           </table>
         </div>
@@ -760,79 +752,139 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 
 <!-- ═══ TABLES & QR ═══ -->
 <div class="view" id="v-tables">
-  <div class="section-header">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
     <div>
-      <h2 class="section-title">🪑 الطاولات & QR</h2>
-      <p class="section-sub">أنشئ QR code لكل طاولة — العميل يمسحه ويطلب مباشرة</p>
+      <div style="font-size:1.1rem;font-weight:800;">🪑 الطاولات & QR Code</div>
+      <div style="font-size:.76rem;color:var(--muted);margin-top:3px;">أضف طاولة وأنشئ QR code — العميل يمسحه ويطلب مباشرة</div>
     </div>
-    <button class="btn-primary" onclick="openTableModal()">+ إضافة طاولة</button>
+    <button class="tb-btn primary" onclick="openTableModal()">+ إضافة طاولة</button>
   </div>
-  <div class="qr-grid" id="tablesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:16px;"></div>
+  <div id="tablesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;"></div>
 </div>
 
-<!-- ═══ POPUPS ═══ -->
-<div class="view" id="v-popups">
-  <div class="section-header"><h2 class="section-title">💬 إشعارات منبثقة</h2></div>
-  <div style="max-width:520px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:22px;">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-      <label class="sw"><input type="checkbox" id="popEnabled"><span class="sw-sl"></span></label>
-      <span style="font-weight:700">تفعيل الرسالة المنبثقة</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="field-group"><label>أيقونة</label><input id="popIcon" type="text" placeholder="🔥"></div>
-      <div class="field-group"><label>تأخير الظهور (ثانية)</label><input id="popDelay" type="number" placeholder="2"></div>
-    </div>
-    <div class="field-group"><label>العنوان</label><input id="popTitle" type="text" placeholder="عرض خاص!"></div>
-    <div class="field-group"><label>المحتوى</label><textarea id="popBody" style="min-height:70px"></textarea></div>
-    <div class="field-group"><label>إغلاق تلقائي (ثانية - 0 لإيقاف)</label><input id="popAutoClose" type="number" placeholder="0"></div>
-    <button class="btn-primary" onclick="savePopupConfig()" style="margin-top:8px;">💾 حفظ الإعدادات</button>
-  </div>
-</div>
-
-<!-- ═══ SOCIAL ═══ -->
+<!-- ═══ SOCIAL MEDIA ═══ -->
 <div class="view" id="v-social">
-  <div class="section-header"><h2 class="section-title">📱 السوشيال ميديا</h2></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:680px;">
-    <div style="background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:20px;">
-      <div style="font-weight:800;margin-bottom:14px;color:var(--or);">🔗 روابط السوشيال</div>
-      <div class="field-group"><label>📸 Instagram</label><input id="smIg" type="url" placeholder="https://instagram.com/..."></div>
-      <div class="field-group"><label>👤 Facebook</label><input id="smFb" type="url" placeholder="https://facebook.com/..."></div>
-      <div class="field-group"><label>🎵 TikTok</label><input id="smTk" type="url" placeholder="https://tiktok.com/..."></div>
-      <div class="field-group"><label>💬 WhatsApp (رقم)</label><input id="smWa" type="text" placeholder="201020009617"></div>
-      <button class="btn-primary" onclick="saveSocialConfig()">💾 حفظ</button>
+  <div style="font-size:1.1rem;font-weight:800;margin-bottom:20px;">📱 إعدادات السوشيال ميديا</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px;">
+    <div class="settings-card">
+      <h3>🔗 روابط التواصل</h3>
+      <div class="field"><label>📸 Instagram</label><input type="url" id="smIg2" placeholder="https://instagram.com/..."></div>
+      <div class="field"><label>👤 Facebook</label><input type="url" id="smFb2" placeholder="https://facebook.com/..."></div>
+      <div class="field"><label>🎵 TikTok</label><input type="url" id="smTk2" placeholder="https://tiktok.com/..."></div>
+      <div class="field"><label>💬 واتساب (رقم بدون +)</label><input type="text" id="smWa2" placeholder="201020009617"></div>
+      <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveSocialConfig()">💾 حفظ</button>
     </div>
-    <div style="background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:20px;">
-      <div style="font-weight:800;margin-bottom:14px;color:var(--or);">⚡ الزر العائم</div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-        <label class="sw"><input type="checkbox" id="fbEnabled"><span class="sw-sl"></span></label>
-        <span style="font-weight:700">إظهار الزر</span>
+    <div class="settings-card">
+      <h3>⚡ زر الطلب العائم</h3>
+      <div class="toggle-row">
+        <div><div class="toggle-lbl">تفعيل الزر العائم</div></div>
+        <div class="toggle on" id="floatBtnToggle" onclick="this.classList.toggle('on');saveFloatBtn()"><div class="toggle-dot"></div></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="field-group"><label>أيقونة</label><input id="fbIcon" type="text" placeholder="⚡"></div>
-        <div class="field-group"><label>نص</label><input id="fbText" type="text" placeholder="اطلب الآن"></div>
+      <div class="field" style="margin-top:12px;"><label>نص الزر</label><input type="text" id="floatBtnText" placeholder="اطلب الآن 🔥"></div>
+      <div class="field"><label>الإجراء عند الضغط</label>
+        <select id="floatBtnAction">
+          <option value="menu">فتح القائمة</option>
+          <option value="whatsapp">فتح واتساب</option>
+          <option value="cart">فتح السلة</option>
+        </select>
       </div>
-      <div class="field-group"><label>الإجراء</label>
-        <select id="fbAction"><option value="menu">فتح القائمة</option><option value="whatsapp">واتساب</option></select>
-      </div>
-      <button class="btn-primary" onclick="saveFloatBtnConfig()">💾 حفظ</button>
+      <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveFloatBtn()">💾 حفظ</button>
     </div>
   </div>
 </div>
 
-<!-- Table Modal -->
-<div class="modal-overlay" id="tableModal" onclick="if(event.target===this)closeTableModal()">
-  <div class="modal" style="max-width:320px;">
-    <div class="modal-header"><h3>إضافة طاولة</h3><button class="modal-close" onclick="closeTableModal()">✕</button></div>
+<!-- ═══ CUSTOM PAGES ═══ -->
+<div class="view" id="v-pages">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+    <div>
+      <div style="font-size:1.1rem;font-weight:800;">📄 الصفحات المخصصة</div>
+      <div style="font-size:.76rem;color:var(--muted);margin-top:3px;">أنشئ صفحات مخصصة تظهر في الموقع مثل: العروض، السياسات، الاتصال</div>
+    </div>
+    <button class="tb-btn primary" onclick="openPageModal()">+ صفحة جديدة</button>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>العنوان</th><th>الرابط</th><th>الحالة</th><th>آخر تعديل</th><th>إجراء</th></tr></thead>
+      <tbody id="pagesBody">
+        <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">جاري التحميل...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TABLE MODAL -->
+<div class="modal-bg" id="tableModal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-head">
+      <div class="modal-title">🪑 إضافة طاولة</div>
+      <button class="modal-cl" onclick="document.getElementById('tableModal').classList.remove('open')">✕</button>
+    </div>
     <div class="modal-body">
-      <div class="field-group"><label>رقم أو اسم الطاولة *</label><input id="tableNum" type="text" placeholder="1 أو VIP1 أو A3"></div>
+      <div class="field"><label>رقم / اسم الطاولة *</label><input type="text" id="tableNumInp" placeholder="مثال: 1 أو VIP أو A3"></div>
+      <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-top:8px;font-size:.76rem;color:var(--muted);">
+        💡 سيتم إنشاء QR code تلقائياً يحتوي على رابط الطلب من هذه الطاولة
+      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeTableModal()">إلغاء</button>
-      <button class="btn-primary" onclick="saveTable()">💾 إضافة</button>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="document.getElementById('tableModal').classList.remove('open')">إلغاء</button>
+      <button class="btn-save" onclick="saveTable()">💾 إضافة</button>
     </div>
   </div>
 </div>
 
+<!-- PAGE EDITOR MODAL -->
+<div class="modal-bg" id="pageModal">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-head">
+      <div class="modal-title" id="pageModalTitle">📄 صفحة جديدة</div>
+      <button class="modal-cl" onclick="closePageModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field"><label>عنوان الصفحة *</label><input type="text" id="pgTitle" placeholder="مثال: العروض الخاصة"></div>
+        <div class="field"><label>رابط الصفحة (slug)</label><input type="text" id="pgSlug" placeholder="مثال: offers"></div>
+      </div>
+      <div class="field">
+        <label>المحتوى (HTML مدعوم)</label>
+        <textarea id="pgContent" style="min-height:200px;font-family:monospace;font-size:.8rem;" placeholder="<h2>عنوان</h2>
+<p>محتوى الصفحة...</p>"></textarea>
+      </div>
+      <div class="toggle-row" style="margin-top:8px;">
+        <div><div class="toggle-lbl">نشر الصفحة</div><div class="toggle-sub">ستظهر في قائمة الموقع</div></div>
+        <div class="toggle on" id="pgActiveToggle" onclick="this.classList.toggle('on')"><div class="toggle-dot"></div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closePageModal()">إلغاء</button>
+      <button class="btn-save" onclick="savePage()">💾 حفظ الصفحة</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAT EDIT MODAL -->
+<div class="modal-bg" id="catEditModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-head">
+      <div class="modal-title">✏️ تعديل القسم</div>
+      <button class="modal-cl" onclick="document.getElementById('catEditModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ceId">
+      <div class="field-row">
+        <div class="field"><label>الاسم (عربي)</label><input type="text" id="ceAr"></div>
+        <div class="field"><label>الاسم (إنجليزي)</label><input type="text" id="ceEn"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>أيقونة</label><input type="text" id="ceEm" placeholder="🍕"></div>
+        <div class="field"><label>معرف القسم</label><input type="text" id="ceCatId" readonly style="opacity:.6;"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="document.getElementById('catEditModal').classList.remove('open')">إلغاء</button>
+      <button class="btn-save" onclick="saveCatEdit()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1098,7 +1150,7 @@ async function saveProd(){
   const sizes=getSizesFromModal();
   if(editId){
     const m=MEALS.find(x=>x.id===editId);
-    if(m){Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value});}
+    if(m){Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});}
     // Save sizes to Firebase
     if(window._db&&sizes.length>=0){
       try{
@@ -1111,7 +1163,7 @@ async function saveProd(){
     showT('✅ تم تعديل المنتج بنجاح!');
   } else {
     const newId=Math.max(...MEALS.map(m=>m.id))+1;
-    MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,opts:[],badge:document.getElementById('pBdg').value});
+    MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,opts:[],badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});
     if(window._db&&sizes.length>0){
       try{
         const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
@@ -1122,6 +1174,7 @@ async function saveProd(){
     }
     showT('✅ تم إضافة المنتج بنجاح!');
   }
+  await syncMealsToFirebase();
   closeProdModal();rProds('all');
 }
 
@@ -1135,7 +1188,7 @@ function rCats(){
       <td><span style="color:var(--or);font-weight:700;">${c.cnt}</span></td>
       <td>
         <div style="display:flex;gap:5px;">
-          <div class="pa-btn" onclick="showT('✏️ تعديل القسم قريباً!')" title="تعديل">✏️</div>
+          <div class="pa-btn" onclick="openCatEditModal('${c.id}')" title="تعديل">✏️</div><div class="pa-btn del" onclick="deleteCat('${c.id}')" title="حذف">🗑️</div>
         </div>
       </td>
     </tr>`).join('');
@@ -1160,6 +1213,7 @@ async function savePromo(){
   window._PROMOS.push({code, disc, uses:document.getElementById('prUse').value||'∞', active:true});
   await syncPromosToFirebase();
   document.getElementById('promoModal').classList.remove('open');
+  rPromos();
   showT(`✅ تم إضافة كود ${code}!`);
 }
 
@@ -1474,10 +1528,10 @@ const ROLES = {
 
 // Permissions per role
 const PERMS = {
-  super:    { dashboard:true,  orders:true,  products:true,  categories:true, settings:true, promo:true, analytics:true, ramadan:true, users:true  },
-  branch:   { dashboard:true,  orders:true,  products:true,  categories:true, settings:true, promo:true, analytics:false, ramadan:true, users:false },
-  cashier:  { dashboard:false, orders:true,  products:false, categories:false, settings:false, promo:false, analytics:false, ramadan:false, users:false },
-  delivery: { dashboard:false, orders:true,  products:false, categories:false, settings:false, promo:false, analytics:false, ramadan:false, users:false },
+  super:    { dashboard:true,  orders:true,  products:true,  categories:true, settings:true, promo:true, analytics:true, ramadan:true, users:true, tables:true, social:true, pages:true  },
+  branch:   { dashboard:true,  orders:true,  products:true,  categories:true, settings:true, promo:true, analytics:false, ramadan:true, users:false, tables:true, social:true, pages:true },
+  cashier:  { dashboard:false, orders:true,  products:false, categories:false, settings:false, promo:false, analytics:false, ramadan:false, users:false, tables:false, social:false, pages:false },
+  delivery: { dashboard:false, orders:true,  products:false, categories:false, settings:false, promo:false, analytics:false, ramadan:false, users:false, tables:false, social:false, pages:false },
 };
 
 let currentUser = null; // { uid, name, email, role }
@@ -1594,7 +1648,7 @@ let editUserId = null;
 const PERM_LABELS = {
   dashboard:'لوحة المعلومات', orders:'الطلبات', products:'المنتجات',
   categories:'الأقسام', settings:'الإعدادات', promo:'كودات الخصم',
-  analytics:'الحسابات', ramadan:'رمضان', users:'المستخدمون'
+  analytics:'الحسابات', ramadan:'رمضان', users:'المستخدمون', tables:'الطاولات', social:'السوشيال', pages:'الصفحات'
 };
 
 function openUserModal(uid=null){
@@ -1744,6 +1798,7 @@ async function initAdmin(){
     if(pSnap.exists()) window._PROMOS=pSnap.data().promos||[];
     else window._PROMOS=[{code:'SPARK20',disc:20,uses:'∞',active:true},{code:'WELCOME10',disc:10,uses:'1',active:true}];
   }catch(e){ window._PROMOS=[]; }
+  rPromos();
 
   // Load product sizes config
   try{
@@ -1755,6 +1810,24 @@ async function initAdmin(){
       if(data.mealId) window.PROD_SIZES_ADMIN[data.mealId]=data.sizes||[];
     });
   }catch(e){console.warn('load sizes:',e);}
+
+  // Load meals from Firebase first (overwrite hardcoded data)
+  try{
+    const {doc:d2,getDoc:g2}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const msn=await g2(d2(db,'config','meals'));
+    if(msn.exists()&&msn.data().meals?.length){
+      MEALS.splice(0,MEALS.length,...msn.data().meals);
+    }
+    const csn=await g2(d2(db,'config','categories'));
+    if(csn.exists()&&csn.data().cats?.length){
+      CATS.splice(0,CATS.length,...csn.data().cats);
+    }
+    // Load sizes
+    const {collection:col3,getDocs:gd3}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const szSnap=await gd3(col3(db,'product_sizes'));
+    window.PROD_SIZES_ADMIN={};
+    szSnap.docs.forEach(d=>{const data=d.data();if(data.mealId)window.PROD_SIZES_ADMIN[data.mealId]=data.sizes||[];});
+  }catch(e){console.warn('load meals:',e);}
 
   // Listen realtime to orders
   const q=query(collection(db,'orders'),orderBy('timestamp','desc'));
@@ -1783,7 +1856,7 @@ async function initAdmin(){
     if(curV==='analytics'){rAnalytics();}
     if(curV==='dashboard'){rDash();}
     // Update stats
-    document.querySelector('.sc-num').textContent=ORDERS_DATA.length;
+    const scn=document.querySelector('.sc-num'); if(scn)scn.textContent=ORDERS_DATA.length;
   });
   rDash();
   initPushNotifications();
@@ -1839,192 +1912,319 @@ function showNewOrderBanner(title, body){
   try{ new Audio('https://www.soundjay.com/buttons/sounds/button-09a.mp3').play(); }catch(e){}
 }
 
-// Register Service Worker
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
-}
 
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 // TABLES & QR
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 let TABLES = [];
 
-async function loadTables() {
+async function loadTables(){
   if(!window._db) return;
-  try {
-    const {collection,getDocs} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const s = await getDocs(collection(window._db,'tables'));
-    TABLES = s.docs.map(d=>({id:d.id,...d.data()}));
-    rTables();
-  } catch(e) { console.warn('loadTables:',e); }
+  const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const s=await getDocs(collection(window._db,'tables'));
+  TABLES=s.docs.map(d=>({id:d.id,...d.data()}));
+  rTables();
 }
 
-function rTables() {
-  const grid = document.getElementById('tablesGrid');
-  if(!grid) return;
-  if(!TABLES.length) {
-    grid.innerHTML = '<div style="color:var(--muted);padding:30px;text-align:center;grid-column:1/-1;">لا توجد طاولات — أضف طاولة أولى</div>';
+function rTables(){
+  const grid=document.getElementById('tablesGrid');
+  if(!grid)return;
+  if(!TABLES.length){
+    grid.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px;grid-column:1/-1;font-size:.86rem;">لا توجد طاولات — أضف طاولتك الأولى</div>';
     return;
   }
-  grid.innerHTML = TABLES.map(t => {
-    const url = `${location.origin}/?table=${t.id}`;
-    const qr  = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=140x140&bgcolor=ffffff`;
+  const base=window.location.origin||'https://spark-restaurant.vercel.app';
+  grid.innerHTML=TABLES.map(t=>{
+    const url=`${base}/?table=${t.id}`;
+    const qr=`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=160x160&bgcolor=ffffff&color=1a1a1a&margin=10`;
     return `<div style="background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px;text-align:center;">
-      <div style="font-weight:800;font-size:.9rem;margin-bottom:8px;">طاولة ${t.id}</div>
-      <img src="${qr}" style="width:140px;height:140px;border-radius:10px;display:block;margin:0 auto 10px;" loading="lazy">
-      <div style="font-size:.6rem;color:var(--muted);word-break:break-all;margin-bottom:10px;">${url}</div>
-      <div style="display:flex;gap:6px;justify-content:center;">
-        <button onclick="printQR('${t.id}')" style="flex:1;padding:6px;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.7rem;cursor:pointer;">🖨️ طباعة</button>
-        <button onclick="deleteTable('${t.id}')" style="padding:6px 10px;background:transparent;border:1px solid var(--bdr);border-radius:8px;color:var(--red);font-size:.7rem;cursor:pointer;">🗑</button>
+      <div style="font-family:Cairo,sans-serif;font-weight:800;font-size:.9rem;margin-bottom:10px;color:var(--or);">طاولة ${t.id}</div>
+      <img src="${qr}" style="width:160px;height:160px;border-radius:10px;border:1px solid var(--bdr);display:block;margin:0 auto 10px;" loading="lazy" onerror="this.style.display='none'">
+      <div style="font-size:.58rem;color:var(--muted);word-break:break-all;margin-bottom:10px;line-height:1.4;">${url}</div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="printQR('${t.id}')" style="flex:1;padding:7px;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.72rem;font-family:Cairo,sans-serif;cursor:pointer;">🖨️ طباعة</button>
+        <button onclick="copyTableURL('${encodeURIComponent(url)}')" style="flex:1;padding:7px;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;color:var(--txt);font-size:.72rem;font-family:Cairo,sans-serif;cursor:pointer;">🔗 نسخ</button>
+        <button onclick="deleteTable('${t.id}')" style="padding:7px 10px;background:transparent;border:1px solid var(--bdr);border-radius:8px;color:var(--red);font-size:.72rem;cursor:pointer;">🗑</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function openTableModal() { document.getElementById('tableNum').value=''; document.getElementById('tableModal').classList.add('open'); }
-function closeTableModal() { document.getElementById('tableModal').classList.remove('open'); }
-
-async function saveTable() {
-  const num = document.getElementById('tableNum').value.trim();
-  if(!num) { showT('⚠️ أدخل رقم الطاولة'); return; }
-  if(!window._db) { showT('❌ Firebase غير متصل'); return; }
-  try {
-    const {doc,setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const url = `${location.origin}/?table=${num}`;
-    await setDoc(doc(window._db,'tables',num),{id:num,url,createdAt:Date.now()});
-    TABLES.push({id:num,url});
-    closeTableModal(); rTables(); showT('✅ تم إضافة الطاولة');
-  } catch(e) { showT('❌ '+e.message); }
+function openTableModal(){
+  document.getElementById('tableNumInp').value='';
+  document.getElementById('tableModal').classList.add('open');
 }
 
-async function deleteTable(id) {
-  if(!confirm('حذف الطاولة؟')) return;
-  try {
-    const {doc,deleteDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await deleteDoc(doc(window._db,'tables',id));
-    TABLES = TABLES.filter(t=>t.id!==id); rTables(); showT('🗑 تم');
-  } catch(e) { showT('❌ '+e.message); }
+async function saveTable(){
+  const num=document.getElementById('tableNumInp').value.trim();
+  if(!num){showT('⚠️ أدخل رقم الطاولة');return;}
+  if(!window._db){showT('❌ Firebase غير متصل');return;}
+  const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const base=window.location.origin||'https://spark-restaurant.vercel.app';
+  const url=`${base}/?table=${num}`;
+  await setDoc(doc(window._db,'tables',num),{id:num,url,createdAt:Date.now()});
+  TABLES.push({id:num,url,createdAt:Date.now()});
+  document.getElementById('tableModal').classList.remove('open');
+  rTables();
+  showT('✅ تم إضافة الطاولة '+num);
 }
 
-function printQR(id) {
-  const t = TABLES.find(x=>x.id===id); if(!t) return;
-  const url = t.url || `${location.origin}/?table=${id}`;
-  const w = window.open('','_blank','width=420,height=550');
-  w.document.write(`<!DOCTYPE html><html><body style="text-align:center;font-family:Arial,sans-serif;padding:36px;background:#fff;">
-    <h2 style="color:#FF6B00;font-size:2rem;margin-bottom:4px;">🔥 SPARK</h2>
-    <h1 style="font-size:3rem;margin:8px 0;color:#111;">طاولة ${id}</h1>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=260x260" style="display:block;margin:16px auto;border-radius:12px;">
-    <p style="color:#666;font-size:14px;margin-top:12px;">امسح الكود للطلب مباشرة من طاولتك</p>
-    <script>window.onload=()=>{window.print();}<\/script>
+async function deleteTable(id){
+  if(!confirm('حذف الطاولة '+id+'؟'))return;
+  const {doc,deleteDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  await deleteDoc(doc(window._db,'tables',id));
+  TABLES=TABLES.filter(t=>t.id!==id);
+  rTables();
+  showT('🗑️ تم حذف الطاولة');
+}
+
+function copyTableURL(encodedUrl){
+  const url=decodeURIComponent(encodedUrl);
+  navigator.clipboard.writeText(url).then(()=>showT('✅ تم نسخ الرابط')).catch(()=>showT('❌ فشل النسخ'));
+}
+
+function printQR(id){
+  const t=TABLES.find(x=>x.id===id);if(!t)return;
+  const url=t.url||`${location.origin}/?table=${id}`;
+  const qr=`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=280x280&bgcolor=ffffff&margin=15`;
+  const w=window.open('','_blank','width=440,height=580');
+  if(!w)return;
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>QR طاولة ${id}</title></head>
+  <body style="text-align:center;font-family:Cairo,Arial,sans-serif;padding:40px;background:#fff;color:#111;">
+    <div style="font-size:2rem;font-weight:900;color:#FF6B00;letter-spacing:3px;margin-bottom:4px;">🔥 SPARK</div>
+    <h1 style="font-size:3.5rem;margin:8px 0;font-weight:900;color:#111;">طاولة ${id}</h1>
+    <img src="${qr}" style="display:block;margin:20px auto;border-radius:12px;border:2px solid #eee;" width="280" height="280">
+    <p style="color:#666;font-size:14px;margin-top:14px;">📱 امسح الكود لتطلب مباشرة من طاولتك</p>
+    <div style="font-size:11px;color:#aaa;margin-top:8px;word-break:break-all;">${url}</div>
+    <script>window.onload=()=>{setTimeout(()=>window.print(),800);}<\/script>
   </body></html>`);
+  w.document.close();
 }
 
-// ═══════════════════════════════════════
-// POPUPS CONFIG
-// ═══════════════════════════════════════
-async function loadPopupConfig() {
-  if(!window._db) return;
-  try {
-    const {doc,getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const s = await getDoc(doc(window._db,'config','popup'));
-    if(s.exists()) {
-      const d = s.data();
-      document.getElementById('popEnabled').checked = !!d.enabled;
-      document.getElementById('popIcon').value = d.icon||'🔥';
-      document.getElementById('popTitle').value = d.title||'';
-      document.getElementById('popBody').value = d.body||'';
-      document.getElementById('popDelay').value = d.delay||2;
-      document.getElementById('popAutoClose').value = d.autoClose||0;
-    }
-  } catch(e) { console.warn('loadPopup:',e); }
-}
-
-async function savePopupConfig() {
-  if(!window._db) { showT('❌ Firebase غير متصل'); return; }
-  try {
-    const {doc,setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await setDoc(doc(window._db,'config','popup'),{
-      enabled: document.getElementById('popEnabled').checked,
-      icon:    document.getElementById('popIcon').value,
-      title:   document.getElementById('popTitle').value,
-      body:    document.getElementById('popBody').value,
-      delay:   Number(document.getElementById('popDelay').value)||2,
-      autoClose: Number(document.getElementById('popAutoClose').value)||0,
-      updatedAt: Date.now()
-    }, {merge:true});
-    showT('✅ تم حفظ إعدادات البوب-أب');
-  } catch(e) { showT('❌ '+e.message); }
-}
-
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 // SOCIAL MEDIA CONFIG
-// ═══════════════════════════════════════
-async function loadSocialConfig2() {
-  if(!window._db) return;
-  try {
-    const {doc,getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const [sSnap,fSnap] = await Promise.all([
-      getDoc(doc(window._db,'config','social')),
-      getDoc(doc(window._db,'config','floatBtn'))
-    ]);
-    if(sSnap.exists()) {
-      const d = sSnap.data();
-      document.getElementById('smIg').value = d.instagram||'';
-      document.getElementById('smFb').value = d.facebook||'';
-      document.getElementById('smTk').value = d.tiktok||'';
-      document.getElementById('smWa').value = d.whatsapp||'';
+// ═══════════════════════════════════════════════════════
+async function loadSocialConfig2(){
+  if(!window._db)return;
+  const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const s=await getDoc(doc(window._db,'config','social'));
+  if(s.exists()){
+    const d=s.data();
+    if(d.instagram)document.getElementById('smIg2').value=d.instagram;
+    if(d.facebook)document.getElementById('smFb2').value=d.facebook;
+    if(d.tiktok)document.getElementById('smTk2').value=d.tiktok;
+    if(d.whatsapp)document.getElementById('smWa2').value=d.whatsapp;
+  }
+}
+
+async function saveSocialConfig(){
+  if(!window._db){showT('❌ Firebase غير متصل');return;}
+  const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  await setDoc(doc(window._db,'config','social'),{
+    instagram:document.getElementById('smIg2').value,
+    facebook:document.getElementById('smFb2').value,
+    tiktok:document.getElementById('smTk2').value,
+    whatsapp:document.getElementById('smWa2').value,
+    updatedAt:Date.now()
+  },{merge:true});
+  showT('✅ تم حفظ روابط السوشيال');
+}
+
+async function saveFloatBtn(){
+  if(!window._db)return;
+  const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const enabled=document.getElementById('floatBtnToggle').classList.contains('on');
+  const text=document.getElementById('floatBtnText')?.value||'اطلب الآن 🔥';
+  const action=document.getElementById('floatBtnAction')?.value||'menu';
+  await setDoc(doc(window._db,'config','floatBtn'),{enabled,text,action,updatedAt:Date.now()},{merge:true});
+  showT('✅ تم حفظ إعدادات الزر العائم');
+}
+
+// ═══════════════════════════════════════════════════════
+// CUSTOM PAGES
+// ═══════════════════════════════════════════════════════
+let PAGES=[], editPageId=null;
+
+async function loadPages(){
+  if(!window._db)return;
+  const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const s=await getDocs(collection(window._db,'pages'));
+  PAGES=s.docs.map(d=>({_id:d.id,...d.data()}));
+  rPages();
+}
+
+function rPages(){
+  const tbody=document.getElementById('pagesBody');
+  if(!tbody)return;
+  if(!PAGES.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">لا توجد صفحات مخصصة بعد — أنشئ صفحتك الأولى!</td></tr>';
+    return;
+  }
+  tbody.innerHTML=PAGES.map(p=>{
+    const d=p.updatedAt?new Date(p.updatedAt).toLocaleDateString('ar-EG'):'—';
+    return `<tr>
+      <td><strong>${p.title||'—'}</strong></td>
+      <td><span style="color:var(--or);font-size:.74rem;">/${p.slug||'#'}</span></td>
+      <td><span class="st-badge ${p.active?'st-done':'st-canc'}">${p.active?'منشور':'مسودة'}</span></td>
+      <td style="color:var(--muted);font-size:.76rem;">${d}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <div class="pa-btn" onclick="openPageModal('${p._id}')" title="تعديل">✏️</div>
+          <div class="pa-btn" onclick="previewPage('${p._id}')" title="معاينة">👁</div>
+          <div class="pa-btn del" onclick="deletePage('${p._id}')" title="حذف">🗑️</div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openPageModal(id=null){
+  editPageId=id;
+  document.getElementById('pageModalTitle').textContent=id?'✏️ تعديل الصفحة':'📄 صفحة جديدة';
+  if(id){
+    const p=PAGES.find(x=>x._id===id);
+    if(p){
+      document.getElementById('pgTitle').value=p.title||'';
+      document.getElementById('pgSlug').value=p.slug||'';
+      document.getElementById('pgContent').value=p.content||'';
+      const tog=document.getElementById('pgActiveToggle');
+      if(p.active)tog.classList.add('on'); else tog.classList.remove('on');
     }
-    if(fSnap.exists()) {
-      const d = fSnap.data();
-      document.getElementById('fbEnabled').checked = !!d.enabled;
-      document.getElementById('fbIcon').value = d.icon||'⚡';
-      document.getElementById('fbText').value = d.text||'';
-      document.getElementById('fbAction').value = d.action||'menu';
-    }
-  } catch(e) { console.warn('loadSocial:',e); }
+  } else {
+    document.getElementById('pgTitle').value='';
+    document.getElementById('pgSlug').value='';
+    document.getElementById('pgContent').value='';
+    document.getElementById('pgActiveToggle').classList.add('on');
+  }
+  document.getElementById('pageModal').classList.add('open');
 }
 
-async function saveSocialConfig() {
-  if(!window._db) { showT('❌ Firebase غير متصل'); return; }
-  try {
-    const {doc,setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await setDoc(doc(window._db,'config','social'),{
-      instagram: document.getElementById('smIg').value,
-      facebook:  document.getElementById('smFb').value,
-      tiktok:    document.getElementById('smTk').value,
-      whatsapp:  document.getElementById('smWa').value,
-      updatedAt: Date.now()
-    }, {merge:true});
-    showT('✅ تم حفظ السوشيال ميديا');
-  } catch(e) { showT('❌ '+e.message); }
+function closePageModal(){ document.getElementById('pageModal').classList.remove('open'); }
+
+async function savePage(){
+  const title=document.getElementById('pgTitle').value.trim();
+  const slug=document.getElementById('pgSlug').value.trim().toLowerCase().replace(/\s+/g,'-')||title.toLowerCase().replace(/\s+/g,'-');
+  const content=document.getElementById('pgContent').value;
+  const active=document.getElementById('pgActiveToggle').classList.contains('on');
+  if(!title){showT('❌ أدخل عنوان الصفحة');return;}
+  if(!window._db){showT('❌ Firebase غير متصل');return;}
+  const {doc,setDoc,addDoc,collection}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const data={title,slug,content,active,updatedAt:Date.now()};
+  if(editPageId){
+    await setDoc(doc(window._db,'pages',editPageId),data,{merge:true});
+    const i=PAGES.findIndex(p=>p._id===editPageId);
+    if(i>=0)PAGES[i]={...PAGES[i],...data};
+    showT('✅ تم تعديل الصفحة!');
+  } else {
+    const ref=await addDoc(collection(window._db,'pages'),data);
+    PAGES.push({_id:ref.id,...data});
+    showT('✅ تم إنشاء الصفحة!');
+  }
+  closePageModal();rPages();
 }
 
-async function saveFloatBtnConfig() {
-  if(!window._db) { showT('❌ Firebase غير متصل'); return; }
-  try {
-    const {doc,setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await setDoc(doc(window._db,'config','floatBtn'),{
-      enabled: document.getElementById('fbEnabled').checked,
-      icon:    document.getElementById('fbIcon').value,
-      text:    document.getElementById('fbText').value,
-      action:  document.getElementById('fbAction').value,
-      updatedAt: Date.now()
-    }, {merge:true});
-    showT('✅ تم حفظ الزر العائم');
-  } catch(e) { showT('❌ '+e.message); }
+async function deletePage(id){
+  if(!confirm('حذف هذه الصفحة؟'))return;
+  const {doc,deleteDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  await deleteDoc(doc(window._db,'pages',id));
+  PAGES=PAGES.filter(p=>p._id!==id);rPages();showT('🗑️ تم حذف الصفحة');
 }
 
-// ═══════════════════════════════════════
-// PATCH goV to load new views
-// ═══════════════════════════════════════
-const _origGoV = goV;
+function previewPage(id){
+  const p=PAGES.find(x=>x._id===id);
+  if(!p)return;
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>${p.title}</title>
+  <style>body{font-family:Cairo,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;background:#0A0A0A;color:#fff;line-height:1.8;}
+  h1,h2,h3{color:#FF6B00;}a{color:#FF6B00;}</style></head>
+  <body><h1>🔥 ${p.title}</h1>${p.content}</body></html>`);
+  w.document.close();
+}
+
+// ═══════════════════════════════════════════════════════
+// CATEGORY EDIT & DELETE
+// ═══════════════════════════════════════════════════════
+function openCatEditModal(id){
+  const c=CATS.find(x=>x.id===id);if(!c)return;
+  document.getElementById('ceId').value=id;
+  document.getElementById('ceAr').value=c.ar||'';
+  document.getElementById('ceEn').value=c.en||'';
+  document.getElementById('ceEm').value=c.em||'🍽️';
+  document.getElementById('ceCatId').value=c.id;
+  document.getElementById('catEditModal').classList.add('open');
+}
+
+async function saveCatEdit(){
+  const id=document.getElementById('ceId').value;
+  const ar=document.getElementById('ceAr').value.trim();
+  const en=document.getElementById('ceEn').value.trim();
+  const em=document.getElementById('ceEm').value.trim();
+  if(!ar||!en){showT('❌ يرجى ملء الحقول');return;}
+  const idx=CATS.findIndex(c=>c.id===id);
+  if(idx>=0)Object.assign(CATS[idx],{ar,en,em});
+  await syncCatsToFirebase();
+  document.getElementById('catEditModal').classList.remove('open');
+  rCats();showT('✅ تم تعديل القسم');
+}
+
+async function deleteCat(id){
+  if(!confirm('حذف هذا القسم؟ سيُحذف من الواجهة فقط، المنتجات تبقى.'))return;
+  CATS.splice(CATS.findIndex(c=>c.id===id),1);
+  await syncCatsToFirebase();
+  rCats();rProds('all');showT('🗑️ تم حذف القسم');
+}
+
+// ═══════════════════════════════════════════════════════
+// PROMO DYNAMIC RENDERING
+// ═══════════════════════════════════════════════════════
+function rPromos(){
+  const tbody=document.getElementById('promosBody');
+  if(!tbody||!window._PROMOS)return;
+  tbody.innerHTML=window._PROMOS.map((p,i)=>`
+    <tr>
+      <td><strong style="color:var(--or);">${p.code}</strong></td>
+      <td>${p.disc}%</td>
+      <td>${p.uses||'∞'}</td>
+      <td><span class="st-badge ${p.active?'st-done':'st-canc'}">${p.active?'نشط':'متوقف'}</span></td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <div class="pa-btn" onclick="togglePromo(${i})" title="تفعيل/إيقاف">⏯</div>
+          <div class="pa-btn del" onclick="deletePromo(${i})" title="حذف">🗑️</div>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function togglePromo(idx){
+  if(!window._PROMOS)return;
+  window._PROMOS[idx].active=!window._PROMOS[idx].active;
+  await syncPromosToFirebase();rPromos();
+  showT(window._PROMOS[idx].active?'✅ تم تفعيل الكود':'⏸ تم إيقاف الكود');
+}
+
+async function deletePromo(idx){
+  if(!confirm('حذف هذا الكود؟'))return;
+  window._PROMOS.splice(idx,1);
+  await syncPromosToFirebase();rPromos();showT('🗑️ تم حذف الكود');
+}
+
+// ═══════════════════════════════════════════════════════
+// PATCH goV to load new views on navigate
+// ═══════════════════════════════════════════════════════
+const _origGoV = window.goV || goV;
 goV = function(id, el) {
   _origGoV(id, el);
   if(id==='tables')  loadTables();
-  if(id==='popups')  loadPopupConfig();
   if(id==='social')  loadSocialConfig2();
+  if(id==='pages')   loadPages();
+  if(id==='promo')   rPromos();
 };
+window.goV = goV;
 
+// Register Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
