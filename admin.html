@@ -140,13 +140,32 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
   .mob-menu{display:flex;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .settings-grid{grid-template-columns:1fr;}
+  .topbar{padding:12px 16px;}
+  .tbl th,.tbl td{padding:10px 14px;}
+  .card-head{padding:12px 14px;}
+  .content{padding:16px;}
 }
 @media(max-width:560px){
   .stats-row{grid-template-columns:repeat(2,1fr);gap:9px;}
-  .content{padding:14px 14px;}
-  .tbl th,.tbl td{padding:9px 12px;}
+  .content{padding:12px 10px;}
+  .tbl th,.tbl td{padding:8px 10px;font-size:.76rem;}
   .prod-grid{grid-template-columns:1fr 1fr;}
   .field-row{grid-template-columns:1fr;}
+  .settings-grid{grid-template-columns:1fr;}
+  .modal{border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;right:0;max-width:100%!important;max-height:85vh;}
+  .modal-bg{align-items:flex-end;}
+  #permEditor{grid-template-columns:1fr;}
+  .tabs{gap:4px;}
+  .tab{padding:6px 10px;font-size:.74rem;}
+}
+
+@media(max-width:420px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .sc-num{font-size:1.4rem;}
+  .topbar{padding:10px 14px;}
+  .tb-title{font-size:.9rem;}
+  .field-row{grid-template-columns:1fr;}
+  #sizesEditor{grid-template-columns:1fr;}
 }
 @media(max-width:380px){
   .prod-grid{grid-template-columns:1fr;}
@@ -367,11 +386,25 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
       <div class="settings-grid">
         <div class="settings-card">
           <h3>🔥 بيانات المطعم</h3>
-          <div class="field"><label>اسم المطعم</label><input type="text" value="SPARK Restaurant"></div>
-          <div class="field"><label>الشعار</label><input type="text" value="Ignite Your Taste 🔥"></div>
-          <div class="field"><label>العنوان</label><input type="text" value="أولاد صقر - الشرقية - شارع البحر"></div>
-          <div class="field"><label>رقم التليفون</label><input type="text" value="01020009617"></div>
-          <button class="btn-save" style="width:100%;margin-top:4px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ التغييرات</button>
+          <div class="field"><label>اسم المطعم</label><input type="text" id="stRestName" value="SPARK Restaurant"></div>
+          <div class="field"><label>الشعار (نص)</label><input type="text" id="stSlogan" value="Fire Up Your Hunger 🔥"></div>
+          <div class="field"><label>العنوان</label><input type="text" id="stAddress" value="أولاد صقر - الشرقية - شارع البحر"></div>
+          <div class="field"><label>رقم التليفون</label><input type="text" id="stPhone" value="01020009617"></div>
+          <div class="field">
+            <label>🖼️ شعار المطعم (Logo URL)</label>
+            <input type="url" id="stLogoUrl" placeholder="https://example.com/logo.png" oninput="previewLogo()">
+            <div style="margin-top:8px;font-size:.72rem;color:var(--muted);line-height:1.6;">
+              💡 <strong>كيف تضيف اللوجو:</strong><br>
+              1️⃣ ارفع الصورة على <a href="https://imgbb.com" target="_blank" style="color:var(--or);">imgBB.com</a> أو Cloudinary<br>
+              2️⃣ انسخ رابط الصورة المباشر (Direct Link)<br>
+              3️⃣ الصقه هنا واضغط حفظ<br>
+              📐 المقاس المثالي: 200×60px أو أي صورة PNG شفافة
+            </div>
+            <div id="logoPreviewBox" style="margin-top:10px;display:none;">
+              <img id="logoPreview" src="" style="max-height:50px;border-radius:6px;border:1px solid var(--bdr);padding:4px;background:#fff;">
+            </div>
+          </div>
+          <button class="btn-save" style="width:100%;margin-top:4px;" onclick="saveSettings()">💾 حفظ التغييرات</button>
         </div>
         <div class="settings-card">
           <h3>⏰ أوقات العمل</h3>
@@ -391,12 +424,21 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
           </div>
           <button class="btn-save" style="width:100%;margin-top:14px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ</button>
         </div>
-        <div class="settings-card">
-          <h3>🚚 إعدادات التوصيل</h3>
-          <div class="field"><label>رسوم التوصيل (EGP)</label><input type="number" value="15"></div>
-          <div class="field"><label>الحد الأدنى للتوصيل المجاني</label><input type="number" value="200"></div>
-          <div class="field"><label>وقت التوصيل المتوقع</label><input type="text" value="25-35 دقيقة"></div>
-          <button class="btn-save" style="width:100%;margin-top:4px;" onclick="showT('✅ تم الحفظ!')">💾 حفظ</button>
+        <div class="settings-card" style="grid-column:1/-1;">
+          <h3>🚚 مناطق التوصيل وأسعارها</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div class="field"><label>الحد الأدنى للتوصيل المجاني (EGP)</label><input type="number" id="delFreeMin" value="200" placeholder="200"></div>
+            <div class="field"><label>وقت التوصيل الافتراضي</label><input type="text" id="delTime" value="25-35 دقيقة"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div style="font-size:.8rem;font-weight:700;color:var(--or);">المناطق والأسعار</div>
+            <button onclick="addDeliveryRegion()" style="font-size:.72rem;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.3);color:var(--or);border-radius:7px;padding:5px 12px;cursor:pointer;font-family:Cairo,sans-serif;">+ إضافة منطقة</button>
+          </div>
+          <div id="regionsEditor" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+          <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">
+            💡 عند الطلب سيختار العميل منطقته وسيُحسب سعر التوصيل تلقائياً
+          </div>
+          <button class="btn-save" style="width:100%;" onclick="saveDeliveryRegions()">💾 حفظ مناطق التوصيل</button>
         </div>
         <div class="settings-card">
           <h3>🎨 إعدادات الموقع</h3>
@@ -532,7 +574,10 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
     <!-- ═══ RAMADAN ═══ -->
     <div class="view" id="v-ramadan">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-        <div style="font-size:1rem;font-weight:700;">🌙 إعدادات قسم رمضان</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="font-size:1rem;font-weight:700;">🌙 إعدادات قسم رمضان</div>
+          <span id="ramSavedBadge" style="font-size:.72rem;background:rgba(67,160,71,.15);color:#43A047;padding:3px 9px;border-radius:50px;opacity:0;transition:opacity .5s;"></span>
+        </div>
         <div style="display:flex;align-items:center;gap:12px;">
           <span style="font-size:.85rem;color:var(--muted);">تفعيل القسم:</span>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -549,7 +594,10 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
         <div style="padding:18px;display:flex;flex-direction:column;gap:12px;">
           <div class="field"><label>عنوان صفحة رمضان</label><input type="text" id="ramTitle" placeholder="رمضان كريم 🌙" value="رمضان كريم"></div>
           <div class="field"><label>وصف الصفحة</label><input type="text" id="ramDescInp" placeholder="أكلات السحور والإفطار — عروض رمضانية حصرية"></div>
-          <button class="tb-btn primary" onclick="saveRamadanConfig()" style="width:fit-content;">💾 حفظ الإعدادات</button>
+          <button class="btn-save" onclick="saveRamadanConfig()" style="width:100%;padding:12px;font-size:.9rem;">💾 حفظ إعدادات رمضان</button>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:6px;text-align:center;">
+            الحفظ يُحدّث الموقع مباشرة — <span id="ramSelCount">0</span> منتج محدد
+          </div>
         </div>
       </div>
 
@@ -644,10 +692,13 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
         </div>
       </div>
       <div id="uErrMsg" style="color:#EF5350;font-size:.78rem;margin-top:6px;"></div>
-      <!-- Permissions preview -->
+      <!-- Custom Permissions Editor -->
       <div style="margin-top:14px;">
-        <label style="font-size:.78rem;color:var(--muted);">الصلاحيات حسب الدور:</label>
-        <div class="perm-grid" id="permPreview"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <label style="font-size:.78rem;font-weight:700;color:var(--muted);">الصلاحيات (يمكن تعديلها يدوياً):</label>
+          <button onclick="resetPermToRole()" style="font-size:.7rem;color:var(--or);background:none;border:none;cursor:pointer;font-family:Cairo,sans-serif;">↺ إعادة ضبط حسب الدور</button>
+        </div>
+        <div id="permEditor" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
       </div>
     </div>
     <div class="modal-foot">
@@ -694,6 +745,47 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
       <div class="field"><label>الوصف (عربي)</label><textarea id="pDa" placeholder="وصف المنتج بالعربي..."></textarea></div>
       <div class="field"><label>الوصف (إنجليزي)</label><textarea id="pDe" placeholder="Product description..."></textarea></div>
       <div class="field"><label>الشارة (اختياري)</label><input type="text" id="pBdg" placeholder="Best Seller / Popular / Hot 🌶️"></div>
+
+      <!-- ─── SIZES ─── -->
+      <div style="margin-top:8px;">
+        <div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📐 الأحجام المتاحة</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;" id="sizesEditor">
+          <div style="background:var(--bg3);border-radius:10px;padding:10px;">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:8px;font-size:.8rem;font-weight:700;">
+              <input type="checkbox" id="szSmall" onchange="toggleSzField('small')" style="accent-color:var(--or);width:15px;height:15px;"> صغير
+            </label>
+            <div id="szF-small" style="display:none;">
+              <input type="number" id="szP-small" placeholder="سعر صغير (EGP)" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:7px;padding:7px 9px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;">
+            </div>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px;">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:8px;font-size:.8rem;font-weight:700;">
+              <input type="checkbox" id="szMedium" onchange="toggleSzField('medium')" style="accent-color:var(--or);width:15px;height:15px;"> وسط
+            </label>
+            <div id="szF-medium" style="display:none;">
+              <input type="number" id="szP-medium" placeholder="سعر وسط (EGP)" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:7px;padding:7px 9px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;">
+            </div>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px;">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:8px;font-size:.8rem;font-weight:700;">
+              <input type="checkbox" id="szLarge" onchange="toggleSzField('large')" style="accent-color:var(--or);width:15px;height:15px;"> كبير
+            </label>
+            <div id="szF-large" style="display:none;">
+              <input type="number" id="szP-large" placeholder="سعر كبير (EGP)" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:7px;padding:7px 9px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── EXTRAS / OPTIONS ─── -->
+      <div style="margin-top:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">⚡ الإضافات الاختيارية (Extras)</div>
+          <button onclick="addOptRow()" style="font-size:.72rem;color:var(--or);background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.3);border-radius:7px;padding:4px 10px;cursor:pointer;font-family:Cairo,sans-serif;">+ إضافة</button>
+        </div>
+        <div id="optsEditor" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:6px;">مثال: موزاريلا إضافي / Extra Mozzarella — السعر: 10 EGP</div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" onclick="closeProdModal()">إلغاء</button>
@@ -1076,6 +1168,38 @@ function filterProds(f,el){
 }
 async function deleteProd(id){if(confirm('هل تريد حذف هذا المنتج؟')){MEALS=MEALS.filter(m=>m.id!==id);await syncMealsToFirebase();rProds('all');showT('🗑️ تم حذف المنتج!');}}
 
+
+// ── Options Editor ──
+function addOptRow(opt=null){
+  const editor=document.getElementById('optsEditor');
+  if(!editor) return;
+  const idx=editor.children.length;
+  const row=document.createElement('div');
+  row.style.cssText='display:grid;grid-template-columns:1fr 1fr auto auto;gap:6px;align-items:center;';
+  row.innerHTML=`
+    <input type="text" placeholder="الاسم (عربي)" value="${opt?opt.ar||'':''}"
+      style="background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;" class="opt-ar">
+    <input type="text" placeholder="Name (EN)" value="${opt?opt.en||'':''}"
+      style="background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;" class="opt-en">
+    <input type="number" placeholder="السعر" value="${opt?opt.p||'':''}"
+      style="width:80px;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:8px 8px;color:var(--or);font-size:.78rem;font-family:Cairo,sans-serif;" class="opt-p">
+    <button onclick="this.parentElement.remove()" style="width:28px;height:28px;border-radius:7px;background:rgba(229,57,53,.15);border:1px solid rgba(229,57,53,.3);color:#EF5350;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;">✕</button>
+  `;
+  editor.appendChild(row);
+}
+
+function getOptsFromModal(){
+  const rows=document.querySelectorAll('#optsEditor > div');
+  const opts=[];
+  rows.forEach(row=>{
+    const ar=row.querySelector('.opt-ar')?.value.trim();
+    const en=row.querySelector('.opt-en')?.value.trim();
+    const p=parseFloat(row.querySelector('.opt-p')?.value)||0;
+    if(ar||en) opts.push({ar:ar||en,en:en||ar,p});
+  });
+  return opts;
+}
+
 // ── Product Modal ──
 function openProdModal(id){
   editId=id;
@@ -1089,6 +1213,8 @@ function openProdModal(id){
     if(f) f.style.display='none';
     if(pEl) pEl.value='';
   });
+  // Clear opts editor
+  document.getElementById('optsEditor').innerHTML='';
   if(id){
     const m=MEALS.find(x=>x.id===id);
     if(m){
@@ -1101,8 +1227,12 @@ function openProdModal(id){
       document.getElementById('pTm').value=m.tm;
       document.getElementById('pRt').value=m.r;
       document.getElementById('pBdg').value=m.badge||'';
+      document.getElementById('pDa').value=m.da||'';
+      document.getElementById('pDe').value=m.de||'';
       // Load saved sizes
       loadSizesToModal(id);
+      // Load opts
+      (m.opts||[]).forEach(opt=>addOptRow(opt));
     }
   } else {
     ['pAr','pEn','pEm','pPr','pCal','pTm','pRt','pBdg','pDa','pDe'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';});
@@ -1150,7 +1280,7 @@ async function saveProd(){
   const sizes=getSizesFromModal();
   if(editId){
     const m=MEALS.find(x=>x.id===editId);
-    if(m){Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});}
+    if(m){Object.assign(m,{ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||'',opts:getOptsFromModal()});}
     // Save sizes to Firebase
     if(window._db&&sizes.length>=0){
       try{
@@ -1163,7 +1293,7 @@ async function saveProd(){
     showT('✅ تم تعديل المنتج بنجاح!');
   } else {
     const newId=Math.max(...MEALS.map(m=>m.id))+1;
-    MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,opts:[],badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});
+    MEALS.push({id:newId,ar,en,cat:document.getElementById('pCat').value,em:document.getElementById('pEm').value||'🍕',pr,cal:parseInt(document.getElementById('pCal').value)||500,tm:document.getElementById('pTm').value||'15-25',r:parseFloat(document.getElementById('pRt').value)||4.5,opts:getOptsFromModal(),badge:document.getElementById('pBdg').value,da:document.getElementById('pDa')?.value||'',de:document.getElementById('pDe')?.value||''});
     if(window._db&&sizes.length>0){
       try{
         const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
@@ -1439,11 +1569,30 @@ async function saveSettings(){
   if(!window._db){showT('❌ Firebase غير متصل');return;}
   try{
     const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const fields={};
-    document.querySelectorAll('#v-settings input[id], #v-settings textarea[id]').forEach(el=>{fields[el.id]=el.value;});
-    await setDoc(doc(window._db,'config','settings'),{...fields,updatedAt:Date.now()});
+    const get=id=>{const el=document.getElementById(id);return el?el.value:'';};
+    const data={
+      restName: get('stRestName'),
+      slogan:   get('stSlogan'),
+      address:  get('stAddress'),
+      phone:    get('stPhone'),
+      logoUrl:  get('stLogoUrl'),
+      updatedAt:Date.now()
+    };
+    // Also save working hours if inputs exist
+    document.querySelectorAll('#v-settings input[id]').forEach(el=>{
+      if(!data[el.id]) data[el.id]=el.value;
+    });
+    await setDoc(doc(window._db,'config','settings'),data,{merge:true});
     showT('✅ تم حفظ الإعدادات!');
-  }catch(e){showT('❌ خطأ في الحفظ');}
+  }catch(e){showT('❌ خطأ في الحفظ: '+e.message);}
+}
+
+// Logo preview
+function previewLogo(){
+  const url=document.getElementById('stLogoUrl')?.value;
+  const box=document.getElementById('logoPreviewBox');
+  const img=document.getElementById('logoPreview');
+  if(url&&box&&img){img.src=url;box.style.display='block';}
 }
 
 // ── Ramadan Admin ──
@@ -1467,6 +1616,8 @@ function filterRamProds(cat){
 }
 
 function rRamProds(){
+  const cnt=document.getElementById('ramSelCount');
+  if(cnt) cnt.textContent=ramSelItems.size;
   const filtered=ramFilter==='all'?MEALS:MEALS.filter(m=>m.cat===ramFilter);
   const grid=document.getElementById('ramProdGrid');
   if(!grid) return;
@@ -1483,6 +1634,8 @@ function toggleRamProd(id){
   if(ramSelItems.has(id)) ramSelItems.delete(id);
   else ramSelItems.add(id);
   rRamProds();
+  const cnt=document.getElementById('ramSelCount');
+  if(cnt) cnt.textContent=ramSelItems.size;
 }
 
 async function saveRamadanConfig(){
@@ -1491,11 +1644,18 @@ async function saveRamadanConfig(){
     const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const title=document.getElementById('ramTitle')?.value||'رمضان كريم';
     const desc=document.getElementById('ramDescInp')?.value||'';
+    const selCount=document.getElementById('ramSelCount');
     await setDoc(doc(window._db,'config','ramadan'),{
-      active:ramadanActive, title, desc,
-      items:[...ramSelItems]
+      active:ramadanActive,
+      title,
+      desc,
+      items:[...ramSelItems],
+      updatedAt:Date.now()
     });
-    showT('✅ تم حفظ إعدادات رمضان!');
+    // Update status indicator
+    const badge=document.getElementById('ramSavedBadge');
+    if(badge){badge.textContent='✅ محفوظ';badge.style.opacity='1';setTimeout(()=>{badge.style.opacity='0';},3000);}
+    showT(ramadanActive?'✅ قسم رمضان فعّال ومحفوظ!':'✅ تم حفظ إعدادات رمضان (القسم متوقف)');
   }catch(e){showT('❌ خطأ: '+e.message);}
 }
 
@@ -1560,7 +1720,7 @@ async function doLogin() {
     // Check if user is active
     if(profile.active === false){ await auth.signOut(); errEl.textContent='هذا الحساب موقوف'; return; }
     // Apply role
-    applyRole(profile.role);
+    applyRole(profile.role, profile.customPerms||null);
     document.getElementById('authOverlay').style.display='none';
     initAdmin();
   } catch(e) {
@@ -1585,9 +1745,11 @@ async function doLogout() {
 }
 
 // ── APPLY ROLE: show/hide nav + update sidebar ──
-function applyRole(role) {
+function applyRole(role, customPerms=null) {
   const r = ROLES[role] || ROLES.cashier;
-  const p = PERMS[role] || PERMS.cashier;
+  // Use customPerms if available, else fall back to role defaults
+  const base = PERMS[role] || PERMS.cashier;
+  const p = customPerms ? {...base,...customPerms} : base;
   // Sidebar name + badge
   document.getElementById('sbName').textContent = currentUser?.name || r.label;
   const badge = document.getElementById('sbRoleBadge');
@@ -1631,7 +1793,7 @@ function applyRole(role) {
         const snap = await getDoc(doc(db,'users',user.uid));
         if(snap.exists() && snap.data().active !== false){
           currentUser = {uid:user.uid,...snap.data()};
-          applyRole(currentUser.role);
+          applyRole(currentUser.role, currentUser.customPerms||null);
           document.getElementById('authOverlay').style.display='none';
           initAdmin();
         } else {
@@ -1651,27 +1813,74 @@ const PERM_LABELS = {
   analytics:'الحسابات', ramadan:'رمضان', users:'المستخدمون', tables:'الطاولات', social:'السوشيال', pages:'الصفحات'
 };
 
-function openUserModal(uid=null){
+async function openUserModal(uid=null){
   editUserId = uid;
   document.getElementById('userModalTitle').textContent = uid ? 'تعديل المستخدم' : 'إضافة مستخدم جديد';
   document.getElementById('uErrMsg').textContent='';
   if(!uid){
     ['uName','uEmail','uPass'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('uRole').value='cashier';
+    updatePermPreview(false);
+  } else {
+    // Load existing user data to fill permissions
+    if(window._db){
+      try{
+        const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const snap=await getDoc(doc(window._db,'users',uid));
+        if(snap.exists()){
+          const u=snap.data();
+          document.getElementById('uName').value=u.name||'';
+          document.getElementById('uEmail').value=u.email||'';
+          document.getElementById('uRole').value=u.role||'cashier';
+          document.getElementById('uPass').value='';
+          // Build checkboxes then apply customPerms if exists
+          updatePermPreview(false);
+          if(u.customPerms){
+            // Apply custom permissions to checkboxes
+            setTimeout(()=>{
+              Object.entries(u.customPerms).forEach(([k,v])=>{
+                const cb=document.querySelector(`#permEditor [data-perm="${k}"]`);
+                if(cb) cb.checked=v;
+              });
+            },50);
+          }
+        }
+      }catch(e){console.warn(e);}
+    }
   }
-  updatePermPreview();
   document.getElementById('userModal').classList.add('open');
 }
 function closeUserModal(){ document.getElementById('userModal').classList.remove('open'); }
 
-function updatePermPreview(){
+function updatePermPreview(keepExisting=false){
   const role = document.getElementById('uRole').value;
   const p = PERMS[role]||PERMS.cashier;
-  document.getElementById('permPreview').innerHTML = Object.entries(PERM_LABELS).map(([k,lbl])=>`
-    <div class="perm-item">
-      <div class="perm-dot ${p[k]?'perm-on':'perm-off'}"></div>
-      <span style="color:${p[k]?'var(--txt)':'var(--muted)'}">${lbl}</span>
-    </div>`).join('');
+  const editor = document.getElementById('permEditor');
+  if(!editor) return;
+  // If keepExisting, read existing checkboxes first
+  const existing = {};
+  if(keepExisting){
+    editor.querySelectorAll('input[type=checkbox]').forEach(cb=>{existing[cb.dataset.perm]=cb.checked;});
+  }
+  editor.innerHTML = Object.entries(PERM_LABELS).map(([k,lbl])=>{
+    const checked = keepExisting&&existing[k]!==undefined ? existing[k] : !!p[k];
+    return `<label style="display:flex;align-items:center;gap:7px;padding:6px 8px;background:var(--bg3);border-radius:8px;cursor:pointer;font-size:.78rem;">
+      <input type="checkbox" data-perm="${k}" ${checked?'checked':''} style="width:14px;height:14px;accent-color:var(--or);">
+      <span style="color:var(--txt);">${lbl}</span>
+    </label>`;
+  }).join('');
+}
+
+function resetPermToRole(){
+  updatePermPreview(false);
+}
+
+function getCustomPerms(){
+  const perms={};
+  document.querySelectorAll('#permEditor input[type=checkbox]').forEach(cb=>{
+    perms[cb.dataset.perm]=cb.checked;
+  });
+  return perms;
 }
 
 async function saveUser(){
@@ -1687,7 +1896,8 @@ async function saveUser(){
     const {doc,setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     if(editUserId){
       // Update existing user profile
-      await setDoc(doc(window._db,'users',editUserId),{name,email,role,active:true},{merge:true});
+      const customPerms=getCustomPerms();
+      await setDoc(doc(window._db,'users',editUserId),{name,email,role,active:true,customPerms},{merge:true});
       showT('✅ تم تعديل المستخدم!');
     } else {
       // Create new user via Firebase Auth REST API
@@ -1698,7 +1908,8 @@ async function saveUser(){
       const data = await res.json();
       if(data.error){ errEl.textContent = data.error.message==='EMAIL_EXISTS'?'هذا الإيميل مستخدم بالفعل':data.error.message; return; }
       // Save user profile to Firestore
-      await setDoc(doc(window._db,'users',data.localId),{name,email,role,active:true,createdAt:Date.now()});
+      const customPerms=getCustomPerms();
+      await setDoc(doc(window._db,'users',data.localId),{name,email,role,active:true,customPerms,createdAt:Date.now()});
       showT('✅ تم إضافة المستخدم!');
     }
     closeUserModal();
@@ -1780,6 +1991,8 @@ async function initAdmin(){
       if(rd.title) document.getElementById('ramTitle').value=rd.title;
       if(rd.desc) document.getElementById('ramDescInp').value=rd.desc;
     }
+    // Load delivery regions
+    await loadDeliveryRegions();
     // Load social
     const socSnap=await getDoc(docRef(db,'config','social'));
     if(socSnap.exists()){
@@ -1799,6 +2012,7 @@ async function initAdmin(){
     else window._PROMOS=[{code:'SPARK20',disc:20,uses:'∞',active:true},{code:'WELCOME10',disc:10,uses:'1',active:true}];
   }catch(e){ window._PROMOS=[]; }
   rPromos();
+  loadSettingsFromFirebase();
 
   // Load product sizes config
   try{
@@ -2214,12 +2428,103 @@ async function deletePromo(idx){
 const _origGoV = window.goV || goV;
 goV = function(id, el) {
   _origGoV(id, el);
-  if(id==='tables')  loadTables();
-  if(id==='social')  loadSocialConfig2();
-  if(id==='pages')   loadPages();
-  if(id==='promo')   rPromos();
+  if(id==='tables')    loadTables();
+  if(id==='social')    loadSocialConfig2();
+  if(id==='pages')     loadPages();
+  if(id==='promo')     rPromos();
+  if(id==='settings')  { loadDeliveryRegions(); loadSettingsFromFirebase(); }
 };
 window.goV = goV;
+
+
+// ═══════════════════════════════════════════════════════
+// DELIVERY REGIONS
+// ═══════════════════════════════════════════════════════
+let DELIVERY_REGIONS = [
+  {name:'أولاد صقر', price:15, time:'20-30'},
+  {name:'أبو كبير', price:20, time:'30-45'},
+  {name:'الزقازيق', price:25, time:'40-55'},
+];
+
+function renderDeliveryRegions(){
+  const editor = document.getElementById('regionsEditor');
+  if(!editor) return;
+  editor.innerHTML = DELIVERY_REGIONS.map((r,i) => `
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:center;background:var(--bg3);border-radius:10px;padding:10px 12px;">
+      <input type="text" value="${r.name}" placeholder="اسم المنطقة"
+        oninput="DELIVERY_REGIONS[${i}].name=this.value"
+        style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.8rem;font-family:Cairo,sans-serif;">
+      <div style="position:relative;">
+        <input type="number" value="${r.price}" placeholder="السعر"
+          oninput="DELIVERY_REGIONS[${i}].price=parseFloat(this.value)||0"
+          style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px 8px 38px;color:var(--or);font-size:.8rem;font-family:Cairo,sans-serif;">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:var(--muted);">EGP</span>
+      </div>
+      <input type="text" value="${r.time||''}" placeholder="وقت التوصيل"
+        oninput="DELIVERY_REGIONS[${i}].time=this.value"
+        style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;">
+      <button onclick="deleteDeliveryRegion(${i})"
+        style="width:30px;height:30px;border-radius:8px;background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.25);color:#EF5350;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;">✕</button>
+    </div>`).join('');
+}
+
+function addDeliveryRegion(){
+  DELIVERY_REGIONS.push({name:'', price:15, time:'25-35'});
+  renderDeliveryRegions();
+  // Focus last name input
+  const inputs = document.querySelectorAll('#regionsEditor input[type=text]');
+  if(inputs.length) inputs[inputs.length-2].focus();
+}
+
+function deleteDeliveryRegion(idx){
+  DELIVERY_REGIONS.splice(idx,1);
+  renderDeliveryRegions();
+}
+
+async function saveDeliveryRegions(){
+  if(!window._db){showT('❌ Firebase غير متصل');return;}
+  const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const freeMin = parseFloat(document.getElementById('delFreeMin')?.value)||200;
+  const defTime = document.getElementById('delTime')?.value||'25-35 دقيقة';
+  await setDoc(doc(window._db,'config','delivery'),{
+    regions: DELIVERY_REGIONS,
+    freeMin,
+    defTime,
+    updatedAt:Date.now()
+  });
+  showT('✅ تم حفظ مناطق التوصيل!');
+}
+
+async function loadDeliveryRegions(){
+  if(!window._db) return;
+  const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const snap=await getDoc(doc(window._db,'config','delivery'));
+  if(snap.exists()){
+    const d=snap.data();
+    if(d.regions?.length) DELIVERY_REGIONS=d.regions;
+    if(d.freeMin!=null){const el=document.getElementById('delFreeMin');if(el)el.value=d.freeMin;}
+    if(d.defTime){const el=document.getElementById('delTime');if(el)el.value=d.defTime;}
+  }
+  renderDeliveryRegions();
+}
+
+
+async function loadSettingsFromFirebase(){
+  if(!window._db) return;
+  try{
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(window._db,'config','settings'));
+    if(!snap.exists()) return;
+    const d=snap.data();
+    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null)el.value=v;};
+    set('stRestName', d.restName);
+    set('stSlogan',   d.slogan);
+    set('stAddress',  d.address);
+    set('stPhone',    d.phone);
+    set('stLogoUrl',  d.logoUrl);
+    if(d.logoUrl) previewLogo();
+  }catch(e){console.warn('loadSettings:',e);}
+}
 
 // Register Service Worker
 if('serviceWorker' in navigator){

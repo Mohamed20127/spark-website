@@ -273,8 +273,9 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   .ftg{grid-template-columns:1fr 1fr;gap:18px;}
 }
 /* ─── MOBILE ─── */
+@media(max-width:768px){.cgrid{grid-template-columns:repeat(3,1fr);}.mgrid{grid-template-columns:repeat(2,1fr);}.ab-cards{grid-template-columns:repeat(2,1fr);}.ab-stats{grid-template-columns:repeat(2,1fr);}.hero{padding:78px 14px 32px;}.csb{width:min(340px,96%);}}
 @media(max-width:560px){
-  .cgrid{grid-template-columns:repeat(3,1fr);gap:6px;}
+  .cgrid{grid-template-columns:repeat(3,1fr);gap:6px;}.ab-story{grid-template-columns:1fr;}.ab-cards{grid-template-columns:1fr;}.co-grid{grid-template-columns:1fr;}.csb{width:100%;}.dmod,.comod{border-radius:14px 14px 0 0;}
   .cc{padding:11px 5px;border-radius:10px;}
   .cem{font-size:1.55rem;margin-bottom:4px;}
   .cnm{font-size:.7rem;}
@@ -304,7 +305,9 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
 
 <!-- NAV -->
 <nav>
-  <div class="logo" onclick="gp('home',document.getElementById('nH'))" style="cursor:pointer;">🔥 SPARK</div>
+  <div class="logo" onclick="gp('home',document.getElementById('nH'))" style="cursor:pointer;display:flex;align-items:center;gap:8px;">
+      <span id="logoImg" style="display:none;"><img id="logoImgEl" src="" alt="SPARK" style="height:36px;object-fit:contain;vertical-align:middle;"></span>
+      <span id="logoText">🔥 SPARK</span></div>
   <ul class="nlinks" id="nlinks">
     <li><a href="#" onclick="gp('home',this)" class="act" id="nH">Home</a></li>
     <li><a href="#" onclick="gp('pgMenu',this)" id="nM">Menu</a></li>
@@ -346,7 +349,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
     <div class="hbg"></div><div class="hgrid"></div>
     <div class="hc">
       <div class="hbdg" id="hBd">⚡ Hot &amp; Fresh Daily</div>
-      <h1 id="hH1">IGNITE<br><span>YOUR</span><br>TASTE</h1>
+      <h1 id="hH1">FIRE UP<br><span>YOUR</span><br>HUNGER 🔥</h1>
       <p id="hSb">Bold flavors fired with passion. Every dish crafted to ignite your senses.</p>
       <div class="hbtns">
         <a href="#" class="bprim" onclick="gp('pgMenu')" id="hB1">🔥 Explore Menu</a>
@@ -411,8 +414,8 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
 <footer>
     <div class="ftg">
       <div>
-        <div class="ftlo">🔥 SPARK</div>
-        <p class="ftde" id="ftD">Ignite your taste with bold flavors. More than a restaurant.</p>
+        <div class="ftlo" style="display:flex;align-items:center;gap:8px;"><span id="ftLogoImg" style="display:none;"><img id="ftLogoImgEl" src="" alt="SPARK" style="height:30px;object-fit:contain;"></span><span id="ftLogoText">🔥 SPARK</span></div>
+        <p class="ftde" id="ftD">Fire up your hunger 🔥 — bold flavors crafted with passion.</p>
         <div class="ftsoc">
   <a href="https://www.facebook.com/sparkrestaurant" target="_blank" title="Facebook" style="text-decoration:none;font-size:1.3rem;">📘</a>
   <a href="https://www.instagram.com/sparkrestaurant" target="_blank" title="Instagram" style="text-decoration:none;font-size:1.3rem;">📸</a>
@@ -425,6 +428,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
           <li><a href="#" onclick="gp('home')" id="fl1">Home</a></li>
           <li><a href="#" onclick="gp('pgMenu')" id="fl2">Menu</a></li>
           <li><a href="#" onclick="gp('pgAbout')" id="fl3">About</a></li>
+          <div id="ftCustomPages"></div>
         </ul>
       </div>
       <div class="ftcol">
@@ -449,7 +453,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
     </div>
     <div class="ftbt">
       <div id="ftC">© 2025 SPARK Restaurant. All rights reserved.</div>
-      <div style="color:var(--or);font-weight:700;">🔥 Ignite Your Taste</div>
+      <div style="color:var(--or);font-weight:700;">🔥 Fire Up Your Hunger</div>
     </div>
   </footer>
 </div>
@@ -506,6 +510,14 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
         <div class="cocard"><div class="coic">🕑</div><h3 id="co3T">Working Hours</h3><p id="co3P">Daily: 2PM – 2AM<br>Ramadan: 9PM – 4AM</p></div>
       </div>
     </section>
+  </div>
+</div>
+
+<!-- ═══ CUSTOM PAGE ═══ -->
+<div class="pg" id="pgCustom" style="padding-top:60px;">
+  <div style="max-width:820px;margin:0 auto;padding:32px 16px 60px;">
+    <div id="pgCustomTitle" style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;margin-bottom:8px;color:var(--or);"></div>
+    <div id="pgCustomContent" style="color:var(--txt);line-height:1.9;font-size:.9rem;"></div>
   </div>
 </div>
 
@@ -626,12 +638,12 @@ const MEALS=[
 // ══════════════════ TRANSLATIONS ══════════════════
 const TR={
   en:{lb:'🌐 AR',nH:'Home',nM:'Menu',nA:'About',nC:'Cart',nO:'Order Now',dH:'🏠 Home',dM:'🍽️ Menu',dA:'⭐ About',dO:'Order Now',
-    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'Bold flavors fired with passion. Every dish crafted to ignite your senses.',
+    hBd:'⚡ Hot & Fresh Daily',hH1:'IGNITE<br><span>YOUR</span><br>TASTE',hSb:'Fire up your hunger — bold flavors, real passion, zero compromise. 🔥',
     hB1:'🔥 Explore Menu',hB2:'Browse Categories',hs1:'Rating',hs2:'Customers',hs3:'Items',hs4:'Delivery',
     ti1:'🔥 FREE DELIVERY OVER 200 EGP',ti2:'⚡ CODE: SPARK20 → 20% OFF',ti3:'🍕 NEW CALZONE NOW AVAILABLE!',ti4:'🎉 OPEN DAILY 2PM – 2AM',
     bsL:'🏆 Most Ordered',bsT:'OUR BEST SELLER!',bsS:'Loved by thousands — signature pizza with fresh toppings and melted cheese.',bsB:'Order Now →',
     hML:'Hand Picked',hMT:'POPULAR',hSA:'See all →',
-    ftD:'Ignite your taste with bold flavors. More than a restaurant.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
+    ftD:'Fire up your hunger 🔥 — bold flavors crafted with passion.',ftH1:'Quick Links',ftH2:'Categories',ftH3:'Contact',fl1:'Home',fl2:'Menu',fl3:'About',ftC:'© 2025 SPARK Restaurant. All rights reserved.',
     cL:'Browse By',cT:'CATEGORIES',mL:'Hand Picked',mT:'ALL MEALS',cu:'items',
     cTtl:'🛒 MY CART',ce:'Cart is empty',ces:'Add some delicious items!',pp:'Enter Promo Code',ab:'Apply',sub:'Subtotal',del:'Delivery',tot:'Total',fd:'FREE',am:(n)=>`Add ${n} EGP for free delivery!`,chb:'🚀 Proceed To Checkout',
     po:'🎉 20% discount applied!',pf:'❌ Invalid promo code',ad:(n)=>`🔥 ${n} added to cart!`,addB:'+ Add',cu2:'Cal',ot:'Additional Options:',tl:'Total:',acb:'🛒 Add to Cart',clb:'Close',
@@ -644,12 +656,12 @@ const TR={
     ast1:'Happy Customers',ast2:'Menu Items',ast3:'Avg Rating',ast4:'Big Goal',coL:'Find Us',coT:'CONTACT',
     co1T:'Address',co1P:'Awlad Saqr - El Sharqia - El Bahr St. - next to Old Othman Pharmacy',co2T:'Phone',co3T:'Working Hours',co3P:'Daily: 2PM – 2AM | Ramadan: 9PM – 4AM'},
   ar:{lb:'🌐 EN',nH:'الرئيسية',nM:'القائمة',nA:'عن سبارك',nC:'سلتي',nO:'اطلب الآن',dH:'🏠 الرئيسية',dM:'🍽️ القائمة',dA:'⭐ عن سبارك',dO:'اطلب الآن',
-    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'نكهات جريئة مصنوعة بعشق. كل صنف في سبارك بيشعل حواسك.',
+    hBd:'⚡ طازج وساخن كل يوم',hH1:'أشعل<br><span>جوعك</span><br>معنا',hSb:'أشعل جوعك — نكهات جريئة، شغف حقيقي، لا تنازل. 🔥',
     hB1:'🔥 استعرض القائمة',hB2:'تصفح الأقسام',hs1:'التقييم',hs2:'عميل',hs3:'صنف',hs4:'توصيل',
     ti1:'🔥 توصيل مجاني فوق 200 جنيه',ti2:'⚡ كود SPARK20 خصم 20%',ti3:'🍕 كالزوني الجديد متاح الآن!',ti4:'🎉 مفتوح 2م – 2ص يومياً',
     bsL:'🏆 الأكثر طلباً',bsT:'!الأكثر مبيعاً',bsS:'محبوب من آلاف الزباين. بيتزا سبارك بتوبينج خاص وجبن مذاب.',bsB:'← اطلب الآن',
     hML:'مختارة بعناية',hMT:'الأشهر',hSA:'← عرض الكل',
-    ftD:'أشعل ذوقك بنكهات جريئة. إحنا مش مجرد مطعم.',ftH1:'روابط سريعة',ftH2:'الأقسام',ftH3:'تواصل',fl1:'الرئيسية',fl2:'القائمة',fl3:'عن سبارك',ftC:'.© 2025 مطعم سبارك. جميع الحقوق محفوظة',
+    ftD:'أشعل جوعك 🔥 — نكهات جريئة مصنوعة بعشق.',ftH1:'روابط سريعة',ftH2:'الأقسام',ftH3:'تواصل',fl1:'الرئيسية',fl2:'القائمة',fl3:'عن سبارك',ftC:'.© 2025 مطعم سبارك. جميع الحقوق محفوظة',
     cL:'تصفح حسب',cT:'الأقسام',mL:'مختارة بعناية',mT:'كل الأصناف',cu:'صنف',
     cTtl:'🛒 سلتي',ce:'سلتك فاضية',ces:'ضيف أصناف لذيذة!',pp:'كود الخصم',ab:'تطبيق',sub:'الإجمالي',del:'التوصيل',tot:'الإجمالي الكلي',fd:'مجاني',am:(n)=>`ضيف ${n} جنيه للتوصيل المجاني!`,chb:'🚀 إتمام الطلب',
     po:'🎉 تم تطبيق خصم 20%!',pf:'❌ كود خاطئ',ad:(n)=>`🔥 ${n} أضيف للسلة!`,addB:'+ أضف',cu2:'سعرة',ot:':خيارات إضافية',tl:':الإجمالي',acb:'🛒 أضف للسلة',clb:'إغلاق',
@@ -764,7 +776,7 @@ function rCart(){
   const list=document.getElementById('cList'),bot=document.getElementById('cBot');
   if(!cart.length){list.innerHTML=`<div style="text-align:center;padding:44px 14px;color:var(--muted)"><div style="font-size:3.2rem;margin-bottom:11px">🛒</div><div style="font-weight:600;margin-bottom:4px">${T('ce')}</div><div style="font-size:.74rem">${T('ces')}</div></div>`;bot.innerHTML='';return;}
   list.innerHTML=cart.map(it=>`<div class="ci"><div class="ciem">${it.em}</div><div class="ciin"><div class="cinm">${L==='en'?it.en:it.ar}</div><div class="cipr">${it.pr*it.qty} EGP</div></div><div class="qcl"><button class="qb" onclick="chQ(${it.id},-1)">−</button><span class="qn">${it.qty}</span><button class="qb" onclick="chQ(${it.id},1)">+</button></div></div>`).join('');
-  const sub=cTot(),del=sub>=200?0:15;
+  const sub=cTot(),del=sub>=(window._delFreeMin||200)?0:(window._delPrice||15);
   bot.innerHTML=`<div class="prow"><input type="text" placeholder="${T('pp')}" id="pIn"><button class="bap" onclick="apPr()">${T('ab')}</button></div>
   <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div>${sub&&del?`<div style="font-size:.66rem;color:var(--or);margin-bottom:4px">${T('am',200-sub)}</div>`:''}<div class="stot"><span>${T('tot')}</span><span class="totp">${sub+del} EGP</span></div></div>
   <button class="bco" onclick="openCO()">${T('chb')}</button>`;}
@@ -867,7 +879,16 @@ function openCO(){
   document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
   <div class="cohd"><div class="cottl">${T('coTtl')}</div><button class="ccl" onclick="closeCO()">✕</button></div>
   <div class="cobdy">
-  <div class="coslb">${T('shl')} <a href="#" style="color:var(--or);font-size:.68rem;margin-inline-start:7px;">${T('aad')}</a></div>
+  <div class="coslb">${T('shl')}</div>
+  <!-- Delivery Region Selector -->
+  ${window._deliveryRegions&&window._deliveryRegions.length ? `
+  <div style="margin-bottom:10px;">
+    <label style="font-size:.74rem;color:var(--muted);font-weight:700;display:block;margin-bottom:6px;">${L==='ar'?'اختر منطقة التوصيل':'Select Delivery Region'}</label>
+    <select id="regionSelect" onchange="onRegionChange(this)" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg3);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.84rem;">
+      <option value="">${L==='ar'?'-- اختر منطقتك --':'-- Select your region --'}</option>
+      ${window._deliveryRegions.map(r=>`<option value="${r.price}" data-name="${r.name}" data-time="${r.time||''}">${r.name} — ${r.price} EGP ${r.time?'('+r.time+')':''}</option>`).join('')}
+    </select>
+  </div>` : ''}
   <div class="adc${selA==='home'?' sel':''}" onclick="sA('home',this)"><div class="adic">🏠</div><div><div class="adt">${L==='ar'?'المنزل':'Home'}</div><div class="add">${L==='ar'?'التوصيل لمنزلك':'Deliver to my home'}</div></div></div>
   <div class="adc${selA==='custom'?' sel':''}" onclick="sA('custom',this);setTimeout(()=>document.getElementById('customAddrInp')?.focus(),100)"><div class="adic">📍</div><div><div class="adt">${L==='ar'?'عنوان مخصص':'Custom Address'}</div><div class="add">${L==='ar'?'ادخل عنوانك يدوياً':'Enter your address manually'}</div></div></div>
   <div id="customAddrBox" style="display:${selA==='custom'?'block':'none'};margin-top:8px;">
@@ -896,6 +917,16 @@ function openCO(){
   })()}
   <button class="bco" onclick="confO()">${T('cfb')}</button></div>`;
   document.getElementById('coOv').classList.add('open');
+}
+function onRegionChange(sel){
+  const opt=sel.options[sel.selectedIndex];
+  if(opt&&opt.value){
+    window._delPrice=parseFloat(opt.value)||15;
+    // refresh cart bottom
+    const sub=cTot(), del=sub>=(window._delFreeMin||200)?0:window._delPrice;
+    const totEl=document.querySelector('#coMod .totp');
+    if(totEl) totEl.textContent=(sub+del)+' EGP';
+  }
 }
 function sA(v,el){
   selA=v;
@@ -1015,14 +1046,74 @@ async function loadFromFirebase(){
     const szn=await getDocs(collection(db,'product_sizes'));
     szn.docs.forEach(d=>{const data=d.data();if(data.mealId&&data.sizes) PROD_SIZES[data.mealId]=data.sizes;});
 
-    // Settings
+    // Settings + Logo
     const stn=await getDoc(doc(db,'config','settings'));
-    if(stn.exists()&&stn.data().restName) document.title=stn.data().restName+' 🔥';
+    if(stn.exists()){
+      const sd=stn.data();
+      if(sd.restName) document.title=sd.restName+' 🔥';
+      if(sd.logoUrl){
+        // Show logo image, hide text
+        ['logoImgEl','ftLogoImgEl'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=sd.logoUrl;});
+        ['logoImg','ftLogoImg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+        ['logoText','ftLogoText'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+      }
+    }
 
     // Refresh UI
     if(curPg==='pgMenu'){rCats();rMeals(cat);}
     else if(curPg==='home') rHome();
   }catch(e){console.warn('loadFromFirebase:',e);}
+  // Load custom pages into footer nav
+  loadCustomPages();
+  // Load delivery config
+  loadDeliveryConfig();
+}
+
+async function loadDeliveryConfig(){
+  try{
+    const {db}=await initFB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','delivery'));
+    if(snap.exists()){
+      const d=snap.data();
+      if(d.regions?.length) window._deliveryRegions=d.regions;
+      if(d.freeMin!=null) window._delFreeMin=d.freeMin;
+      if(d.defTime) window._delDefTime=d.defTime;
+    } else {
+      // defaults
+      window._deliveryRegions=[];
+      window._delFreeMin=200;
+    }
+  }catch(e){console.warn('loadDeliveryConfig:',e);}
+}
+
+let _customPages=[];
+async function loadCustomPages(){
+  try{
+    const {db}=await initFB();
+    const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDocs(collection(db,'pages'));
+    _customPages=snap.docs.map(d=>({_id:d.id,...d.data()})).filter(p=>p.active);
+    // Render in footer
+    const ftSlot=document.getElementById('ftCustomPages');
+    if(ftSlot && _customPages.length){
+      ftSlot.innerHTML=_customPages.map(p=>`<li><a href="#" onclick="openCustomPage('${p._id}')">${p.title}</a></li>`).join('');
+    }
+    // Check URL for direct page link ?page=slug
+    const slug=new URLSearchParams(location.search).get('page');
+    if(slug){
+      const pg=_customPages.find(p=>p.slug===slug);
+      if(pg) openCustomPage(pg._id);
+    }
+  }catch(e){console.warn('loadCustomPages:',e);}
+}
+
+function openCustomPage(id){
+  const pg=_customPages.find(p=>p._id===id);
+  if(!pg) return;
+  document.getElementById('pgCustomTitle').textContent=pg.title;
+  document.getElementById('pgCustomContent').innerHTML=pg.content||'';
+  gp('pgCustom');
 }
 
 // ── Firebase ──
