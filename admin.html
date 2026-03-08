@@ -2014,7 +2014,7 @@ function applyRole(role, customPerms=null) {
 }
 
 // ── CHECK AUTH ON LOAD ──
-(async async function checkAuth(){
+(async function checkAuth(){
   try{
     const {initializeApp,getApps} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getAuth,onAuthStateChanged} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -2204,7 +2204,7 @@ const FB_CFG={
 };
 
 // ── Init ──
-async async function initAdmin(){
+async function initAdmin(){
   const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
   const {getFirestore,collection,onSnapshot,orderBy,query,doc,updateDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
   const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
