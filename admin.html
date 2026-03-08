@@ -254,6 +254,7 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
     <div class="sb-sec">الإعدادات</div>
     <div class="sb-item" onclick="goV('ramadan',this)"><div class="icon">🌙</div> قسم رمضان</div>
     <div class="sb-item" onclick="goV('settings',this)"><div class="icon">⚙️</div> إعدادات الموقع</div>
+    <div class="sb-item" onclick="goV('payment-methods',this)"><div class="icon">💳</div> طرق الدفع</div>
     <div class="sb-item" onclick="goV('promo',this)"><div class="icon">🎁</div> كودات الخصم</div>
     <div class="sb-item" onclick="goV('tables',this)"><div class="icon">🪑</div> الطاولات & QR</div>
     <div class="sb-item" onclick="goV('social',this)"><div class="icon">📱</div> السوشيال ميديا</div>
@@ -431,13 +432,37 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
             <div class="field"><label>الحد الأدنى للتوصيل المجاني (EGP)</label><input type="number" id="delFreeMin" value="200" placeholder="200"></div>
             <div class="field"><label>وقت التوصيل الافتراضي</label><input type="text" id="delTime" value="25-35 دقيقة"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <div style="font-size:.8rem;font-weight:700;color:var(--or);">المناطق والأسعار</div>
-            <button onclick="addDeliveryRegion()" style="font-size:.72rem;background:rgba(255,107,0,.1);border:1px solid rgba(255,107,0,.3);color:var(--or);border-radius:7px;padding:5px 12px;cursor:pointer;font-family:Cairo,sans-serif;">+ إضافة منطقة</button>
+          <!-- Regions header -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--txt);">📍 مناطق التوصيل</div>
+              <div style="font-size:.7rem;color:var(--muted);margin-top:2px;">كل منطقة لها سعر ووقت توصيل منفصل</div>
+            </div>
+            <button onclick="addDeliveryRegion()" style="display:flex;align-items:center;gap:5px;font-size:.78rem;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.35);color:var(--or);border-radius:8px;padding:7px 14px;cursor:pointer;font-family:Cairo,sans-serif;font-weight:700;">+ إضافة منطقة</button>
           </div>
-          <div id="regionsEditor" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
-          <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">
-            💡 عند الطلب سيختار العميل منطقته وسيُحسب سعر التوصيل تلقائياً
+
+          <!-- Column headers -->
+          <div style="display:grid;grid-template-columns:2fr 100px 120px 60px 32px;gap:8px;padding:0 4px;margin-bottom:4px;">
+            <div style="font-size:.68rem;color:var(--muted);font-weight:700;">اسم المنطقة</div>
+            <div style="font-size:.68rem;color:var(--muted);font-weight:700;">السعر (EGP)</div>
+            <div style="font-size:.68rem;color:var(--muted);font-weight:700;">وقت التوصيل</div>
+            <div style="font-size:.68rem;color:var(--muted);font-weight:700;text-align:center;">متاح</div>
+            <div></div>
+          </div>
+
+          <!-- Regions list -->
+          <div id="regionsEditor" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:320px;overflow-y:auto;padding-left:2px;"></div>
+
+          <!-- Empty state -->
+          <div id="regionsEmpty" style="display:none;text-align:center;padding:24px;background:var(--bg3);border-radius:10px;border:1px dashed var(--bdr);margin-bottom:14px;">
+            <div style="font-size:1.8rem;margin-bottom:8px;">📍</div>
+            <div style="font-size:.8rem;color:var(--muted);">لا توجد مناطق بعد</div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:4px;">اضغط "+ إضافة منطقة" لإضافة أول منطقة</div>
+          </div>
+
+          <div id="deliveryPreview" style="display:none;background:var(--bg3);border:1px solid rgba(255,107,0,.2);border-radius:10px;padding:12px;margin-bottom:10px;"></div>
+          <div style="font-size:.7rem;color:var(--muted);margin-bottom:12px;background:rgba(255,107,0,.06);border-radius:8px;padding:8px 12px;border:1px solid rgba(255,107,0,.15);">
+            💡 العميل سيختار منطقته من قائمة منسدلة عند الطلب وسيُحسب السعر تلقائياً
           </div>
           <button class="btn-save" style="width:100%;" onclick="saveDeliveryRegions()">💾 حفظ مناطق التوصيل</button>
         </div>
@@ -667,6 +692,49 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
     </div>
 
   
+
+
+<!-- ═══ PAYMENT METHODS ═══ -->
+<div class="view" id="v-payment-methods">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <div>
+      <div style="font-size:1.2rem;font-weight:900;">💳 طرق الدفع</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">إدارة طرق الدفع المتاحة للعملاء</div>
+    </div>
+    <button class="sbtn" onclick="openPaymentModal(null)" style="padding:10px 18px;font-size:.82rem;">+ إضافة طريقة</button>
+  </div>
+  <div id="paymentGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
+    <div style="color:var(--muted);text-align:center;padding:40px;grid-column:1/-1;">جاري التحميل...</div>
+  </div>
+</div>
+
+<!-- Payment Method Modal -->
+<div class="modal-bg" id="paymentModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-head">
+      <div class="modal-title" id="pmTitle">➕ إضافة طريقة دفع</div>
+      <button class="modal-cl" onclick="closePaymentModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label>اسم طريقة الدفع (عربي)</label><input type="text" id="pmAr" placeholder="كاش عند الاستلام"></div>
+      <div class="field"><label>اسم طريقة الدفع (إنجليزي)</label><input type="text" id="pmEn" placeholder="Cash on Delivery"></div>
+      <div class="field"><label>أيقونة / رمز</label><input type="text" id="pmIcon" placeholder="💵" maxlength="4"></div>
+      <div class="field"><label>التعليمات للعميل</label><textarea id="pmDesc" rows="3" placeholder="تعليمات الدفع أو أي ملاحظات للعميل..." style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;resize:vertical;"></textarea></div>
+      <div class="field"><label>ملاحظات (اختياري)</label><input type="text" id="pmNotes" placeholder="مثلاً: متاح فقط للطلبات أكثر من 200 EGP"></div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:10px;padding:12px;">
+        <label class="toggle" style="flex-shrink:0;" id="pmToggleLbl">
+          <input type="checkbox" id="pmActive" checked onchange="document.getElementById('pmStatusLbl').textContent=this.checked?'مفعّل':'معطّل'">
+          <span class="toggle-track"><span class="toggle-dot"></span></span>
+        </label>
+        <div><div style="font-size:.82rem;font-weight:700;">حالة طريقة الدفع</div><div id="pmStatusLbl" style="font-size:.72rem;color:var(--muted);">مفعّل</div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closePaymentModal()">إلغاء</button>
+      <button class="btn-save" onclick="savePaymentMethod()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ TABLES & QR ═══ -->
 <div class="view" id="v-tables">
@@ -1102,11 +1170,19 @@ function goV(id,el){
   // close sidebar on mobile
   document.getElementById('sidebar').classList.remove('open');
 }
-function toggleSb(){document.getElementById('sidebar').classList.toggle('open');}
+function toggleSb(){
+  const sb=document.getElementById('sidebar');
+  sb.classList.toggle('open');
+  // show/hide overlay
+  let ov=document.getElementById('sbOverlay');
+  if(!ov){ov=document.createElement('div');ov.id='sbOverlay';ov.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:149;';ov.onclick=toggleSb;document.body.appendChild(ov);}
+  ov.style.display=sb.classList.contains('open')?'block':'none';
+}
 function handleAction(){
   if(curV==='products'||curV==='dashboard')openProdModal(null);
   if(curV==='categories')openCatModal();
   if(curV==='promo')openPromoModal();
+  if(curV==='payment-methods')openPaymentModal(null);
   if(curV==='settings')showT('✅ تم حفظ جميع الإعدادات!');
 }
 
@@ -1591,6 +1667,116 @@ async function syncPromosToFirebase(){
     await setDoc(doc(window._db,'config','promos'),{promos:window._PROMOS||[],updatedAt:Date.now()});
   }catch(e){console.warn('syncPromos:',e);}
 }
+
+// ══════════════════════════════════════════
+// ── Payment Methods ──
+// ══════════════════════════════════════════
+let PAYMENT_METHODS = [
+  {id:'pm_cash',   ar:'كاش عند الاستلام', en:'Cash on Delivery',  icon:'💵', desc:'',    notes:'', active:true},
+  {id:'pm_card',   ar:'بطاقة ائتمان',     en:'Credit Card',        icon:'💳', desc:'',    notes:'', active:true},
+  {id:'pm_vodaf',  ar:'فودافون كاش',      en:'Vodafone Cash',      icon:'📱', desc:'',    notes:'', active:false},
+  {id:'pm_insta',  ar:'انستا باي',         en:'InstaPay',           icon:'⚡', desc:'',    notes:'', active:false},
+];
+let _editingPmId = null;
+
+function rPaymentMethods(){
+  const grid = document.getElementById('paymentGrid');
+  if(!grid) return;
+  if(!PAYMENT_METHODS.length){
+    grid.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px;grid-column:1/-1;">لا توجد طرق دفع — أضف طريقة جديدة</div>';
+    return;
+  }
+  grid.innerHTML = PAYMENT_METHODS.map(pm => `
+    <div style="background:var(--bg2);border:1px solid ${pm.active?'rgba(255,107,0,.35)':'var(--bdr)'};border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;position:relative;opacity:${pm.active?1:.6};">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:2rem;width:48px;height:48px;background:var(--bg3);border-radius:12px;display:flex;align-items:center;justify-content:center;">${pm.icon||'💳'}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.95rem;">${pm.ar}</div>
+          <div style="font-size:.72rem;color:var(--muted);">${pm.en}</div>
+        </div>
+        <span class="st-badge ${pm.active?'st-done':'st-canc'}">${pm.active?'مفعّل':'معطّل'}</span>
+      </div>
+      ${pm.desc?`<div style="font-size:.75rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--bdr);padding-top:8px;">${pm.desc}</div>`:''}
+      ${pm.notes?`<div style="font-size:.7rem;color:var(--or);background:rgba(255,107,0,.08);border-radius:7px;padding:6px 10px;">📌 ${pm.notes}</div>`:''}
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="pa-btn" onclick="openPaymentModal('${pm.id}')" style="flex:1;justify-content:center;" title="تعديل">✏️ تعديل</button>
+        <button class="pa-btn" onclick="togglePaymentMethod('${pm.id}')" style="flex:1;justify-content:center;" title="تفعيل/إيقاف">${pm.active?'⏸ إيقاف':'▶️ تفعيل'}</button>
+        <button class="pa-btn del" onclick="deletePaymentMethod('${pm.id}')" title="حذف">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function openPaymentModal(id){
+  _editingPmId = id;
+  const pm = id ? PAYMENT_METHODS.find(p=>p.id===id) : null;
+  document.getElementById('pmTitle').textContent = id ? '✏️ تعديل طريقة الدفع' : '➕ إضافة طريقة دفع';
+  document.getElementById('pmAr').value   = pm?.ar   || '';
+  document.getElementById('pmEn').value   = pm?.en   || '';
+  document.getElementById('pmIcon').value = pm?.icon || '';
+  document.getElementById('pmDesc').value = pm?.desc || '';
+  document.getElementById('pmNotes').value= pm?.notes|| '';
+  const activeEl = document.getElementById('pmActive');
+  if(activeEl){ activeEl.checked = pm ? pm.active!==false : true; }
+  document.getElementById('pmStatusLbl').textContent = (pm?.active!==false)?'مفعّل':'معطّل';
+  document.getElementById('paymentModal').classList.add('open');
+}
+function closePaymentModal(){
+  document.getElementById('paymentModal').classList.remove('open');
+  _editingPmId = null;
+}
+async function savePaymentMethod(){
+  const ar    = document.getElementById('pmAr').value.trim();
+  const en    = document.getElementById('pmEn').value.trim();
+  const icon  = document.getElementById('pmIcon').value.trim() || '💳';
+  const desc  = document.getElementById('pmDesc').value.trim();
+  const notes = document.getElementById('pmNotes').value.trim();
+  const active= document.getElementById('pmActive').checked;
+  if(!ar){ showT('❌ أدخل اسم طريقة الدفع'); return; }
+  if(_editingPmId){
+    const idx = PAYMENT_METHODS.findIndex(p=>p.id===_editingPmId);
+    if(idx>=0) Object.assign(PAYMENT_METHODS[idx], {ar,en,icon,desc,notes,active});
+  } else {
+    PAYMENT_METHODS.push({id:'pm_'+Date.now(), ar,en,icon,desc,notes,active});
+  }
+  await syncPaymentMethodsToFirebase();
+  closePaymentModal();
+  rPaymentMethods();
+  showT('✅ تم حفظ طريقة الدفع');
+}
+async function togglePaymentMethod(id){
+  const pm = PAYMENT_METHODS.find(p=>p.id===id);
+  if(pm){ pm.active = !pm.active; }
+  await syncPaymentMethodsToFirebase();
+  rPaymentMethods();
+  showT(pm?.active ? '✅ تم تفعيل طريقة الدفع' : '⏸ تم إيقاف طريقة الدفع');
+}
+async function deletePaymentMethod(id){
+  if(!confirm('هل تريد حذف هذه الطريقة؟')) return;
+  PAYMENT_METHODS = PAYMENT_METHODS.filter(p=>p.id!==id);
+  await syncPaymentMethodsToFirebase();
+  rPaymentMethods();
+  showT('🗑️ تم الحذف');
+}
+async function syncPaymentMethodsToFirebase(){
+  if(!window._db) return;
+  try{
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(window._db,'config','payments'),{methods:PAYMENT_METHODS,updatedAt:Date.now()});
+  }catch(e){console.warn('syncPaymentMethods:',e);}
+}
+async function loadPaymentMethods(){
+  if(!window._db) return;
+  try{
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(window._db,'config','payments'));
+    if(snap.exists()&&snap.data().methods?.length){
+      PAYMENT_METHODS=snap.data().methods;
+    }
+  }catch(e){console.warn('loadPaymentMethods:',e);}
+  rPaymentMethods();
+}
+
+
 async function saveSettings(){
   if(!window._db){showT('❌ Firebase غير متصل');return;}
   try{
@@ -1745,6 +1931,8 @@ async function doLogin() {
   const errEl = document.getElementById('loginErr');
   errEl.textContent = '';
   if(!email || !pass){ errEl.textContent = 'يرجى إدخال الإيميل وكلمة المرور'; return; }
+  const btn = document.querySelector('.auth-btn');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ جاري التحقق...'; }
   try {
     const {initializeApp,getApps} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getAuth,signInWithEmailAndPassword} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -1766,8 +1954,12 @@ async function doLogin() {
     document.getElementById('authOverlay').style.display='none';
     initAdmin();
   } catch(e) {
-    const msgs = {'auth/wrong-password':'كلمة المرور غير صحيحة','auth/user-not-found':'الإيميل غير موجود','auth/invalid-email':'إيميل غير صالح','auth/too-many-requests':'محاولات كثيرة — انتظر قليلاً'};
-    errEl.textContent = msgs[e.code] || 'خطأ في تسجيل الدخول';
+    const msgs = {'auth/wrong-password':'كلمة المرور غير صحيحة','auth/invalid-credential':'الإيميل أو كلمة المرور غير صحيحة','auth/user-not-found':'الإيميل غير موجود','auth/invalid-email':'إيميل غير صالح','auth/too-many-requests':'محاولات كثيرة — انتظر قليلاً','auth/network-request-failed':'مشكلة في الاتصال بالإنترنت'};
+    errEl.textContent = msgs[e.code] || ('خطأ: ' + (e.message||e.code||'غير معروف'));
+    console.error('Login error:', e.code, e.message);
+  } finally {
+    const btn = document.querySelector('.auth-btn');
+    if(btn){ btn.disabled=false; btn.textContent='🔐 تسجيل الدخول'; }
   }
 }
 
@@ -1822,7 +2014,7 @@ function applyRole(role, customPerms=null) {
 }
 
 // ── CHECK AUTH ON LOAD ──
-(async function checkAuth(){
+(async async function checkAuth(){
   try{
     const {initializeApp,getApps} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getAuth,onAuthStateChanged} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
@@ -2012,7 +2204,7 @@ const FB_CFG={
 };
 
 // ── Init ──
-async function initAdmin(){
+async async function initAdmin(){
   const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
   const {getFirestore,collection,onSnapshot,orderBy,query,doc,updateDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
   const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
@@ -2055,6 +2247,8 @@ async function initAdmin(){
   }catch(e){ window._PROMOS=[]; }
   rPromos();
   loadSettingsFromFirebase();
+  // Load payment methods
+  try{ await loadPaymentMethods(); }catch(e){ console.warn('loadPaymentMethods:',e); }
 
   // Load product sizes config
   try{
@@ -2466,11 +2660,19 @@ async function deletePromo(idx){
 const _goV_orig = goV;
 function goV(id, el){
   _goV_orig(id, el);
-  if(id==='tables')   loadTables();
-  if(id==='social')   loadSocialConfig2();
-  if(id==='pages')    loadPages();
-  if(id==='promo')    { if(window._PROMOS) rPromos(); }
-  if(id==='settings') { loadDeliveryRegions(); loadSettingsFromFirebase(); }
+  // Close sidebar on mobile after navigation
+  if(window.innerWidth<=900){
+    const sb=document.getElementById('sidebar');
+    const ov=document.getElementById('sbOverlay');
+    if(sb)sb.classList.remove('open');
+    if(ov)ov.style.display='none';
+  }
+  if(id==='tables')          loadTables();
+  if(id==='social')          loadSocialConfig2();
+  if(id==='pages')           loadPages();
+  if(id==='promo')           { if(window._PROMOS) rPromos(); }
+  if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); }
+  if(id==='payment-methods') { rPaymentMethods(); }
 }
 window.goV = goV;
 
@@ -2486,32 +2688,45 @@ let DELIVERY_REGIONS = [
 
 function renderDeliveryRegions(){
   const editor = document.getElementById('regionsEditor');
+  const empty  = document.getElementById('regionsEmpty');
   if(!editor) return;
+  if(!DELIVERY_REGIONS.length){
+    editor.style.display='none';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  editor.style.display='flex';
+  if(empty) empty.style.display='none';
   editor.innerHTML = DELIVERY_REGIONS.map((r,i) => `
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:center;background:var(--bg3);border-radius:10px;padding:10px 12px;">
-      <input type="text" value="${r.name}" placeholder="اسم المنطقة"
+    <div style="display:grid;grid-template-columns:2fr 100px 120px 60px 32px;gap:8px;align-items:center;background:var(--bg3);border:1px solid ${r.active!==false?'rgba(255,107,0,.2)':'var(--bdr)'};border-radius:10px;padding:9px 12px;opacity:${r.active!==false?1:.6};transition:opacity .2s;">
+      <input type="text" value="${r.name}" placeholder="اسم المنطقة (مثلاً: أولاد صقر)"
         oninput="DELIVERY_REGIONS[${i}].name=this.value"
-        style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.8rem;font-family:Cairo,sans-serif;">
+        style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.82rem;font-family:Cairo,sans-serif;font-weight:600;">
       <div style="position:relative;">
-        <input type="number" value="${r.price}" placeholder="السعر"
+        <input type="number" value="${r.price}" placeholder="0"
           oninput="DELIVERY_REGIONS[${i}].price=parseFloat(this.value)||0"
-          style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px 8px 38px;color:var(--or);font-size:.8rem;font-family:Cairo,sans-serif;">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.7rem;color:var(--muted);">EGP</span>
+          style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 8px 8px 32px;color:var(--or);font-size:.82rem;font-weight:700;font-family:Cairo,sans-serif;box-sizing:border-box;">
+        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--muted);">EGP</span>
       </div>
-      <input type="text" value="${r.time||''}" placeholder="وقت التوصيل"
+      <input type="text" value="${r.time||''}" placeholder="25-35 دقيقة"
         oninput="DELIVERY_REGIONS[${i}].time=this.value"
-        style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.78rem;font-family:Cairo,sans-serif;">
+        style="background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:8px 10px;color:var(--txt);font-size:.75rem;font-family:Cairo,sans-serif;">
+      <label style="display:flex;justify-content:center;align-items:center;cursor:pointer;" title="${r.active!==false?'متاح':'غير متاح'}">
+        <input type="checkbox" ${r.active!==false?'checked':''} onchange="DELIVERY_REGIONS[${i}].active=this.checked;renderDeliveryRegions()" style="width:16px;height:16px;accent-color:var(--or);cursor:pointer;">
+      </label>
       <button onclick="deleteDeliveryRegion(${i})"
-        style="width:30px;height:30px;border-radius:8px;background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.25);color:#EF5350;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;">✕</button>
+        style="width:30px;height:30px;border-radius:8px;background:rgba(229,57,53,.1);border:1px solid rgba(229,57,53,.2);color:#EF5350;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;transition:background .15s;" onmouseover="this.style.background='rgba(229,57,53,.25)'" onmouseout="this.style.background='rgba(229,57,53,.1)'">✕</button>
     </div>`).join('');
 }
 
 function addDeliveryRegion(){
-  DELIVERY_REGIONS.push({name:'', price:15, time:'25-35'});
+  DELIVERY_REGIONS.push({name:'', price:15, time:'25-35 دقيقة', active:true});
   renderDeliveryRegions();
   // Focus last name input
-  const inputs = document.querySelectorAll('#regionsEditor input[type=text]');
-  if(inputs.length) inputs[inputs.length-2].focus();
+  setTimeout(()=>{
+    const inputs = document.querySelectorAll('#regionsEditor input[type=text]');
+    if(inputs.length) inputs[inputs.length-2].focus();
+  },50);
 }
 
 function deleteDeliveryRegion(idx){
@@ -2530,7 +2745,24 @@ async function saveDeliveryRegions(){
     defTime,
     updatedAt:Date.now()
   });
-  showT('✅ تم حفظ مناطق التوصيل!');
+  showT('✅ تم حفظ '+DELIVERY_REGIONS.filter(r=>r.active!==false).length+' منطقة توصيل');
+  renderDeliveryRegions();
+  rDeliveryPreview();
+}
+function rDeliveryPreview(){
+  // Show a mini-preview of what the dropdown looks like
+  const preview=document.getElementById('deliveryPreview');
+  if(!preview)return;
+  const active=DELIVERY_REGIONS.filter(r=>r.active!==false);
+  if(!active.length){preview.style.display='none';return;}
+  preview.style.display='block';
+  preview.innerHTML=`
+    <div style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">معاينة — كيف ستبدو للعميل</div>
+    <select style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg2);color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;" disabled>
+      <option>-- اختر منطقتك --</option>
+      ${active.map(r=>`<option>${r.name}${r.price===0?' — توصيل مجاني':' — '+r.price+' EGP'}${r.time?' ('+r.time+')':''}</option>`).join('')}
+    </select>
+  `;
 }
 
 async function loadDeliveryRegions(){
@@ -2539,11 +2771,12 @@ async function loadDeliveryRegions(){
   const snap=await getDoc(doc(window._db,'config','delivery'));
   if(snap.exists()){
     const d=snap.data();
-    if(d.regions?.length) DELIVERY_REGIONS=d.regions;
+    if(d.regions?.length) DELIVERY_REGIONS=d.regions.map(r=>({active:true,...r}));
     if(d.freeMin!=null){const el=document.getElementById('delFreeMin');if(el)el.value=d.freeMin;}
     if(d.defTime){const el=document.getElementById('delTime');if(el)el.value=d.defTime;}
   }
   renderDeliveryRegions();
+  rDeliveryPreview();
 }
 
 

@@ -720,7 +720,7 @@ let L='en', theme='dark', cat='all', curPg='home';
 let cart=[], favs=new Set(MEALS.filter(m=>m.fav||m.featured).map(m=>m.id));
 // Load persisted favorites
 try{const sf=localStorage.getItem('spark_favs');if(sf){const ids=JSON.parse(sf);if(ids.length)favs=new Set(ids);}}catch(e){}
-let cMeal=null, dQ=1, sOpts={}, selA='home', selP='cash', selSz=null;
+let cMeal=null, dQ=1, sOpts={}, selA='home', selP='pm_cash', selSz=null;
 function T(k,...a){const v=TR[L][k];return typeof v==='function'?v(...a):(v!=null?v:k);}
 
 // ── Pages ──
@@ -972,13 +972,22 @@ function openCO(){
   <div class="cobdy">
   <div class="coslb">${T('shl')}</div>
   <!-- Delivery Region Selector -->
-  ${window._deliveryRegions&&window._deliveryRegions.length ? `
-  <div style="margin-bottom:10px;">
-    <label style="font-size:.74rem;color:var(--muted);font-weight:700;display:block;margin-bottom:6px;">${L==='ar'?'اختر منطقة التوصيل':'Select Delivery Region'}</label>
-    <select id="regionSelect" onchange="onRegionChange(this)" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg3);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.84rem;">
+  ${(window._deliveryRegions&&window._deliveryRegions.filter(r=>r.active!==false).length) ? `
+  <div style="margin-bottom:14px;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <span style="font-size:1.1rem;">📍</span>
+      <div>
+        <div style="font-size:.82rem;font-weight:700;">${L==='ar'?'اختر منطقة التوصيل':'Select Delivery Region'}</div>
+        <div style="font-size:.68rem;color:var(--muted);">${L==='ar'?'السعر يتغير حسب منطقتك':'Price varies by region'}</div>
+      </div>
+    </div>
+    <select id="regionSelect" onchange="onRegionChange(this)" style="width:100%;padding:11px 14px;border-radius:10px;border:2px solid var(--bdr);background:var(--bg2);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;outline:none;transition:border .2s;" onfocus="this.style.borderColor='var(--or)'" onblur="this.style.borderColor='var(--bdr)'">
       <option value="">${L==='ar'?'-- اختر منطقتك --':'-- Select your region --'}</option>
-      ${window._deliveryRegions.map(r=>`<option value="${r.price}" data-name="${r.name}" data-time="${r.time||''}">${r.name} — ${r.price} EGP ${r.time?'('+r.time+')':''}</option>`).join('')}
+      ${window._deliveryRegions.filter(r=>r.active!==false).map(r=>`<option value="${r.price}" data-name="${r.name}" data-time="${r.time||''}">${r.name}${r.price===0?' — توصيل مجاني':' — '+r.price+' EGP'}${r.time?' ('+r.time+')':''}</option>`).join('')}
     </select>
+    <div id="regionInfo" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(255,107,0,.08);border-radius:8px;border:1px solid rgba(255,107,0,.2);">
+      <span id="regionInfoTxt" style="font-size:.75rem;color:var(--or);font-weight:600;"></span>
+    </div>
   </div>` : ''}
   <div class="adc${selA==='home'?' sel':''}" onclick="sA('home',this)"><div class="adic">🏠</div><div><div class="adt">${L==='ar'?'المنزل':'Home'}</div><div class="add">${L==='ar'?'التوصيل لمنزلك':'Deliver to my home'}</div></div></div>
   <div class="adc${selA==='custom'?' sel':''}" onclick="sA('custom',this);setTimeout(()=>document.getElementById('customAddrInp')?.focus(),100)"><div class="adic">📍</div><div><div class="adt">${L==='ar'?'عنوان مخصص':'Custom Address'}</div><div class="add">${L==='ar'?'ادخل عنوانك يدوياً':'Enter your address manually'}</div></div></div>
@@ -987,9 +996,20 @@ function openCO(){
       style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg3);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.85rem;box-sizing:border-box;">
   </div>
   <div class="coslb" style="margin-top:12px;">${T('pyl')}</div>
-  <div class="popt${selP==='cash'?' sel':''}" onclick="sP('cash',this)"><div class="popl">${T('p1')}</div><div class="radio"><div class="rdot"></div></div></div>
-  <div class="popt${selP==='card'?' sel':''}" onclick="sP('card',this)"><div class="popl">${T('p2')}</div><div class="radio"><div class="rdot"></div></div></div>
-  <div class="popt${selP==='wallet'?' sel':''}" onclick="sP('wallet',this)"><div class="popl">${T('p3')}</div><div class="radio"><div class="rdot"></div></div></div>
+  ${(window._paymentMethods&&window._paymentMethods.length?window._paymentMethods:[
+    {id:'pm_cash',ar:'كاش عند الاستلام',en:'Cash on Delivery',icon:'💵'},
+    {id:'pm_card',ar:'بطاقة ائتمان',en:'Credit Card',icon:'💳'},
+    {id:'pm_wallet',ar:'محفظة إلكترونية',en:'Digital Wallet',icon:'📱'},
+  ]).map(pm=>`
+  <div class="popt${selP===pm.id?' sel':''}" onclick="sP('${pm.id}',this)">
+    <div class="popl">
+      <span style="margin-left:6px;">${pm.icon||'💳'}</span>
+      ${L==='ar'?pm.ar:pm.en}
+      ${pm.notes?`<span style="font-size:.68rem;color:var(--or);display:block;margin-top:2px;">📌 ${pm.notes}</span>`:''}
+    </div>
+    <div class="radio"><div class="rdot"></div></div>
+  </div>
+  ${pm.desc?`<div style="font-size:.72rem;color:var(--muted);padding:4px 10px 8px;line-height:1.5;">${pm.desc}</div>`:''}`).join('')}
   <div class="coslb" style="margin-top:12px;">${T('sul')}</div>
   <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div><div class="stot"><span>${T('tot')}</span><span class="totp">${tot} EGP</span></div></div>
   <!-- Suggestions -->
@@ -1011,12 +1031,34 @@ function openCO(){
 }
 function onRegionChange(sel){
   const opt=sel.options[sel.selectedIndex];
+  const infoBox=document.getElementById('regionInfo');
+  const infoTxt=document.getElementById('regionInfoTxt');
   if(opt&&opt.value){
-    window._delPrice=parseFloat(opt.value)||15;
-    // refresh cart bottom
+    window._delPrice=parseFloat(opt.value)||0;
+    window._selRegionName=opt.getAttribute('data-name')||opt.text;
+    const time=opt.getAttribute('data-time');
+    // Show info box
+    if(infoBox&&infoTxt){
+      const sub=cTot();
+      const isFree=sub>=(window._delFreeMin||200);
+      let info=window._selRegionName;
+      if(isFree) info+=' • 🎉 توصيل مجاني!';
+      else if(window._delPrice===0) info+=' • 🎉 توصيل مجاني!';
+      else info+=' • التوصيل: '+window._delPrice+' EGP';
+      if(time) info+=' • ⏱ '+time;
+      infoTxt.textContent=info;
+      infoBox.style.display='block';
+    }
+    // refresh cart total row
     const sub=cTot(), del=sub>=(window._delFreeMin||200)?0:window._delPrice;
     const totEl=document.querySelector('#coMod .totp');
     if(totEl) totEl.textContent=(sub+del)+' EGP';
+    // also update delivery line
+    const delRow=document.querySelector('#coMod .del-row');
+    if(delRow) delRow.textContent=(del===0?'مجاني 🎉':del+' EGP');
+  } else {
+    window._delPrice=0; window._selRegionName='';
+    if(infoBox) infoBox.style.display='none';
   }
 }
 function sA(v,el){
@@ -1028,8 +1070,23 @@ function sA(v,el){
 }
 function sP(v,el){selP=v;document.querySelectorAll('#coMod .popt').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
 async function confO(){
+  // Validate region selection if regions exist
+  const _activeReg=(window._deliveryRegions||[]).filter(r=>r.active!==false);
+  if(_activeReg.length>0&&!window._selRegionName){
+    showT('⚠️ يرجى اختيار منطقة التوصيل أولاً');
+    const rsel=document.getElementById('regionSelect');
+    if(rsel){rsel.style.borderColor='var(--or)';setTimeout(()=>{rsel.style.borderColor='var(--bdr)';},2000);}
+    return;
+  }
   // Build order object
-  const sub=cTot(), del=sub>=(window._delFreeMin||200)?0:(window._delPrice||(window._deliveryRegions?.length?window._deliveryRegions[0]?.price:15)||15), tot=sub+del;
+  // Determine delivery price
+  const _regions=window._deliveryRegions||[];
+  const _hasRegions=_regions.filter(r=>r.active!==false).length>0;
+  const _freeMin=window._delFreeMin||200;
+  const sub=cTot();
+  // If regions exist but none selected, default price to 0 until they select
+  const del=sub>=_freeMin?0:(window._delPrice||(_hasRegions?0:15));
+  const tot=sub+del;
   const promoInfo=window._activePromo?{
     code:window._activePromo.code,
     disc:window._activePromo.disc,
@@ -1043,7 +1100,7 @@ async function confO(){
     promo:promoInfo,
     deliveryRegion:window._selRegionName||'',
     address:window._tableId?('طاولة '+window._tableId):(selA==='custom'?(document.getElementById('customAddrInp')?.value||'عنوان مخصص'):(selA==='home'?'المنزل':'عنوان آخر')),
-    payment:selP==='cash'?'كاش عند الاستلام':selP==='card'?'بطاقة ائتمان':'محفظة إلكترونية',
+    payment:(window._paymentMethods||[]).find(p=>p.id===selP)?.ar || selP,
     status:'new',
     time: new Date().toLocaleString('ar-EG'),
     timestamp: Date.now()
@@ -1201,6 +1258,8 @@ function syncAllViews(){
   loadCustomPages();
   // Load delivery config
   loadDeliveryConfig();
+  // Load payment methods
+  loadPaymentMethods();
 }
 
 async function loadDeliveryConfig(){
@@ -1210,7 +1269,7 @@ async function loadDeliveryConfig(){
     const snap=await getDoc(doc(db,'config','delivery'));
     if(snap.exists()){
       const d=snap.data();
-      if(d.regions?.length) window._deliveryRegions=d.regions;
+      if(d.regions?.length) window._deliveryRegions=d.regions.filter(r=>r.active!==false);
       if(d.freeMin!=null) window._delFreeMin=d.freeMin;
       if(d.defTime) window._delDefTime=d.defTime;
     } else {
@@ -1220,6 +1279,23 @@ async function loadDeliveryConfig(){
     }
   }catch(e){console.warn('loadDeliveryConfig:',e);}
 }
+async function loadPaymentMethods(){
+  try{
+    const {db}=await initFB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','payments'));
+    if(snap.exists()&&snap.data().methods?.length){
+      window._paymentMethods=snap.data().methods.filter(m=>m.active!==false);
+    }
+  }catch(e){console.warn('loadPaymentMethods:',e);}
+  // Set default selP to first available method
+  if(window._paymentMethods?.length) selP=window._paymentMethods[0].id;
+  // Re-render checkout if open
+  const coMod=document.getElementById('coMod');
+  if(coMod&&coMod.querySelector('.popt'))openCO();
+}
+
+
 
 let _customPages=[];
 async function loadCustomPages(){
