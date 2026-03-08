@@ -1152,23 +1152,37 @@ let curV='dashboard', editId=null, orderFilter='all';
 // ── Navigation ──
 function goV(id,el){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('v-'+id).classList.add('active');
+  const vEl=document.getElementById('v-'+id);
+  if(vEl) vEl.classList.add('active');
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   if(el)el.classList.add('active');
   curV=id;
-  const titles={dashboard:'لوحة المعلومات',orders:'الطلبات',products:'المنتجات',categories:'الأقسام',settings:'إعدادات الموقع',promo:'كودات الخصم',analytics:'الحسابات والإيرادات',ramadan:'🌙 قسم رمضان',users:'👥 المستخدمون'};
-  const actions={dashboard:'+ إضافة منتج',orders:'تصدير',products:'+ إضافة منتج',categories:'+ قسم جديد',settings:'حفظ الكل',promo:'+ كود جديد',analytics:'تحديث',ramadan:'💾 حفظ',users:'+ إضافة مستخدم'};
+  const titles={dashboard:'لوحة المعلومات',orders:'الطلبات',products:'المنتجات',categories:'الأقسام',settings:'إعدادات الموقع',promo:'كودات الخصم',analytics:'الحسابات والإيرادات',ramadan:'🌙 قسم رمضان',users:'👥 المستخدمون','payment-methods':'💳 طرق الدفع',tables:'الطاولات',social:'التواصل الاجتماعي',pages:'الصفحات المخصصة'};
+  const actions={dashboard:'+ إضافة منتج',orders:'تصدير',products:'+ إضافة منتج',categories:'+ قسم جديد',settings:'حفظ الكل',promo:'+ كود جديد',analytics:'تحديث',ramadan:'💾 حفظ',users:'+ إضافة مستخدم','payment-methods':'+ إضافة طريقة',tables:'+ طاولة',pages:'+ صفحة'};
   document.getElementById('topTitle').textContent=titles[id]||id;
   document.getElementById('topAction').textContent=actions[id]||'+ إضافة';
-  if(id==='dashboard'){rDash();}
-  if(id==='products'){rProds('all');}
-  if(id==='categories'){rCats();}
-  if(id==='orders'){rOrders('all');}
-  if(id==='analytics'){setAnPeriod(anPeriod);}
-  if(id==='ramadan'){rRamProds();}
-  if(id==='users'){rUsers();}
+  if(id==='dashboard')       { rDash(); }
+  if(id==='products')        { rProds('all'); }
+  if(id==='categories')      { rCats(); }
+  if(id==='orders')          { rOrders('all'); }
+  if(id==='analytics')       { setAnPeriod(anPeriod); }
+  if(id==='ramadan')         { rRamProds(); }
+  if(id==='users')           { rUsers(); }
+  if(id==='tables')          { loadTables(); }
+  if(id==='social')          { loadSocialConfig2(); }
+  if(id==='pages')           { loadPages(); }
+  if(id==='promo')           { if(window._PROMOS) rPromos(); }
+  if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); }
+  if(id==='payment-methods') { rPaymentMethods(); }
   // close sidebar on mobile
-  document.getElementById('sidebar').classList.remove('open');
+  if(window.innerWidth<=900){
+    const sb=document.getElementById('sidebar');
+    const ov=document.getElementById('sbOverlay');
+    if(sb) sb.classList.remove('open');
+    if(ov) ov.style.display='none';
+  } else {
+    document.getElementById('sidebar').classList.remove('open');
+  }
 }
 function toggleSb(){
   const sb=document.getElementById('sidebar');
@@ -2654,27 +2668,7 @@ async function deletePromo(idx){
   await syncPromosToFirebase();rPromos();showT('🗑️ تم حذف الكود');
 }
 
-// ═══════════════════════════════════════════════════════
-// PATCH goV to load new views on navigate
-// ═══════════════════════════════════════════════════════
-const _goV_orig = goV;
-function goV(id, el){
-  _goV_orig(id, el);
-  // Close sidebar on mobile after navigation
-  if(window.innerWidth<=900){
-    const sb=document.getElementById('sidebar');
-    const ov=document.getElementById('sbOverlay');
-    if(sb)sb.classList.remove('open');
-    if(ov)ov.style.display='none';
-  }
-  if(id==='tables')          loadTables();
-  if(id==='social')          loadSocialConfig2();
-  if(id==='pages')           loadPages();
-  if(id==='promo')           { if(window._PROMOS) rPromos(); }
-  if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); }
-  if(id==='payment-methods') { rPaymentMethods(); }
-}
-window.goV = goV;
+
 
 
 // ═══════════════════════════════════════════════════════
