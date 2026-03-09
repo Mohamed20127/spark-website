@@ -311,7 +311,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   <ul class="nlinks" id="nlinks">
     <li><a href="#" onclick="gp('home',this)" class="act" id="nH">Home</a></li>
     <li><a href="#" onclick="gp('pgMenu',this)" id="nM">Menu</a></li>
-    <li id="navRamadan"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
+    <li id="navRamadan" style="display:none;"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
     <li><a href="#" onclick="gp('pgAbout',this)" id="nA">About</a></li>
     <li><a href="#" onclick="gp('pgFavs',this)" id="nFav" style="display:none;">❤️ <span id="favNavLbl">Favorites</span></a></li>
   </ul>
@@ -1172,14 +1172,13 @@ async function loadRamadanConfig(){
     const data=snap.exists()?snap.data():{active:true,items:[],title:'رمضان كريم 🌙',desc:''};
     ramActive = snap.exists() ? !!data.active : true;
     ramItems = data.items||[];
-    // Show nav by default; hide only if admin explicitly deactivated
     const navEl=document.getElementById('navRamadan');
-    // Ramadan nav always visible; ramActive controls the curated product list
+    // Show ramadan nav only if active
+    if(navEl) navEl.style.display = ramActive ? '' : 'none';
     const grid=document.getElementById('ramGrid');
     if(grid){
       if(data.title) { const t=document.getElementById('ramTitle'); if(t) t.textContent=data.title; }
       if(data.desc)  { const d=document.getElementById('ramDesc');  if(d) d.textContent=data.desc; }
-      // Re-render always so any product change is reflected
       rRamGrid();
     }
   }catch(e){
@@ -1234,6 +1233,7 @@ async function loadFromFirebase(){
         ['logoImgEl','ftLogoImgEl'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=sd.logoUrl;});
         ['logoImg','ftLogoImg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
         ['logoText','ftLogoText'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+        localStorage.setItem('spark_logo', sd.logoUrl);
       }
     }
 
@@ -1377,6 +1377,16 @@ async function loadProdSizes(){
 })();
 
 rHome();
+// Show cached logo instantly (no flash)
+(function(){
+  const cached=localStorage.getItem('spark_logo');
+  if(cached){
+    ['logoImgEl','ftLogoImgEl'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=cached;});
+    ['logoImg','ftLogoImg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+    ['logoText','ftLogoText'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  }
+})();
+
 loadFromFirebase().then(()=>{
   loadRamadanConfig();
   loadSocialConfig();
