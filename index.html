@@ -1,23 +1,18 @@
-function gp(pg,el){
-  // Update URL hash for refresh persistence
-  if(pg&&pg!=='home') history.replaceState(null,'','#'+pg);
+function gp(id,el){
+  // Hash routing for refresh persistence
+  if(id&&id!=='home') history.replaceState(null,'','#'+id);
   else history.replaceState(null,'',''+location.pathname);
-  // Hide all pages
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  // Show target page
-  const target=document.getElementById(pg);
-  if(target) target.classList.add('active');
-  curPg=pg;
-  // Nav highlight
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById(id); if(pg) pg.classList.add('active');
   document.querySelectorAll('.nlinks a').forEach(a=>a.classList.remove('act'));
-  if(el) el.classList.add('act');
-  // Close mobile nav
-  const mn=document.getElementById('mobNav');
-  if(mn) mn.classList.remove('open');
-  // Page-specific actions
-  if(pg==='pgMenu'){rCats();rMeals(cat);}
-  if(pg==='pgFavs'){rFavs();}
-  if(pg==='pgRamadan'){rRamGrid();}
+  if(el)el.classList.add('act');
+  else{const map={home:'nH',pgMenu:'nM',pgAbout:'nA',pgRamadan:'nR',pgFavs:'nFav'};const x=document.getElementById(map[id]);if(x)x.classList.add('act');}
+  curPg=id; window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='pgMenu'){rCats();rMeals(cat);}
+  if(id==='home'){rHome();}
+  if(id==='pgFavs'){rFavs();}
+  if(id==='pgRamadan'){rRamGrid();}
+  cd();
 }<!DOCTYPE html>
 <html lang="en" data-theme="dark" data-lang="en">
 <head>
