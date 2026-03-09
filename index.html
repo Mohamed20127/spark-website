@@ -1241,6 +1241,8 @@ async function loadFromFirebase(){
     // Refresh UI + update favs from loaded meal data
     favs=new Set(MEALS.filter(m=>m.fav||m.featured).map(m=>m.id));
     syncAllViews();
+  // Show popup after content loads
+  setTimeout(loadAndShowPopup, 500);
   }catch(e){console.warn('loadFromFirebase:',e);}
 }
 
@@ -1380,6 +1382,99 @@ loadFromFirebase().then(()=>{
   loadRamadanConfig();
   loadSocialConfig();
 });
+
+// ════════════════════════════════════════
+// ── POPUP SYSTEM (Frontend) ──
+// ════════════════════════════════════════
+async function loadAndShowPopup(){
+  try{
+    const {db}=await initFB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','popup'));
+    if(!snap.exists())return;
+    const cfg=snap.data();
+    if(!cfg.enabled)return;
+
+    // Check frequency
+    const storKey='spark_popup_'+cfg.updatedAt;
+    const freq=cfg.freq||'once';
+    if(freq==='once'&&localStorage.getItem(storKey))return;
+    if(freq==='daily'){
+      const last=localStorage.getItem(storKey);
+      if(last&&Date.now()-parseInt(last)<86400000)return;
+    }
+    if(freq==='session'&&sessionStorage.getItem(storKey))return;
+
+    // Delay then show
+    setTimeout(()=>renderPopup(cfg,storKey),((cfg.delay||2)*1000));
+  }catch(e){console.warn('popup:',e);}
+}
+
+function renderPopup(cfg, storKey){
+  const overlay=document.getElementById('sitePopup');
+  const inner=document.getElementById('sitePopupInner');
+  if(!overlay||!inner)return;
+
+  const pos=cfg.position||'center';
+  if(pos==='bottom'){ inner.style.bottom='20px'; inner.style.top='auto'; inner.style.transform='translateX(-50%)'; }
+  else if(pos==='top'){ inner.style.top='20px'; inner.style.bottom='auto'; inner.style.transform='translateX(-50%)'; }
+  else { inner.style.top='50%'; inner.style.bottom='auto'; inner.style.transform='translate(-50%,-50%)'; }
+
+  let html='';
+  const closeBtn=`<button onclick="closePopup()" style="position:absolute;top:12px;left:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;">✕</button>`;
+
+  if(cfg.type==='text'){
+    html=`<div style="background:${cfg.bgColor||'#1a1a1a'};border-radius:20px;padding:32px 24px;text-align:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+      ${closeBtn}
+      <div style="font-size:1.4rem;font-weight:900;color:#fff;margin-bottom:10px;">${cfg.title||''}</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.75);line-height:1.8;">${cfg.body||''}</div>
+    </div>`;
+  } else if(cfg.type==='image'){
+    html=`<div style="border-radius:20px;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5);" ${cfg.imgLink?'onclick="window.location.href=\''+cfg.imgLink+'\';closePopup()" style="cursor:pointer;border-radius:20px;overflow:hidden;"':''}>
+      ${closeBtn}
+      <img src="${cfg.imgUrl||''}" style="width:100%;display:block;max-height:80vh;object-fit:contain;" onerror="closePopup()">
+    </div>`;
+  } else if(cfg.type==='offer'){
+    html=`<div style="background:linear-gradient(135deg,#1a1a1a,#2a1500);border-radius:20px;padding:32px 24px;text-align:center;border:1px solid rgba(255,107,0,.3);position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+      ${closeBtn}
+      <div style="font-size:1.5rem;font-weight:900;color:var(--or);margin-bottom:10px;">${cfg.offerTitle||'🔥 عرض خاص!'}</div>
+      <div style="font-size:.88rem;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:20px;">${cfg.offerDesc||''}</div>
+      <a href="${cfg.offerLink||'#pgMenu'}" onclick="closePopup()" style="display:inline-block;background:var(--or);color:#fff;border-radius:12px;padding:14px 32px;font-weight:700;font-size:.95rem;text-decoration:none;font-family:Cairo,sans-serif;">${cfg.offerBtn||'اطلب الآن 🛒'}</a>
+    </div>`;
+  } else if(cfg.type==='discount'){
+    html=`<div style="background:linear-gradient(135deg,#0d1a0d,#1a1a1a);border-radius:20px;padding:32px 24px;text-align:center;border:1px solid rgba(76,175,80,.3);position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+      ${closeBtn}
+      <div style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:8px;">${cfg.discTitle||'🎁 هدية خاصة!'}</div>
+      <div style="font-size:.82rem;color:rgba(255,255,255,.6);margin-bottom:16px;">${cfg.discDesc||''}</div>
+      <div style="background:rgba(76,175,80,.1);border:2px dashed #4CAF50;border-radius:12px;padding:16px;margin-bottom:16px;cursor:pointer;" onclick="copyDiscCode('${cfg.discCode||''}')">
+        <div style="font-size:1.8rem;font-weight:900;color:#4CAF50;letter-spacing:5px;">${cfg.discCode||''}</div>
+        <div style="font-size:.68rem;color:#4CAF50;margin-top:4px;">اضغط لنسخ الكود 📋</div>
+      </div>
+    </div>`;
+  }
+
+  inner.innerHTML=html;
+  overlay.style.display='block';
+
+  // Save shown state
+  if(cfg.freq==='once') localStorage.setItem(storKey,'1');
+  else if(cfg.freq==='daily') localStorage.setItem(storKey,Date.now().toString());
+  else if(cfg.freq==='session') sessionStorage.setItem(storKey,'1');
+
+  // Auto-hide
+  if(cfg.autohide>0) setTimeout(closePopup, cfg.autohide*1000);
+}
+
+function closePopup(event){
+  if(event&&event.target!==document.getElementById('sitePopup'))return;
+  const el=document.getElementById('sitePopup');
+  if(el) el.style.display='none';
+}
+
+function copyDiscCode(code){
+  navigator.clipboard?.writeText(code).then(()=>showT('✅ تم نسخ الكود: '+code)).catch(()=>showT('الكود: '+code));
+}
+
 </script>
 
 <!-- WhatsApp Float Button -->
@@ -1391,5 +1486,11 @@ loadFromFirebase().then(()=>{
     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.51 5.843L.057 23.428a.75.75 0 0 0 .921.921l5.585-1.453A11.944 11.944 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.7-.512-5.24-1.406l-.375-.22-3.883 1.01 1.01-3.794-.242-.389A9.956 9.956 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
   </svg>
 </a>
+
+<!-- ══════════ POPUP / ANNOUNCEMENT ══════════ -->
+<div id="sitePopup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:fadeIn .3s ease;" onclick="closePopup(event)">
+  <div id="sitePopupInner" style="position:absolute;left:50%;transform:translateX(-50%);max-width:420px;width:92%;"></div>
+</div>
+
 </body>
 </html>
