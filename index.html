@@ -970,7 +970,7 @@ function openCO(){
   document.getElementById('coMod').innerHTML=`<div class="dbar"></div>
   <div class="cohd"><div class="cottl">${T('coTtl')}</div><button class="ccl" onclick="closeCO()">✕</button></div>
   <div class="cobdy">
-  <div class="coslb">${T('shl')}</div>
+  <div class="coslb">${L==='ar'?'📍 عنوان التوصيل':'📍 Delivery Address'}</div>
   <!-- Delivery Region Selector -->
   ${(window._deliveryRegions&&window._deliveryRegions.filter(r=>r.active!==false).length) ? `
   <div style="margin-bottom:14px;background:var(--bg3);border:1px solid var(--bdr);border-radius:14px;padding:14px 16px;">
@@ -989,11 +989,9 @@ function openCO(){
       <span id="regionInfoTxt" style="font-size:.75rem;color:var(--or);font-weight:600;"></span>
     </div>
   </div>` : ''}
-  <div class="adc${selA==='home'?' sel':''}" onclick="sA('home',this)"><div class="adic">🏠</div><div><div class="adt">${L==='ar'?'المنزل':'Home'}</div><div class="add">${L==='ar'?'التوصيل لمنزلك':'Deliver to my home'}</div></div></div>
-  <div class="adc${selA==='custom'?' sel':''}" onclick="sA('custom',this);setTimeout(()=>document.getElementById('customAddrInp')?.focus(),100)"><div class="adic">📍</div><div><div class="adt">${L==='ar'?'عنوان مخصص':'Custom Address'}</div><div class="add">${L==='ar'?'ادخل عنوانك يدوياً':'Enter your address manually'}</div></div></div>
-  <div id="customAddrBox" style="display:${selA==='custom'?'block':'none'};margin-top:8px;">
-    <input id="customAddrInp" type="text" placeholder="${L==='ar'?'مثال: شارع النيل، أمام مسجد...':'e.g. Nile St, beside the mosque...'}"
-      style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--bdr);background:var(--bg3);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.85rem;box-sizing:border-box;">
+  <div style="margin-bottom:4px;">
+    <textarea id="customAddrInp" rows="3" placeholder="${L==='ar'?'اكتب عنوانك بالتفصيل — الشارع، المبنى، أي علامة مميزة...':'Enter your full address — street, building, landmark...'}"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--bdr);background:var(--bg3);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.88rem;box-sizing:border-box;resize:none;outline:none;transition:border .2s;line-height:1.6;" onfocus="this.style.borderColor='var(--or)'" onblur="this.style.borderColor='var(--bdr)'"></textarea>
   </div>
   <div class="coslb" style="margin-top:12px;">${T('pyl')}</div>
   ${(window._paymentMethods&&window._paymentMethods.length?window._paymentMethods:[
@@ -1014,8 +1012,8 @@ function openCO(){
   <div class="csum"><div class="srow"><span>${T('sub')}</span><span>${sub} EGP</span></div><div class="srow"><span>${T('del')}</span><span>${del===0?`<span style="color:#4CAF50">${T('fd')}</span>`:(del+' EGP')}</span></div><div class="stot"><span>${T('tot')}</span><span class="totp">${tot} EGP</span></div></div>
   <!-- Suggestions -->
   ${(()=>{
-    const cats=cart.map(c=>c.cat);
-    const suggestions=MEALS.filter(m=>!cart.find(c=>c.id===m.id)).filter(m=>cats.includes(m.cat)||m.badge).slice(0,3);
+    const sugCats=['extras','drinks','fries'];
+    const suggestions=MEALS.filter(m=>!cart.find(c=>c.id===m.id)&&sugCats.includes(m.cat)).slice(0,4);
     if(!suggestions.length) return '';
     return `<div style="margin:12px 0 6px;font-size:.78rem;font-weight:700;color:var(--or);">⚡ ${L==='ar'?'قد يعجبك أيضاً':'You might also like'}</div>
     <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">
@@ -1061,15 +1059,16 @@ function onRegionChange(sel){
     if(infoBox) infoBox.style.display='none';
   }
 }
-function sA(v,el){
-  selA=v;
-  document.querySelectorAll('#coMod .adc').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  const box=document.getElementById('customAddrBox');
-  if(box) box.style.display=v==='custom'?'block':'none';
-}
+function sA(v,el){selA=v;}
 function sP(v,el){selP=v;document.querySelectorAll('#coMod .popt').forEach(p=>p.classList.remove('sel'));el.classList.add('sel');}
 async function confO(){
+  // Validate address
+  const _addrVal=document.getElementById('customAddrInp')?.value?.trim();
+  if(!window._tableId&&!_addrVal){
+    showT('⚠️ '+(L==='ar'?'من فضلك اكتب عنوانك':'Please enter your address'));
+    document.getElementById('customAddrInp')?.focus();
+    return;
+  }
   // Validate region selection if regions exist
   const _activeReg=(window._deliveryRegions||[]).filter(r=>r.active!==false);
   if(_activeReg.length>0&&!window._selRegionName){
@@ -1099,7 +1098,7 @@ async function confO(){
     subtotal:sub, delivery:del, total:tot,
     promo:promoInfo,
     deliveryRegion:window._selRegionName||'',
-    address:window._tableId?('طاولة '+window._tableId):(selA==='custom'?(document.getElementById('customAddrInp')?.value||'عنوان مخصص'):(selA==='home'?'المنزل':'عنوان آخر')),
+    address:window._tableId?('طاولة '+window._tableId):(document.getElementById('customAddrInp')?.value?.trim()||'—'),
     payment:(window._paymentMethods||[]).find(p=>p.id===selP)?.ar || selP,
     status:'new',
     time: new Date().toLocaleString('ar-EG'),
