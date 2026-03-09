@@ -311,7 +311,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
   <ul class="nlinks" id="nlinks">
     <li><a href="#" onclick="gp('home',this)" class="act" id="nH">Home</a></li>
     <li><a href="#" onclick="gp('pgMenu',this)" id="nM">Menu</a></li>
-    <li id="navRamadan" style="display:none;"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
+    <li id="navRamadan"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
     <li><a href="#" onclick="gp('pgAbout',this)" id="nA">About</a></li>
     <li><a href="#" onclick="gp('pgFavs',this)" id="nFav" style="display:none;">❤️ <span id="favNavLbl">Favorites</span></a></li>
   </ul>
@@ -1173,8 +1173,8 @@ async function loadRamadanConfig(){
     ramActive = snap.exists() ? !!data.active : true;
     ramItems = data.items||[];
     const navEl=document.getElementById('navRamadan');
-    // Show ramadan nav only if active
-    if(navEl) navEl.style.display = ramActive ? '' : 'none';
+    // Hide ONLY if admin explicitly set active=false
+    if(navEl) navEl.style.display = (snap.exists() && data.active===false) ? 'none' : '';
     const grid=document.getElementById('ramGrid');
     if(grid){
       if(data.title) { const t=document.getElementById('ramTitle'); if(t) t.textContent=data.title; }
