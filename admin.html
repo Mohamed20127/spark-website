@@ -14,7 +14,7 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:var(--or);border-radius:2px;}
 
 /* ── SIDEBAR ── */
-.sidebar{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--bdr);z-index:100;display:flex;flex-direction:column;transition:transform .3s;}
+.sidebar{position:fixed;top:0;right:0;bottom:0;width:240px;background:var(--bg2);border-left:1px solid var(--bdr);z-index:200;display:flex;flex-direction:column;transition:transform .3s;overflow-y:auto;}
 .sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;}
 .sb-logo-txt{font-size:1.5rem;font-weight:900;color:var(--or);letter-spacing:2px;}
 .sb-logo-sub{font-size:.7rem;color:var(--muted);margin-top:1px;}
@@ -31,7 +31,7 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 .sb-urole{font-size:.68rem;color:var(--muted);}
 
 /* ── MAIN ── */
-.main{margin-right:240px;min-height:100vh;display:flex;flex-direction:column;}
+.main{margin-right:240px;min-height:100vh;display:flex;flex-direction:column;transition:margin .3s;}
 .topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
 .tb-title{font-size:1.1rem;font-weight:700;}
 .tb-right{display:flex;align-items:center;gap:10px;}
@@ -134,43 +134,61 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  .sidebar{transform:translateX(100%);width:260px;}
-  .sidebar.open{transform:translateX(0);}
-  .main{margin-right:0;}
-  .mob-menu{display:flex;}
+  /* Hide sidebar, show hamburger */
+  .sidebar{transform:translateX(100%);width:280px;box-shadow:-4px 0 24px rgba(0,0,0,.5);transition:transform .3s;}
+  .sidebar.open{transform:translateX(0)!important;}
+  /* Remove left margin — sidebar is overlay */
+  .main{margin-right:0!important;}
+  .mob-menu{display:flex!important;}
+  /* Layouts */
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .settings-grid{grid-template-columns:1fr;}
-  .topbar{padding:12px 16px;}
-  .tbl th,.tbl td{padding:10px 14px;}
+  .topbar{padding:12px 14px;}
+  .tbl th,.tbl td{padding:10px 12px;}
   .card-head{padding:12px 14px;}
-  .content{padding:16px;}
+  .content{padding:14px 12px;}
+  .view{padding:14px!important;}
 }
-@media(max-width:560px){
-  .stats-row{grid-template-columns:repeat(2,1fr);gap:9px;}
-  .content{padding:12px 10px;}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .sc-card{padding:14px 12px;}
+  .sc-num{font-size:1.4rem;}
+  .content{padding:10px 8px;}
   .tbl th,.tbl td{padding:8px 10px;font-size:.76rem;}
   .prod-grid{grid-template-columns:1fr 1fr;}
   .field-row{grid-template-columns:1fr;}
   .settings-grid{grid-template-columns:1fr;}
-  .modal{border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;right:0;max-width:100%!important;max-height:85vh;}
+  /* Modals slide from bottom on mobile */
+  .modal{border-radius:16px 16px 0 0;position:fixed;bottom:0;left:0;right:0;max-width:100%!important;max-height:88vh;overflow-y:auto;}
   .modal-bg{align-items:flex-end;}
   #permEditor{grid-template-columns:1fr;}
-  .tabs{gap:4px;}
-  .tab{padding:6px 10px;font-size:.74rem;}
+  .tabs{gap:4px;overflow-x:auto;}
+  .tab{padding:7px 12px;font-size:.75rem;white-space:nowrap;}
+  .tb-title{font-size:.88rem;}
+  #regionsEditor > div{grid-template-columns:1fr 80px!important;}
+  #paymentGrid{grid-template-columns:1fr!important;}
 }
-
 @media(max-width:420px){
-  .stats-row{grid-template-columns:1fr 1fr;}
-  .sc-num{font-size:1.4rem;}
-  .topbar{padding:10px 14px;}
-  .tb-title{font-size:.9rem;}
-  .field-row{grid-template-columns:1fr;}
+  .prod-grid{grid-template-columns:1fr 1fr;}
+  .topbar{padding:10px 10px;}
   #sizesEditor{grid-template-columns:1fr;}
+  .field-row{grid-template-columns:1fr;}
 }
-@media(max-width:380px){
+@media(max-width:360px){
   .prod-grid{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:900px){
+  .popup-layout{grid-template-columns:1fr!important;}
+  #popupPreviewBox{display:none;}
 }
 
+/* ── MOBILE TOUCH IMPROVEMENTS ── */
+.sb-item{min-height:44px;display:flex;align-items:center;}
+.tb-btn{min-height:36px;}
+.sbtn{min-height:40px;}
+.btn-save{min-height:44px;}
+input,select,textarea{font-size:16px!important;} /* prevent iOS zoom */
 /* ── AUTH ── */
 #authOverlay{position:fixed;inset:0;background:#0f0f0f;z-index:9999;display:flex;align-items:center;justify-content:center;}
 .auth-box{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:36px 32px;width:100%;max-width:400px;text-align:center;}
@@ -253,6 +271,7 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 
     <div class="sb-sec">الإعدادات</div>
     <div class="sb-item" onclick="goV('ramadan',this)"><div class="icon">🌙</div> قسم رمضان</div>
+    <div class="sb-item" onclick="goV('popup',this)"><div class="icon">💬</div> النافذة المنبثقة</div>
     <div class="sb-item" onclick="goV('settings',this)"><div class="icon">⚙️</div> إعدادات الموقع</div>
     <div class="sb-item" onclick="goV('payment-methods',this)"><div class="icon">💳</div> طرق الدفع</div>
     <div class="sb-item" onclick="goV('promo',this)"><div class="icon">🎁</div> كودات الخصم</div>
@@ -693,6 +712,131 @@ input,select,textarea{font-family:Cairo,sans-serif;outline:none;}
 
   
 
+
+
+<!-- ═══ POPUP / ANNOUNCEMENT ═══ -->
+<div class="view" id="v-popup">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <div>
+      <div style="font-size:1.2rem;font-weight:900;">💬 النافذة المنبثقة</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">نافذة إعلانية تظهر للزوار عند فتح الموقع</div>
+    </div>
+    <div id="popupStatusBadge" style="padding:6px 14px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(229,57,53,.15);color:#EF5350;">● معطّلة</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="popup-layout">
+
+    <!-- Left: Settings -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Enable toggle -->
+      <div class="settings-card" style="padding:16px 20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:700;font-size:.9rem;">تفعيل النافذة المنبثقة</div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:3px;">تظهر للزوار عند فتح الموقع</div>
+          </div>
+          <label class="toggle" id="popupToggleLbl">
+            <input type="checkbox" id="popupEnabled" onchange="updatePopupStatus()">
+            <span class="toggle-track"><span class="toggle-dot"></span></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Content type -->
+      <div class="settings-card" style="padding:16px 20px;">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:12px;">🎨 نوع المحتوى</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+          <label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border .2s;" id="typeBtn_text">
+            <input type="radio" name="popupType" value="text" checked onchange="onPopupTypeChange()" style="accent-color:var(--or);">
+            <span style="font-size:.8rem;font-weight:600;">📝 نص</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border .2s;" id="typeBtn_image">
+            <input type="radio" name="popupType" value="image" onchange="onPopupTypeChange()" style="accent-color:var(--or);">
+            <span style="font-size:.8rem;font-weight:600;">🖼️ صورة</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border .2s;" id="typeBtn_offer">
+            <input type="radio" name="popupType" value="offer" onchange="onPopupTypeChange()" style="accent-color:var(--or);">
+            <span style="font-size:.8rem;font-weight:600;">🔥 عرض خاص</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:10px 12px;cursor:pointer;transition:border .2s;" id="typeBtn_discount">
+            <input type="radio" name="popupType" value="discount" onchange="onPopupTypeChange()" style="accent-color:var(--or);">
+            <span style="font-size:.8rem;font-weight:600;">🏷️ كود خصم</span>
+          </label>
+        </div>
+
+        <!-- Text fields -->
+        <div id="popupFields_text">
+          <div class="field"><label>العنوان الرئيسي</label><input type="text" id="popupTitle" placeholder="🔥 عرض خاص اليوم!"></div>
+          <div class="field"><label>النص / الرسالة</label><textarea id="popupBody" rows="3" placeholder="احصل على خصم 20% على جميع الوجبات اليوم فقط..." style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;resize:vertical;box-sizing:border-box;"></textarea></div>
+          <div class="field"><label>لون الخلفية (اختياري)</label><input type="color" id="popupBgColor" value="#1a1a1a" style="width:100%;height:40px;border-radius:8px;border:1px solid var(--bdr);background:var(--bg2);cursor:pointer;"></div>
+        </div>
+
+        <!-- Image fields -->
+        <div id="popupFields_image" style="display:none;">
+          <div class="field"><label>رابط الصورة</label><input type="url" id="popupImgUrl" placeholder="https://..." oninput="previewPopupImg()"></div>
+          <div id="popupImgPreview" style="display:none;margin-top:8px;"><img id="popupImgEl" src="" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover;" onerror="this.parentElement.style.display='none'"></div>
+          <div class="field" style="margin-top:10px;"><label>رابط عند الضغط على الصورة (اختياري)</label><input type="text" id="popupImgLink" placeholder="مثلاً: #pgMenu"></div>
+        </div>
+
+        <!-- Offer fields -->
+        <div id="popupFields_offer" style="display:none;">
+          <div class="field"><label>عنوان العرض</label><input type="text" id="popupOfferTitle" placeholder="🔥 عرض نهاية الأسبوع!"></div>
+          <div class="field"><label>وصف العرض</label><textarea id="popupOfferDesc" rows="2" placeholder="وجبتين بسعر واحد..." style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;resize:vertical;box-sizing:border-box;"></textarea></div>
+          <div class="field"><label>نص الزر</label><input type="text" id="popupOfferBtn" placeholder="اطلب الآن 🛒" value="اطلب الآن 🛒"></div>
+          <div class="field"><label>رابط الزر</label><input type="text" id="popupOfferLink" placeholder="#pgMenu" value="#pgMenu"></div>
+        </div>
+
+        <!-- Discount fields -->
+        <div id="popupFields_discount" style="display:none;">
+          <div class="field"><label>العنوان</label><input type="text" id="popupDiscTitle" placeholder="🎁 هدية خاصة لك!" value="🎁 هدية خاصة لك!"></div>
+          <div class="field"><label>كود الخصم</label><input type="text" id="popupDiscCode" placeholder="SPARK20" style="text-transform:uppercase;letter-spacing:3px;font-weight:700;font-size:1rem;text-align:center;"></div>
+          <div class="field"><label>نص تحت الكود</label><input type="text" id="popupDiscDesc" placeholder="استخدم الكود للحصول على خصم 20%"></div>
+        </div>
+      </div>
+
+      <!-- Timing -->
+      <div class="settings-card" style="padding:16px 20px;">
+        <div style="font-size:.82rem;font-weight:700;margin-bottom:12px;">⏱️ توقيت الظهور</div>
+        <div class="field-row">
+          <div class="field"><label>تأخير الظهور (ثانية)</label><input type="number" id="popupDelay" value="2" min="0" max="60" placeholder="2"></div>
+          <div class="field"><label>إخفاء تلقائي بعد (ثانية)</label><input type="number" id="popupAutohide" value="0" min="0" placeholder="0 = لا يُخفى"></div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>تكرار الظهور</label>
+            <select id="popupFreq" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;">
+              <option value="always">كل زيارة</option>
+              <option value="session">مرة لكل جلسة</option>
+              <option value="once" selected>مرة واحدة فقط</option>
+              <option value="daily">مرة كل يوم</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>الموضع</label>
+            <select id="popupPosition" style="width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;color:var(--txt);font-family:Cairo,sans-serif;font-size:.82rem;">
+              <option value="center" selected>وسط الشاشة</option>
+              <option value="bottom">أسفل الشاشة</option>
+              <option value="top">أعلى الشاشة</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-save" style="width:100%;padding:14px;" onclick="savePopupConfig()">💾 حفظ وتطبيق</button>
+    </div>
+
+    <!-- Right: Live Preview -->
+    <div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;">👁️ معاينة مباشرة</div>
+      <div id="popupPreviewBox" style="background:#111;border-radius:16px;overflow:hidden;position:relative;min-height:400px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bdr);">
+        <div style="font-size:.75rem;color:#444;text-align:center;">ستظهر المعاينة هنا</div>
+      </div>
+      <div style="margin-top:10px;font-size:.7rem;color:var(--muted);text-align:center;">↑ هكذا ستبدو النافذة للزوار</div>
+    </div>
+
+  </div>
+</div>
 
 <!-- ═══ PAYMENT METHODS ═══ -->
 <div class="view" id="v-payment-methods">
@@ -1174,23 +1318,31 @@ function goV(id,el){
   if(id==='promo')           { if(window._PROMOS) rPromos(); }
   if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); }
   if(id==='payment-methods') { rPaymentMethods(); }
-  // close sidebar on mobile
-  if(window.innerWidth<=900){
-    const sb=document.getElementById('sidebar');
-    const ov=document.getElementById('sbOverlay');
-    if(sb) sb.classList.remove('open');
-    if(ov) ov.style.display='none';
-  } else {
-    document.getElementById('sidebar').classList.remove('open');
-  }
+  if(id==='popup')           { loadPopupConfig(); }
+  // close sidebar on mobile after navigation
+  if(window.innerWidth<=900) closeSb();
 }
 function toggleSb(){
   const sb=document.getElementById('sidebar');
-  sb.classList.toggle('open');
-  // show/hide overlay
+  const isOpen=sb.classList.toggle('open');
+  // overlay
   let ov=document.getElementById('sbOverlay');
-  if(!ov){ov=document.createElement('div');ov.id='sbOverlay';ov.style.cssText='display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:149;';ov.onclick=toggleSb;document.body.appendChild(ov);}
-  ov.style.display=sb.classList.contains('open')?'block':'none';
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='sbOverlay';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199;display:none;';
+    ov.onclick=function(){closeSb();};
+    document.body.appendChild(ov);
+  }
+  ov.style.display=isOpen?'block':'none';
+  document.body.style.overflow=isOpen?'hidden':'';
+}
+function closeSb(){
+  const sb=document.getElementById('sidebar');
+  if(sb)sb.classList.remove('open');
+  const ov=document.getElementById('sbOverlay');
+  if(ov)ov.style.display='none';
+  document.body.style.overflow='';
 }
 function handleAction(){
   if(curV==='products'||curV==='dashboard')openProdModal(null);
@@ -1685,6 +1837,172 @@ async function syncPromosToFirebase(){
 // ══════════════════════════════════════════
 // ── Payment Methods ──
 // ══════════════════════════════════════════
+
+// ══════════════════════════════════════════════════
+// ── POPUP / ANNOUNCEMENT SYSTEM ──
+// ══════════════════════════════════════════════════
+let _popupCfg = {};
+
+function onPopupTypeChange(){
+  const type = document.querySelector('input[name=popupType]:checked')?.value || 'text';
+  ['text','image','offer','discount'].forEach(t=>{
+    const el = document.getElementById('popupFields_'+t);
+    if(el) el.style.display = t===type ? 'block' : 'none';
+  });
+  // highlight selected type button
+  ['text','image','offer','discount'].forEach(t=>{
+    const btn = document.getElementById('typeBtn_'+t);
+    if(btn) btn.style.borderColor = t===type ? 'var(--or)' : 'var(--bdr)';
+  });
+  updatePopupPreview();
+}
+
+function updatePopupStatus(){
+  const enabled = document.getElementById('popupEnabled')?.checked;
+  const badge = document.getElementById('popupStatusBadge');
+  if(badge){
+    badge.textContent = enabled ? '● مفعّلة' : '● معطّلة';
+    badge.style.background = enabled ? 'rgba(76,175,80,.15)' : 'rgba(229,57,53,.15)';
+    badge.style.color = enabled ? '#4CAF50' : '#EF5350';
+  }
+  updatePopupPreview();
+}
+
+function previewPopupImg(){
+  const url = document.getElementById('popupImgUrl')?.value;
+  const box = document.getElementById('popupImgPreview');
+  const img = document.getElementById('popupImgEl');
+  if(url && box && img){ img.src=url; box.style.display='block'; }
+  else if(box) box.style.display='none';
+  updatePopupPreview();
+}
+
+function updatePopupPreview(){
+  const box = document.getElementById('popupPreviewBox');
+  if(!box) return;
+  const type = document.querySelector('input[name=popupType]:checked')?.value || 'text';
+  const enabled = document.getElementById('popupEnabled')?.checked;
+  const pos = document.getElementById('popupPosition')?.value || 'center';
+
+  let innerHtml = '';
+
+  if(type === 'text'){
+    const title = document.getElementById('popupTitle')?.value || '🔥 عنوان النافذة';
+    const body  = document.getElementById('popupBody')?.value  || 'نص الرسالة يظهر هنا...';
+    const bg    = document.getElementById('popupBgColor')?.value || '#1a1a1a';
+    innerHtml = `
+      <div style="background:${bg};border-radius:16px;padding:28px 24px;max-width:300px;width:90%;text-align:center;border:1px solid rgba(255,255,255,.1);">
+        <div style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:10px;">${title}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:16px;">${body}</div>
+        <button style="background:var(--or);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:Cairo,sans-serif;font-weight:700;cursor:pointer;font-size:.85rem;">إغلاق ✕</button>
+      </div>`;
+  } else if(type === 'image'){
+    const imgUrl = document.getElementById('popupImgUrl')?.value || '';
+    innerHtml = imgUrl
+      ? `<div style="border-radius:16px;overflow:hidden;max-width:300px;width:90%;"><img src="${imgUrl}" style="width:100%;display:block;" onerror="this.src=''"><div style="background:#111;padding:10px;text-align:center;"><button style="background:var(--or);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:Cairo,sans-serif;cursor:pointer;">إغلاق ✕</button></div></div>`
+      : '<div style="color:#555;font-size:.8rem;">أضف رابط صورة لتظهر المعاينة</div>';
+  } else if(type === 'offer'){
+    const t = document.getElementById('popupOfferTitle')?.value || '🔥 عرض خاص!';
+    const d = document.getElementById('popupOfferDesc')?.value  || 'وصف العرض...';
+    const b = document.getElementById('popupOfferBtn')?.value   || 'اطلب الآن 🛒';
+    innerHtml = `
+      <div style="background:linear-gradient(135deg,#1a1a1a,#2a1500);border-radius:16px;padding:28px 24px;max-width:300px;width:90%;text-align:center;border:1px solid rgba(255,107,0,.3);">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--or);margin-bottom:10px;">${t}</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:16px;">${d}</div>
+        <button style="background:var(--or);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-family:Cairo,sans-serif;font-weight:700;cursor:pointer;">${b}</button>
+        <div style="margin-top:12px;"><button style="background:transparent;color:#666;border:none;cursor:pointer;font-size:.75rem;font-family:Cairo,sans-serif;">إغلاق ✕</button></div>
+      </div>`;
+  } else if(type === 'discount'){
+    const t = document.getElementById('popupDiscTitle')?.value || '🎁 هدية خاصة لك!';
+    const c = (document.getElementById('popupDiscCode')?.value || 'SPARK20').toUpperCase();
+    const d = document.getElementById('popupDiscDesc')?.value  || 'استخدم الكود للحصول على خصم';
+    innerHtml = `
+      <div style="background:linear-gradient(135deg,#1a1a1a,#001a0f);border-radius:16px;padding:28px 24px;max-width:300px;width:90%;text-align:center;border:1px solid rgba(76,175,80,.3);">
+        <div style="font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:8px;">${t}</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.6);margin-bottom:14px;">${d}</div>
+        <div style="background:rgba(76,175,80,.15);border:2px dashed #4CAF50;border-radius:10px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:1.6rem;font-weight:900;color:#4CAF50;letter-spacing:4px;">${c}</div>
+        </div>
+        <button style="background:transparent;color:#666;border:none;cursor:pointer;font-size:.75rem;font-family:Cairo,sans-serif;">إغلاق ✕</button>
+      </div>`;
+  }
+
+  const alignStyle = pos==='bottom' ? 'align-items:flex-end;padding-bottom:20px;' : pos==='top' ? 'align-items:flex-start;padding-top:20px;' : 'align-items:center;';
+  box.innerHTML = `<div style="width:100%;height:100%;min-height:380px;display:flex;justify-content:center;${alignStyle}background:rgba(0,0,0,.7);border-radius:16px;">${innerHtml}</div>`;
+}
+
+async function savePopupConfig(){
+  if(!window._db){showT('❌ Firebase غير متصل');return;}
+  const type     = document.querySelector('input[name=popupType]:checked')?.value || 'text';
+  const enabled  = document.getElementById('popupEnabled')?.checked || false;
+  const delay    = parseInt(document.getElementById('popupDelay')?.value)||2;
+  const autohide = parseInt(document.getElementById('popupAutohide')?.value)||0;
+  const freq     = document.getElementById('popupFreq')?.value || 'once';
+  const position = document.getElementById('popupPosition')?.value || 'center';
+
+  const cfg = { type, enabled, delay, autohide, freq, position, updatedAt: Date.now() };
+
+  if(type==='text'){
+    cfg.title   = document.getElementById('popupTitle')?.value || '';
+    cfg.body    = document.getElementById('popupBody')?.value  || '';
+    cfg.bgColor = document.getElementById('popupBgColor')?.value || '#1a1a1a';
+  } else if(type==='image'){
+    cfg.imgUrl  = document.getElementById('popupImgUrl')?.value  || '';
+    cfg.imgLink = document.getElementById('popupImgLink')?.value || '';
+  } else if(type==='offer'){
+    cfg.offerTitle = document.getElementById('popupOfferTitle')?.value || '';
+    cfg.offerDesc  = document.getElementById('popupOfferDesc')?.value  || '';
+    cfg.offerBtn   = document.getElementById('popupOfferBtn')?.value   || 'اطلب الآن';
+    cfg.offerLink  = document.getElementById('popupOfferLink')?.value  || '#pgMenu';
+  } else if(type==='discount'){
+    cfg.discTitle = document.getElementById('popupDiscTitle')?.value || '';
+    cfg.discCode  = (document.getElementById('popupDiscCode')?.value||'').toUpperCase();
+    cfg.discDesc  = document.getElementById('popupDiscDesc')?.value  || '';
+  }
+
+  try{
+    const {doc,setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(window._db,'config','popup'), cfg, {merge:true});
+    _popupCfg = cfg;
+    showT(enabled ? '✅ النافذة المنبثقة مفعّلة وتم الحفظ' : '✅ تم الحفظ (النافذة معطّلة)');
+  } catch(e){ showT('❌ خطأ في الحفظ: '+e.message); }
+}
+
+async function loadPopupConfig(){
+  if(!window._db) return;
+  try{
+    const {doc,getDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap = await getDoc(doc(window._db,'config','popup'));
+    if(!snap.exists()) return;
+    const cfg = snap.data();
+    _popupCfg = cfg;
+
+    // Apply enabled state
+    const enEl = document.getElementById('popupEnabled');
+    if(enEl){ enEl.checked = !!cfg.enabled; updatePopupStatus(); }
+
+    // Apply type
+    const typeEl = document.querySelector(`input[name=popupType][value="${cfg.type||'text'}"]`);
+    if(typeEl){ typeEl.checked=true; onPopupTypeChange(); }
+
+    // Apply timing
+    if(cfg.delay!=null)    { const el=document.getElementById('popupDelay');    if(el)el.value=cfg.delay; }
+    if(cfg.autohide!=null) { const el=document.getElementById('popupAutohide'); if(el)el.value=cfg.autohide; }
+    if(cfg.freq)           { const el=document.getElementById('popupFreq');     if(el)el.value=cfg.freq; }
+    if(cfg.position)       { const el=document.getElementById('popupPosition'); if(el)el.value=cfg.position; }
+
+    // Apply content
+    const setVal=(id,v)=>{const e=document.getElementById(id);if(e&&v!=null)e.value=v;};
+    setVal('popupTitle',cfg.title); setVal('popupBody',cfg.body); setVal('popupBgColor',cfg.bgColor);
+    setVal('popupImgUrl',cfg.imgUrl); setVal('popupImgLink',cfg.imgLink);
+    setVal('popupOfferTitle',cfg.offerTitle); setVal('popupOfferDesc',cfg.offerDesc);
+    setVal('popupOfferBtn',cfg.offerBtn); setVal('popupOfferLink',cfg.offerLink);
+    setVal('popupDiscTitle',cfg.discTitle); setVal('popupDiscCode',cfg.discCode); setVal('popupDiscDesc',cfg.discDesc);
+
+    updatePopupPreview();
+  } catch(e){ console.warn('loadPopupConfig:',e); }
+}
+
 let PAYMENT_METHODS = [
   {id:'pm_cash',   ar:'كاش عند الاستلام', en:'Cash on Delivery',  icon:'💵', desc:'',    notes:'', active:true},
   {id:'pm_card',   ar:'بطاقة ائتمان',     en:'Credit Card',        icon:'💳', desc:'',    notes:'', active:true},
@@ -2263,6 +2581,8 @@ async function initAdmin(){
   loadSettingsFromFirebase();
   // Load payment methods
   try{ await loadPaymentMethods(); }catch(e){ console.warn('loadPaymentMethods:',e); }
+  // Load popup config
+  try{ await loadPopupConfig(); }catch(e){ console.warn('loadPopupConfig:',e); }
 
   // Load product sizes config
   try{
