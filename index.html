@@ -1,4 +1,24 @@
-<!DOCTYPE html>
+function gp(pg,el){
+  // Update URL hash for refresh persistence
+  if(pg&&pg!=='home') history.replaceState(null,'','#'+pg);
+  else history.replaceState(null,'',''+location.pathname);
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  // Show target page
+  const target=document.getElementById(pg);
+  if(target) target.classList.add('active');
+  curPg=pg;
+  // Nav highlight
+  document.querySelectorAll('.nlinks a').forEach(a=>a.classList.remove('act'));
+  if(el) el.classList.add('act');
+  // Close mobile nav
+  const mn=document.getElementById('mobNav');
+  if(mn) mn.classList.remove('open');
+  // Page-specific actions
+  if(pg==='pgMenu'){rCats();rMeals(cat);}
+  if(pg==='pgFavs'){rFavs();}
+  if(pg==='pgRamadan'){rRamGrid();}
+}<!DOCTYPE html>
 <html lang="en" data-theme="dark" data-lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1160,6 +1180,34 @@ async function loadSocialConfig(){
     }
   }catch(e){console.warn('social config:',e);}
 }
+async function loadFloatBtnConfig(){
+  try{
+    const {db}=await initFB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','floatBtn'));
+    if(!snap.exists()) return;
+    const d=snap.data();
+    const btn=document.getElementById('waBtn');
+    if(!btn) return;
+    if(d.enabled===false){ btn.style.display='none'; return; }
+    btn.style.display='';
+    // action: 'menu', 'whatsapp', 'call', 'url'
+    if(d.action==='menu'){
+      btn.onclick=function(e){e.preventDefault();gp('pgMenu',document.getElementById('nM'));};
+      btn.href='#';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>';
+    } else if(d.action==='call'){
+      const waSocial=document.getElementById('waBtn');
+      // keep as whatsapp but use call
+      btn.href='tel:'+((d.phone||'').replace(/\D/g,''));
+      btn.innerHTML='📞';
+    }
+    // text overlay
+    if(d.text && d.action!=='whatsapp'){
+      btn.title=d.text;
+    }
+  }catch(e){console.warn('floatBtn config:',e);}
+}
 
 // ── Ramadan Config ──
 let ramItems=[], ramActive=false;
@@ -1241,25 +1289,24 @@ async function loadFromFirebase(){
     favs=new Set(MEALS.filter(m=>m.fav||m.featured).map(m=>m.id));
     syncAllViews();
   // Show popup after content loads
-  setTimeout(loadAndShowPopup, 500);
+  setTimeout(loadAndShowPopup, 200);
   }catch(e){console.warn('loadFromFirebase:',e);}
 }
 
 function syncAllViews(){
-  // Re-render everywhere so any product change is reflected instantly
+  // Always update category counts first
+  CATS.forEach(c=>{
+    if(c.id==='all') c.cnt=MEALS.length;
+    else c.cnt=MEALS.filter(m=>m.cat===c.id).length;
+  });
+  // Re-render active page
   rHome();
   if(curPg==='pgMenu'){rCats();rMeals(cat);}
   if(curPg==='pgFavs'){rFavs();}
-  if(curPg==='pgRamadan'){const rg=document.getElementById('ramGrid');if(rg){const meals=window._ramItems?.length?MEALS.filter(m=>window._ramItems.includes(m.id)):MEALS;rg.innerHTML=meals.map(mC).join('');}}
-  // Update category counts
-  CATS.forEach(c=>{if(c.id!=='all') c.cnt=MEALS.filter(m=>m.cat===c.id).length;});
-  // Sync ramadan grid
-  rRamGrid();
-  // Load custom pages into footer nav
+  if(curPg==='pgRamadan'){rRamGrid();}
+  // Load configs (non-blocking)
   loadCustomPages();
-  // Load delivery config
   loadDeliveryConfig();
-  // Load payment methods
   loadPaymentMethods();
 }
 
@@ -1310,73 +1357,21 @@ async function loadCustomPages(){
     if(ftSlot && _customPages.length){
       ftSlot.innerHTML=_customPages.map(p=>`<li><a href="#" onclick="openCustomPage('${p._id}')">${p.title}</a></li>`).join('');
     }
-    // Check URL for direct page link ?page=slug
-    const slug=new URLSearchParams(location.search).get('page');
-    if(slug){
-      const pg=_customPages.find(p=>p.slug===slug);
-      if(pg) openCustomPage(pg._id);
-    }
-  }catch(e){console.warn('loadCustomPages:',e);}
-}
 
-function openCustomPage(id){
-  const pg=_customPages.find(p=>p._id===id);
-  if(!pg) return;
-  document.getElementById('pgCustomTitle').textContent=pg.title;
-  document.getElementById('pgCustomContent').innerHTML=pg.content||'';
-  gp('pgCustom');
-}
-
-// ── Firebase ──
-const FB_CFG={
-  apiKey:"AIzaSyCh32ANAz144h5aSZfjZZq3jyzxOocxi94",
-  authDomain:"sparkeg-d8fdd.firebaseapp.com",
-  projectId:"sparkeg-d8fdd",
-  storageBucket:"sparkeg-d8fdd.firebasestorage.app",
-  messagingSenderId:"667897054721",
-  appId:"1:667897054721:web:a765f25a7576d0f1dd6200"
-};
-let _db=null;
-async function initFB(){
-  if(_db) return {db:_db};
-  const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-  const {getFirestore}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
-  _db=getFirestore(app);
-  return {db:_db};
-}
-async function loadProdSizes(){
-  try{
-    const {db}=await initFB();
-    const {collection,getDocs}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const snap=await getDocs(collection(db,'product_sizes'));
-    snap.docs.forEach(d=>{
-      const data=d.data();
-      if(data.mealId&&data.sizes) PROD_SIZES[data.mealId]=data.sizes;
-    });
-  }catch(e){console.warn('loadProdSizes:',e);}
-}
-// ── Init ──
-// ── QR Table Detection ──
-(function detectTableFromURL(){
-  const params=new URLSearchParams(window.location.search);
-  const tableId=params.get('table');
-  if(tableId){
-    window._tableId=tableId;
-    // Show menu directly with table context banner
-    document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
-    const menuPg=document.getElementById('pgMenu');
-    if(menuPg){menuPg.classList.add('active');}
-    curPg='pgMenu';
-    // Show table banner
-    const banner=document.createElement('div');
-    banner.style.cssText='position:fixed;top:60px;left:0;right:0;z-index:800;background:var(--or);color:#fff;text-align:center;padding:8px 16px;font-size:.82rem;font-weight:700;font-family:Cairo,Outfit,sans-serif;';
-    banner.innerHTML=`🪑 أنت على طاولة رقم <strong>${tableId}</strong> — اختر ما تريد وأضف للسلة`;
-    document.body.prepend(banner);
+rHome();
+// Hash-based navigation on page load
+(function(){
+  const hash = location.hash.replace('#','');
+  if(hash && hash!=='home'){
+    setTimeout(()=>{
+      const pg = document.getElementById(hash);
+      const navMap = {pgMenu:'nM',pgAbout:'nA',pgRamadan:'nR',pgFavs:'nFav'};
+      const navEl = navMap[hash] ? document.getElementById(navMap[hash]) : null;
+      if(pg) gp(hash, navEl);
+    }, 300);
   }
 })();
 
-rHome();
 // Show cached logo instantly (no flash)
 (function(){
   const cached=localStorage.getItem('spark_logo');
@@ -1390,6 +1385,7 @@ rHome();
 loadFromFirebase().then(()=>{
   loadRamadanConfig();
   loadSocialConfig();
+  loadFloatBtnConfig();
 });
 
 // ════════════════════════════════════════
