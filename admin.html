@@ -1025,6 +1025,10 @@ input,select,textarea{font-size:16px!important;} /* prevent iOS zoom */
       <div class="field">
         <label>🖼️ رابط صورة المنتج (اختياري)</label>
         <input type="url" id="pImg" placeholder="https://example.com/image.jpg" oninput="previewProdImg()">
+        <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+          <label style="font-size:.75rem;color:var(--muted);">أو ارفع صورة:</label>
+          <input type="file" id="pImgFile" accept="image/*" onchange="uploadProdImg(this)" style="font-size:.75rem;flex:1;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:6px;color:var(--txt);cursor:pointer;">
+        </div>
         <div id="prodImgPreview" style="margin-top:8px;display:none;"><img id="prodImgEl" src="" style="height:80px;border-radius:8px;border:1px solid var(--bdr);object-fit:cover;max-width:100%;" onerror="this.parentElement.style.display='none'"></div>
         <div style="font-size:.7rem;color:var(--muted);margin-top:5px;">💡 ارفع على <a href="https://imgbb.com" target="_blank" style="color:var(--or);">imgBB.com</a> وانسخ الرابط المباشر</div>
       </div>
@@ -1316,7 +1320,7 @@ function goV(id,el){
   if(id==='social')          { loadSocialConfig2(); }
   if(id==='pages')           { loadPages(); }
   if(id==='promo')           { if(window._PROMOS) rPromos(); }
-  if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); }
+  if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); loadFloatBtn(); }
   if(id==='payment-methods') { rPaymentMethods(); }
   if(id==='popup')           { loadPopupConfig(); }
   // close sidebar on mobile after navigation
@@ -2132,6 +2136,19 @@ async function saveSettings(){
 }
 
 // Product image preview
+function uploadProdImg(input){
+  const file=input.files[0];
+  if(!file){return;}
+  if(file.size>800*1024){showT('❌ الصورة أكبر من 800KB — اختر صورة أصغر');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const b64=e.target.result; // data:image/jpeg;base64,...
+    const pImg=document.getElementById('pImg');
+    if(pImg) pImg.value=b64;
+    previewProdImg();
+  };
+  reader.readAsDataURL(file);
+}
 function previewProdImg(){
   const url=document.getElementById('pImg')?.value;
   const box=document.getElementById('prodImgPreview');
@@ -2483,6 +2500,20 @@ async function saveUser(){
   }catch(e){ errEl.textContent='خطأ: '+e.message; }
 }
 
+async function deleteUserRecord(uid, name, evt){
+  if(evt) evt.stopPropagation();
+  if(!confirm('حذف المستخدم "'+name+'" نهائياً؟\nهذا الإجراء لا يمكن التراجع عنه.')) return;
+  if(!window._db){showT('❌ Firebase غير متصل');return;}
+  try{
+    const {doc,deleteDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await deleteDoc(doc(window._db,'users',uid));
+    showT('✅ تم حذف المستخدم بنجاح');
+    rUsers();
+  }catch(e){
+    console.error('deleteUser:',e);
+    showT('❌ فشل الحذف: '+e.message);
+  }
+}
 async function toggleUserActive(uid, current){
   if(!window._db) return;
   const {doc,updateDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
@@ -2519,6 +2550,7 @@ async function rUsers(){
         <div class="uc-actions">
           <button class="pa-btn" onclick="openUserModal('${d.id}')" style="flex:1;">✏️ تعديل</button>
           ${!isMe?`<button class="pa-btn ${u.active!==false?'del':''}" onclick="toggleUserActive('${d.id}',${u.active!==false})" style="flex:1;">${u.active!==false?'⏸ إيقاف':'✅ تفعيل'}</button>`:''}
+          ${!isMe?`<button class="pa-btn del" onclick="deleteUserRecord('${d.id}','${u.name||u.email||''}',event)" style="flex:0 0 36px;padding:0;" title="حذف المستخدم">🗑️</button>`:''}
         </div>
       </div>`;
     }).join('');
@@ -2644,6 +2676,7 @@ async function initAdmin(){
   });
   rDash();
   initPushNotifications();
+  loadFloatBtn();
 }
 
 // Update order status in Firebase
@@ -2814,6 +2847,21 @@ async function saveSocialConfig(){
   showT('✅ تم حفظ روابط السوشيال');
 }
 
+async function loadFloatBtn(){
+  if(!window._db) return;
+  try{
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(window._db,'config','floatBtn'));
+    if(!snap.exists()) return;
+    const d=snap.data();
+    const tog=document.getElementById('floatBtnToggle');
+    const txt=document.getElementById('floatBtnText');
+    const act=document.getElementById('floatBtnAction');
+    if(tog){ if(d.enabled) tog.classList.add('on'); else tog.classList.remove('on'); }
+    if(txt&&d.text) txt.value=d.text;
+    if(act&&d.action) act.value=d.action;
+  }catch(e){console.warn('loadFloatBtn:',e);}
+}
 async function saveFloatBtn(){
   if(!window._db)return;
   const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
