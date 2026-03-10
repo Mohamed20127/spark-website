@@ -1470,7 +1470,7 @@ async function loadFromFirebase(){
     favs=new Set(MEALS.filter(m=>m.fav||m.featured).map(m=>m.id));
     syncAllViews();
   // Show popup after content loads
-  setTimeout(loadAndShowPopup, 500);
+  setTimeout(loadAndShowPopup, 200);
   }catch(e){console.warn('loadFromFirebase:',e);}
 }
 
@@ -1628,11 +1628,37 @@ loadFromFirebase().then(()=>{
   loadRamadanConfig();
   loadSocialConfig();
   loadOffers();
+  loadFloatBtnConfig();
 });
 
 // ════════════════════════════════════════
 // ── POPUP SYSTEM (Frontend) ──
 // ════════════════════════════════════════
+async function loadFloatBtnConfig(){
+  try{
+    const {db}=await initFB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','floatBtn'));
+    if(!snap.exists()) return;
+    const d=snap.data();
+    const btn=document.getElementById('waBtn');
+    if(!btn) return;
+    if(d.enabled===false){btn.style.display='none';return;}
+    btn.style.display='';
+    if(d.action==='menu'){
+      btn.onclick=function(e){e.preventDefault();gp('pgMenu',document.getElementById('nM'));};
+      btn.href='#';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>';
+    } else if(d.action==='call'&&d.phone){
+      btn.href='tel:'+d.phone.replace(/\D/g,'');
+      btn.innerHTML='📞';
+    } else if(d.action==='url'&&d.url){
+      btn.href=d.url;
+      btn.target='_blank';
+    }
+    if(d.text) btn.title=d.text;
+  }catch(e){console.warn('floatBtn:',e);}
+}
 async function loadAndShowPopup(){
   try{
     const {db}=await initFB();
