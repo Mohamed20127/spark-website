@@ -272,6 +272,7 @@ input,select,textarea{font-size:16px!important;} /* prevent iOS zoom */
     <div class="sb-sec">الإعدادات</div>
     <div class="sb-item" onclick="goV('ramadan',this)"><div class="icon">🌙</div> قسم رمضان</div>
     <div class="sb-item" onclick="goV('popup',this)"><div class="icon">💬</div> النافذة المنبثقة</div>
+    <div class="sb-item" onclick="goV('offers',this)"><div class="icon">🔥</div> العروض والخصومات</div>
     <div class="sb-item" onclick="goV('settings',this)"><div class="icon">⚙️</div> إعدادات الموقع</div>
     <div class="sb-item" onclick="goV('payment-methods',this)"><div class="icon">💳</div> طرق الدفع</div>
     <div class="sb-item" onclick="goV('promo',this)"><div class="icon">🎁</div> كودات الخصم</div>
@@ -714,6 +715,115 @@ input,select,textarea{font-size:16px!important;} /* prevent iOS zoom */
 
 
 
+<!-- ═══ OFFERS ═══ -->
+<div class="view" id="v-offers">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:1.1rem;font-weight:700;">🔥 العروض والخصومات</div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:2px;">خصومات على منتجات — وجبات كاملة — وقت محدود</div>
+    </div>
+    <button class="tb-btn primary" onclick="openOfferModal()">+ عرض جديد</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+    <div style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:var(--or);" id="offStatActive">0</div>
+      <div style="font-size:.7rem;color:var(--muted);">نشطة الآن</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:#4CAF50;" id="offStatUsed">0</div>
+      <div style="font-size:.7rem;color:var(--muted);">إجمالي الاستخدام</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center;">
+      <div style="font-size:1.6rem;font-weight:900;color:#9E9E9E;" id="offStatExpired">0</div>
+      <div style="font-size:.7rem;color:var(--muted);">منتهية</div>
+    </div>
+  </div>
+  <div id="offersList" style="display:grid;gap:12px;">
+    <div style="text-align:center;padding:40px;color:var(--muted);">جاري التحميل...</div>
+  </div>
+</div>
+
+<!-- OFFER MODAL -->
+<div class="modal-bg" id="offerModal" style="display:none;" onclick="if(event.target===this)closeOfferModal()">
+  <div class="modal" style="max-width:540px;max-height:90vh;overflow-y:auto;">
+    <div class="card-head">
+      <h3 id="offerModalTitle">🔥 عرض جديد</h3>
+      <button class="tb-btn" onclick="closeOfferModal()">✕</button>
+    </div>
+    <div style="padding:18px;display:flex;flex-direction:column;gap:14px;">
+
+      <div class="field"><label>نوع العرض</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+          <div id="ot-product" onclick="selOfferType('product')" style="background:rgba(255,107,0,.12);border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center;cursor:pointer;">
+            <div style="font-size:1.4rem;">🏷️</div><div style="font-size:.74rem;font-weight:700;margin-top:4px;">خصم على منتج</div>
+          </div>
+          <div id="ot-meal" onclick="selOfferType('meal')" style="background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:12px;text-align:center;cursor:pointer;">
+            <div style="font-size:1.4rem;">🍱</div><div style="font-size:.74rem;font-weight:700;margin-top:4px;">وجبة كاملة</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>الاسم (عربي)</label><input type="text" id="offNameAr" placeholder="مثال: بيتزا سبارك + كولا"></div>
+        <div class="field"><label>الاسم (إنجليزي)</label><input type="text" id="offNameEn" placeholder="SPARK Pizza Deal"></div>
+      </div>
+
+      <!-- product discount fields -->
+      <div id="offProductFields">
+        <div class="field"><label>المنتج</label>
+          <select id="offProduct" style="width:100%;"><option value="">-- اختر منتج --</option></select>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>نوع الخصم</label>
+            <select id="offDiscType">
+              <option value="percent">نسبة % من السعر</option>
+              <option value="fixed">خصم مبلغ ثابت EGP</option>
+              <option value="fixed_price">سعر ثابت بدل السعر الأصلي</option>
+            </select>
+          </div>
+          <div class="field"><label>القيمة</label><input type="number" id="offDiscVal" placeholder="20" min="1"></div>
+        </div>
+      </div>
+
+      <!-- meal deal fields -->
+      <div id="offMealFields" style="display:none;">
+        <div class="field"><label>منتجات الوجبة <span style="color:var(--muted);font-size:.7rem;">(اختر 2 أو أكثر)</span></label>
+          <div id="offMealProducts" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:190px;overflow-y:auto;padding:2px;"></div>
+        </div>
+        <div class="field"><label>سعر الوجبة الكاملة (EGP)</label><input type="number" id="offMealPrice" placeholder="99" min="1"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>📅 يبدأ في</label><input type="datetime-local" id="offStart"></div>
+        <div class="field"><label>📅 ينتهي في</label><input type="datetime-local" id="offEnd"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field"><label>🔢 حد الاستخدام <span style="color:var(--muted);font-size:.7rem;">(0 = غير محدود)</span></label>
+          <input type="number" id="offLimit" placeholder="0" min="0" value="0">
+        </div>
+        <div class="field"><label>🏷️ Badge على المنتج</label>
+          <input type="text" id="offBadge" placeholder="🔥 عرض محدود">
+        </div>
+      </div>
+
+      <div class="field"><label>وصف العرض</label>
+        <input type="text" id="offDesc" placeholder="مثال: وفر 30% على أي بيتزا لارج">
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg3);padding:12px 14px;border-radius:10px;">
+        <div style="font-size:.84rem;font-weight:600;">تفعيل العرض فوراً</div>
+        <div id="offActiveToggle" onclick="this.dataset.on=this.dataset.on==='1'?'0':'1';this.style.background=this.dataset.on==='1'?'var(--or)':'var(--bdr)';"
+          data-on="1" style="width:42px;height:24px;border-radius:50px;background:var(--or);cursor:pointer;position:relative;transition:background .2s;">
+          <div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;" id="offActiveDot"></div>
+        </div>
+      </div>
+
+      <button class="btn-save" onclick="saveOffer()">💾 حفظ العرض</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ POPUP / ANNOUNCEMENT ═══ -->
 <div class="view" id="v-popup">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
@@ -999,15 +1109,7 @@ input,select,textarea{font-size:16px!important;} /* prevent iOS zoom */
       </div>
       <div class="field-row">
         <div class="field"><label>القسم</label>
-          <select id="pCat">
-            <option value="pizza">🍕 بيتزا</option>
-            <option value="calzone">🫓 كالزوني</option>
-            <option value="crepe">🥞 كريب</option>
-            <option value="roll">🌯 رول</option>
-            <option value="fries">🍟 بطاطس</option>
-            <option value="extras">🧀 إضافات</option>
-            <option value="drinks">🧃 مشروبات</option>
-          </select>
+          <select id="pCat"></select>
         </div>
         <div class="field"><label>الإيموجي</label><input type="text" id="pEm" placeholder="🍕" maxlength="4"></div>
       </div>
@@ -1027,7 +1129,7 @@ input,select,textarea{font-size:16px!important;} /* prevent iOS zoom */
         <input type="url" id="pImg" placeholder="https://example.com/image.jpg" oninput="previewProdImg()">
         <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
           <label style="font-size:.75rem;color:var(--muted);">أو ارفع صورة:</label>
-          <input type="file" id="pImgFile" accept="image/*" onchange="uploadProdImg(this)" style="font-size:.75rem;flex:1;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:6px;color:var(--txt);cursor:pointer;">
+          <input type="file" id="pImgFile" accept="image/*,image/jpeg,image/png,image/webp" onchange="uploadProdImg(this)" style="font-size:.75rem;flex:1;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:6px;color:var(--txt);cursor:pointer;" title="اختر صورة (JPG, PNG, WEBP)">
         </div>
         <div id="prodImgPreview" style="margin-top:8px;display:none;"><img id="prodImgEl" src="" style="height:80px;border-radius:8px;border:1px solid var(--bdr);object-fit:cover;max-width:100%;" onerror="this.parentElement.style.display='none'"></div>
         <div style="font-size:.7rem;color:var(--muted);margin-top:5px;">💡 ارفع على <a href="https://imgbb.com" target="_blank" style="color:var(--or);">imgBB.com</a> وانسخ الرابط المباشر</div>
@@ -1458,6 +1560,13 @@ function getOptsFromModal(){
 }
 
 // ── Product Modal ──
+function populateCatDropdown(){
+  const sel=document.getElementById('pCat');
+  if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML=CATS.filter(c=>c.id!=='all').map(c=>`<option value="${c.id}">${c.em||''} ${c.ar}</option>`).join('');
+  if(cur) sel.value=cur;
+}
 function openProdModal(id){
   editId=id;
   document.getElementById('prodModalTitle').textContent=id?'تعديل المنتج':'إضافة منتج جديد';
@@ -1497,6 +1606,7 @@ function openProdModal(id){
     ['pAr','pEn','pEm','pPr','pCal','pTm','pRt','pBdg','pImg','pDa','pDe'].forEach(fid=>{const el=document.getElementById(fid);if(el)el.value='';}); const pb2=document.getElementById('prodImgPreview');if(pb2)pb2.style.display='none';
     document.getElementById('pEm').value='🍕';
   }
+  populateCatDropdown();
   document.getElementById('prodModal').classList.add('open');
 }
 function closeProdModal(){document.getElementById('prodModal').classList.remove('open');}
@@ -2136,18 +2246,52 @@ async function saveSettings(){
 }
 
 // Product image preview
-function uploadProdImg(input){
+async function uploadProdImg(input){
   const file=input.files[0];
   if(!file){return;}
-  if(file.size>800*1024){showT('❌ الصورة أكبر من 800KB — اختر صورة أصغر');input.value='';return;}
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const b64=e.target.result; // data:image/jpeg;base64,...
-    const pImg=document.getElementById('pImg');
-    if(pImg) pImg.value=b64;
-    previewProdImg();
-  };
-  reader.readAsDataURL(file);
+  if(file.size>5*1024*1024){showT('❌ الصورة أكبر من 5MB');input.value='';return;}
+  const label=document.querySelector('label[for="pImgFile"]')||input.previousElementSibling;
+  const origTxt = input.parentElement.querySelector('label')?.textContent||'';
+  showT('⏳ جاري رفع الصورة...');
+  try{
+    // Convert to base64
+    const b64 = await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=e=>res(e.target.result.split(',')[1]);
+      r.onerror=rej;
+      r.readAsDataURL(file);
+    });
+    // Upload to imgbb (free image hosting)
+    const fd=new FormData();
+    fd.append('image',b64);
+    fd.append('key','2e46f5c8db4f83e9a1e9d1c7f8a4b3d2'); // free API key
+    const resp=await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd});
+    const data=await resp.json();
+    if(data.success){
+      const url=data.data.url;
+      const pImg=document.getElementById('pImg');
+      if(pImg) pImg.value=url;
+      previewProdImg();
+      showT('✅ تم رفع الصورة!');
+    } else {
+      // Fallback: use base64 directly
+      const pImg=document.getElementById('pImg');
+      if(pImg) pImg.value='data:image/jpeg;base64,'+b64;
+      previewProdImg();
+      showT('✅ تم تحميل الصورة محلياً');
+    }
+  }catch(e){
+    // Fallback: base64
+    const r2=new FileReader();
+    r2.onload=ev=>{
+      const pImg=document.getElementById('pImg');
+      if(pImg) pImg.value=ev.target.result;
+      previewProdImg();
+      showT('✅ تم تحميل الصورة');
+    };
+    r2.readAsDataURL(file);
+  }
+  input.value='';
 }
 function previewProdImg(){
   const url=document.getElementById('pImg')?.value;
@@ -3167,6 +3311,237 @@ if('serviceWorker' in navigator){
 
 // Extend goV
 (function(){var _go=typeof goV==='function'?goV:null;window.goV=function(id,el){if(_go)_go(id,el);if(id==='tables'&&window._db)loadTables();if(id==='social'&&window._db)loadSocialConfig2();if(id==='pages'&&window._db)loadPages();if(id==='promo')rPromos();if(id==='settings'&&window._db){loadDeliveryRegions();loadSettingsFromFirebase();}};})();
+
+// ══════════════════════════════════════════
+// OFFERS SYSTEM
+// ══════════════════════════════════════════
+let OFFERS = [];
+let _editOfferId = null;
+let _offerType = 'product';
+
+function selOfferType(type){
+  _offerType = type;
+  const pEl=document.getElementById('ot-product');
+  const mEl=document.getElementById('ot-meal');
+  const pf=document.getElementById('offProductFields');
+  const mf=document.getElementById('offMealFields');
+  if(type==='product'){
+    pEl.style.cssText='background:rgba(255,107,0,.12);border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center;cursor:pointer;';
+    mEl.style.cssText='background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:12px;text-align:center;cursor:pointer;';
+    pf.style.display=''; mf.style.display='none';
+  } else {
+    mEl.style.cssText='background:rgba(255,107,0,.12);border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center;cursor:pointer;';
+    pEl.style.cssText='background:var(--bg3);border:2px solid var(--bdr);border-radius:10px;padding:12px;text-align:center;cursor:pointer;';
+    mf.style.display=''; pf.style.display='none';
+    buildMealProductsGrid();
+  }
+}
+
+function buildMealProductsGrid(){
+  const grid=document.getElementById('offMealProducts');
+  if(!grid||!MEALS) return;
+  grid.innerHTML=MEALS.map(m=>`
+    <label style="display:flex;align-items:center;gap:7px;background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:8px;cursor:pointer;font-size:.75rem;">
+      <input type="checkbox" class="meal-pick" value="${m.id}" style="accent-color:var(--or);">
+      <span>${m.em||'🍕'}</span><span>${m.ar}</span>
+      <span style="color:var(--or);margin-left:auto;">${m.pr} EGP</span>
+    </label>`).join('');
+}
+
+function populateOfferProductSelect(selectedId){
+  const sel=document.getElementById('offProduct');
+  if(!sel) return;
+  sel.innerHTML='<option value="">-- اختر منتج --</option>' +
+    (MEALS||[]).map(m=>`<option value="${m.id}" ${m.id==selectedId?'selected':''}>${m.em||''} ${m.ar} — ${m.pr} EGP</option>`).join('');
+}
+
+function openOfferModal(id){
+  _editOfferId = id||null;
+  document.getElementById('offerModalTitle').textContent = id ? '✏️ تعديل العرض' : '🔥 عرض جديد';
+  // Reset form
+  ['offNameAr','offNameEn','offDiscVal','offMealPrice','offLimit','offBadge','offDesc'].forEach(f=>{
+    const el=document.getElementById(f); if(el) el.value='';
+  });
+  document.getElementById('offLimit').value='0';
+  const tog=document.getElementById('offActiveToggle');
+  tog.dataset.on='1'; tog.style.background='var(--or)';
+  // Set start=now, end=+7days
+  const now=new Date(), end=new Date(now.getTime()+7*864e5);
+  document.getElementById('offStart').value=now.toISOString().slice(0,16);
+  document.getElementById('offEnd').value=end.toISOString().slice(0,16);
+
+  selOfferType('product');
+  populateOfferProductSelect(null);
+
+  if(id){
+    const o=OFFERS.find(x=>x.id===id);
+    if(o){
+      document.getElementById('offNameAr').value=o.nameAr||'';
+      document.getElementById('offNameEn').value=o.nameEn||'';
+      document.getElementById('offBadge').value=o.badge||'';
+      document.getElementById('offDesc').value=o.desc||'';
+      document.getElementById('offLimit').value=o.limit||0;
+      if(o.start) document.getElementById('offStart').value=new Date(o.start).toISOString().slice(0,16);
+      if(o.end)   document.getElementById('offEnd').value=new Date(o.end).toISOString().slice(0,16);
+      tog.dataset.on=o.active?'1':'0';
+      tog.style.background=o.active?'var(--or)':'var(--bdr)';
+      selOfferType(o.type||'product');
+      if(o.type==='product'){
+        populateOfferProductSelect(o.productId);
+        document.getElementById('offDiscType').value=o.discType||'percent';
+        document.getElementById('offDiscVal').value=o.discVal||'';
+      } else {
+        buildMealProductsGrid();
+        setTimeout(()=>{
+          document.querySelectorAll('.meal-pick').forEach(cb=>{
+            cb.checked=(o.mealItems||[]).includes(cb.value);
+          });
+        },50);
+        document.getElementById('offMealPrice').value=o.mealPrice||'';
+      }
+    }
+  }
+  document.getElementById('offerModal').style.display='flex';
+}
+
+function closeOfferModal(){
+  document.getElementById('offerModal').style.display='none';
+}
+
+async function saveOffer(){
+  const nameAr=document.getElementById('offNameAr').value.trim();
+  if(!nameAr){showT('❌ أدخل اسم العرض');return;}
+  const tog=document.getElementById('offActiveToggle');
+  const offer={
+    id: _editOfferId || ('OFF'+Date.now()),
+    type: _offerType,
+    nameAr, nameEn: document.getElementById('offNameEn').value.trim(),
+    badge: document.getElementById('offBadge').value.trim(),
+    desc: document.getElementById('offDesc').value.trim(),
+    limit: parseInt(document.getElementById('offLimit').value)||0,
+    usedCount: _editOfferId ? (OFFERS.find(o=>o.id===_editOfferId)?.usedCount||0) : 0,
+    start: new Date(document.getElementById('offStart').value).getTime(),
+    end:   new Date(document.getElementById('offEnd').value).getTime(),
+    active: tog.dataset.on==='1',
+    createdAt: _editOfferId ? (OFFERS.find(o=>o.id===_editOfferId)?.createdAt||Date.now()) : Date.now(),
+  };
+  if(_offerType==='product'){
+    offer.productId = document.getElementById('offProduct').value;
+    offer.discType  = document.getElementById('offDiscType').value;
+    offer.discVal   = parseFloat(document.getElementById('offDiscVal').value)||0;
+    if(!offer.productId){showT('❌ اختر المنتج');return;}
+    if(!offer.discVal){showT('❌ أدخل قيمة الخصم');return;}
+  } else {
+    offer.mealItems = [...document.querySelectorAll('.meal-pick:checked')].map(c=>c.value);
+    offer.mealPrice = parseFloat(document.getElementById('offMealPrice').value)||0;
+    if(offer.mealItems.length<2){showT('❌ اختر منتجين على الأقل');return;}
+    if(!offer.mealPrice){showT('❌ أدخل سعر الوجبة');return;}
+  }
+  try{
+    const {db}=await initDB();
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    // Save full offers array
+    if(_editOfferId) OFFERS=OFFERS.map(o=>o.id===_editOfferId?offer:o);
+    else OFFERS.push(offer);
+    await setDoc(doc(db,'config','offers'),{offers:OFFERS,updatedAt:Date.now()});
+    showT('✅ تم حفظ العرض');
+    closeOfferModal();
+    rOffers();
+  }catch(e){showT('❌ خطأ في الحفظ');console.error(e);}
+}
+
+async function toggleOffer(id){
+  const o=OFFERS.find(x=>x.id===id);
+  if(!o) return;
+  o.active=!o.active;
+  try{
+    const {db}=await initDB();
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(db,'config','offers'),{offers:OFFERS,updatedAt:Date.now()});
+    showT(o.active?'✅ تم تفعيل العرض':'⏸️ تم إيقاف العرض');
+    rOffers();
+  }catch(e){console.error(e);}
+}
+
+async function deleteOffer(id){
+  if(!confirm('حذف هذا العرض؟')) return;
+  OFFERS=OFFERS.filter(o=>o.id!==id);
+  try{
+    const {db}=await initDB();
+    const {doc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(db,'config','offers'),{offers:OFFERS,updatedAt:Date.now()});
+    showT('🗑️ تم الحذف');
+    rOffers();
+  }catch(e){console.error(e);}
+}
+
+async function rOffers(){
+  const list=document.getElementById('offersList');
+  if(!list) return;
+  list.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted);">⏳ جاري التحميل...</div>';
+  try{
+    const {db}=await initDB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','offers'));
+    OFFERS = snap.exists() ? (snap.data().offers||[]) : [];
+  }catch(e){ OFFERS=[]; }
+  const now=Date.now();
+  let active=0, used=0, expired=0;
+  OFFERS.forEach(o=>{
+    used+=o.usedCount||0;
+    const isExpired=o.end&&o.end<now;
+    const isActive=o.active&&!isExpired&&(!o.limit||o.usedCount<o.limit)&&(!o.start||o.start<=now);
+    if(isExpired||(!o.active)) expired++;
+    else if(isActive) active++;
+  });
+  document.getElementById('offStatActive').textContent=active;
+  document.getElementById('offStatUsed').textContent=used;
+  document.getElementById('offStatExpired').textContent=expired;
+
+  if(!OFFERS.length){
+    list.innerHTML='<div style="text-align:center;padding:50px;color:var(--muted);">لا توجد عروض بعد — أضف عرضك الأول!</div>';
+    return;
+  }
+  list.innerHTML=OFFERS.map(o=>{
+    const isExpired=o.end&&o.end<now;
+    const limitReached=o.limit&&o.usedCount>=o.limit;
+    const isActive=o.active&&!isExpired&&!limitReached&&(!o.start||o.start<=now);
+    const statusColor=isExpired||limitReached?'#9E9E9E':isActive?'#4CAF50':'#FF9800';
+    const statusTxt=isExpired?'منتهي':limitReached?'نفد':isActive?'نشط':'متوقف';
+    const product=o.type==='product'?MEALS.find(m=>m.id==o.productId):null;
+    const discTxt=o.type==='product'?(
+      o.discType==='percent'?`خصم ${o.discVal}%`:
+      o.discType==='fixed'?`خصم ${o.discVal} EGP`:
+      `سعر ثابت ${o.discVal} EGP`
+    ):`وجبة بـ ${o.mealPrice} EGP`;
+    const endDate=o.end?new Date(o.end).toLocaleDateString('ar-EG'):'—';
+    const usedBar=o.limit?(o.usedCount/o.limit*100).toFixed(0):null;
+    return `<div style="background:var(--card);border:1px solid ${isActive?'rgba(255,107,0,.3)':'var(--bdr)'};border-radius:14px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:3px;">${o.nameAr}</div>
+          <div style="font-size:.72rem;color:var(--muted);">${product?product.em+' '+product.ar:'🍱 وجبة: '+(o.mealItems||[]).length+' منتجات'} — ${discTxt}</div>
+          ${o.badge?`<span style="background:rgba(255,107,0,.15);color:var(--or);padding:2px 8px;border-radius:50px;font-size:.65rem;font-weight:700;margin-top:4px;display:inline-block;">${o.badge}</span>`:''}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+          <span style="background:${statusColor}22;color:${statusColor};padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:700;">${statusTxt}</span>
+          <button onclick="toggleOffer('${o.id}')" style="background:${o.active?'rgba(239,83,80,.12)':'rgba(76,175,80,.12)'};color:${o.active?'#EF5350':'#4CAF50'};border:1px solid ${o.active?'#EF5350':'#4CAF50'};border-radius:8px;padding:5px 10px;font-size:.7rem;cursor:pointer;">${o.active?'⏸ إيقاف':'▶ تفعيل'}</button>
+          <button onclick="openOfferModal('${o.id}')" style="background:var(--bg3);border:1px solid var(--bdr);border-radius:8px;padding:5px 10px;font-size:.7rem;cursor:pointer;">✏️</button>
+          <button onclick="deleteOffer('${o.id}')" style="background:rgba(239,83,80,.1);border:1px solid #EF5350;color:#EF5350;border-radius:8px;padding:5px 10px;font-size:.7rem;cursor:pointer;">🗑️</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;font-size:.7rem;color:var(--muted);flex-wrap:wrap;">
+        <span>⏰ ينتهي: ${endDate}</span>
+        <span>📊 استُخدم: ${o.usedCount||0}${o.limit?' / '+o.limit:''} مرة</span>
+      </div>
+      ${usedBar!==null?`<div style="margin-top:8px;background:var(--bg3);border-radius:50px;height:5px;overflow:hidden;">
+        <div style="background:${usedBar>=90?'#EF5350':'var(--or)'};height:100%;width:${Math.min(100,usedBar)}%;border-radius:50px;transition:width .3s;"></div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+
 </script>
 </body>
 </html>
