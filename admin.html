@@ -1425,6 +1425,7 @@ function goV(id,el){
   if(id==='settings')        { loadDeliveryRegions(); loadSettingsFromFirebase(); loadFloatBtn(); }
   if(id==='payment-methods') { rPaymentMethods(); }
   if(id==='popup')           { loadPopupConfig(); }
+  if(id==='offers')          { rOffers(); }
   // close sidebar on mobile after navigation
   if(window.innerWidth<=900) closeSb();
 }
