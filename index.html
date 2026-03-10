@@ -314,6 +314,7 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
     <li id="navRamadan"><a href="#" onclick="gp('pgRamadan',this)" id="nR" style="color:#C8A400;">🌙 رمضان</a></li>
     <li><a href="#" onclick="gp('pgAbout',this)" id="nA">About</a></li>
     <li><a href="#" onclick="gp('pgFavs',this)" id="nFav" style="display:none;">❤️ <span id="favNavLbl">Favorites</span></a></li>
+    <li><a href="#" onclick="gp('pgTrack',this)" id="nTrack" style="display:none;">📦 <span id="trackNavLbl">تتبع طلبي</span></a></li>
   </ul>
   <div class="nr">
     <button class="blang" id="langBtn" onclick="tLang()">🌐 AR</button>
@@ -517,6 +518,38 @@ footer{background:var(--bg2);border-top:1px solid var(--bdr);padding:36px 16px 1
 </div>
 
 <!-- ═══ FAVORITES PAGE ═══ -->
+
+<!-- ORDER TRACKING PAGE -->
+<!-- OFFERS PAGE -->
+<div class="pg" id="pgOffers">
+  <div style="padding:76px 16px 40px;max-width:900px;margin:0 auto;">
+    <div style="margin-bottom:22px;">
+      <div style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);margin-bottom:4px;">LIMITED TIME</div>
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,8vw,3.5rem);letter-spacing:3px;line-height:1;">🔥 العروض <span style="color:var(--or);">الحصرية</span></h1>
+      <p style="color:var(--muted);font-size:.84rem;margin-top:8px;" id="offSubtitle">عروض لفترة محدودة — لا تفوتها!</p>
+    </div>
+    <div id="offersGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+      <div style="text-align:center;padding:40px;color:var(--muted);grid-column:1/-1;">جاري التحميل...</div>
+    </div>
+  </div>
+</div>
+
+<div class="pg" id="pgTrack">
+  <div style="min-height:100svh;padding:80px 16px 40px;max-width:500px;margin:0 auto;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;color:var(--or);margin-bottom:6px;">📦 تتبع طلبك</h2>
+    <p style="color:var(--muted);font-size:.82rem;margin-bottom:24px;">أدخل رقم طلبك لمتابعة حالته</p>
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <input id="trackInput" type="text" placeholder="ORD-XXXXXXXXXX" maxlength="20"
+        style="flex:1;padding:12px 14px;border-radius:10px;border:2px solid var(--bdr);background:var(--bg3);color:var(--txt);font-family:Cairo,Outfit,sans-serif;font-size:.9rem;outline:none;text-transform:uppercase;"
+        onfocus="this.style.borderColor='var(--or)'" onblur="this.style.borderColor='var(--bdr)'"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')trackOrder()">
+      <button onclick="trackOrder()" class="bprim" style="padding:12px 18px;border-radius:10px;">🔍</button>
+    </div>
+    <div id="trackResult"></div>
+  </div>
+</div>
+
 <div class="pg" id="pgFavs" style="padding-top:60px;">
   <div style="max-width:900px;margin:0 auto;padding:30px 16px;">
     <div style="text-align:center;margin-bottom:24px;">
@@ -736,6 +769,7 @@ function gp(id,el){
   if(id==='pgMenu'){rCats();rMeals(cat);}
   if(id==='home'){rHome();}
   if(id==='pgFavs'){rFavs();}
+  if(id==='pgOffers'){renderOffersGrid();}
   if(id==='pgRamadan'){
     const grid=document.getElementById('ramGrid');
     if(grid){
@@ -801,7 +835,7 @@ function mC(m){
     :`<span style="font-size:3.6rem;">${m.em}</span>`;
   return `<div class="mc" onclick="openD(${m.id})">
   <div class="mimg" style="${m.img?'padding:0;overflow:hidden;':''}">
-    ${m.badge?`<div class="mbdg">${m.badge}</div>`:''}
+    ${(m._offerBadge||m.badge)?`<div class="mbdg">${m._offerBadge||m.badge}</div>`:''}
     <div class="mfv${favs.has(m.id)?' fav':''}" onclick="event.stopPropagation();tFav(${m.id},this)">${favs.has(m.id)?'❤️':'🤍'}</div>
     ${imgContent}
   </div>
@@ -810,7 +844,7 @@ function mC(m){
     <div class="mds">${ds}</div>
     <div class="mmeta"><div class="mp">🔥${m.cal}${T('cu2')}</div><div class="mp">⭐${m.r}</div><div class="mp">⏱${m.tm}m</div></div>
     <div class="mft">
-      <div class="mpr">${m.pr}<small> EGP</small></div>
+      <div class="mpr">${(()=>{const op=getOfferPrice(m.id,m.pr);return op<m.pr?`${op}<small> EGP</small> <small style="text-decoration:line-through;color:var(--muted);font-size:.6rem;">${m.pr}</small>`:`${m.pr}<small> EGP</small>`;})()}</div>
       <button class="badd" onclick="event.stopPropagation();addC(${m.id})">${T('addB')}</button>
     </div>
   </div></div>`;}
@@ -1110,7 +1144,29 @@ async function confO(){
   try {
     const {db} = await initFB();
     const {collection, addDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    await addDoc(collection(db,'orders'), order);
+    const orderRef = await addDoc(collection(db,'orders'), order);
+    // Start real-time tracking
+    window._orderTracking && window._orderTracking(); // unsubscribe previous
+    const {onSnapshot:oSnap} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    window._orderTracking = oSnap(orderRef, (snap)=>{
+      if(!snap.exists()) return;
+      const d=snap.data();
+      const statusMap={
+        'جديد':    {icon:'🔔', color:'#FF6B00', msg: L==='ar'?'تم استلام طلبك':'Order received'},
+        'قيد التنفيذ': {icon:'👨‍🍳', color:'#FF9800', msg: L==='ar'?'جاري تحضير طلبك':'Preparing your order'},
+        'مكتمل':   {icon:'✅', color:'#4CAF50', msg: L==='ar'?'طلبك جاهز!':'Your order is ready!'},
+        'ملغى':    {icon:'❌', color:'#EF5350', msg: L==='ar'?'تم إلغاء الطلب':'Order cancelled'},
+      };
+      const st = statusMap[d.status] || statusMap['جديد'];
+      const trackEl = document.getElementById('orderTrackStatus');
+      if(trackEl){
+        trackEl.innerHTML=`<span style="font-size:1.4rem;">${st.icon}</span> <span style="color:${st.color};font-weight:700;">${st.msg}</span>`;
+      }
+      if(d.status==='مكتمل'||d.status==='ملغى'){
+        window._orderTracking && window._orderTracking();
+        window._orderTracking=null;
+      }
+    });
   } catch(e){ console.warn('Firebase error:', e); }
   // Increment promo usage
   if(window._activePromo&&window._PROMOS){
@@ -1135,15 +1191,186 @@ async function confO(){
       <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;">رقم طلبك</div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--or);letter-spacing:3px;">#${order.id.slice(-6).toUpperCase()}</div>
     </div>
-    <div style="font-size:.74rem;color:var(--muted);">📞 سنتواصل معك لتأكيد الطلب</div>
+    <div id="orderTrackStatus" style="margin:10px 0;font-size:.84rem;display:flex;align-items:center;justify-content:center;gap:6px;">
+      <span style="font-size:1.4rem;">🔔</span> <span style="color:var(--or);font-weight:700;">${L==='ar'?'تم استلام طلبك':'Order received'}</span>
+    </div>
+    <div style="font-size:.7rem;color:var(--muted);">سيتم تحديث الحالة تلقائياً</div>
     <button class="bprim" style="margin-top:20px;justify-content:center;width:100%;" onclick="closeCO();cart=[];updB();rCart();">${T('bkb')}</button>
   </div>`;
   cart=[];updB();
+  // Show track order nav
+  const tn=document.getElementById('nTrack');
+  if(tn) tn.style.display='';
 }
 function closeCO(){document.getElementById('coOv').classList.remove('open');}
 // ── Toast ──
 function showT(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);}
 // ── Social Config ──
+async function trackOrder(){
+  const input=document.getElementById('trackInput');
+  const result=document.getElementById('trackResult');
+  if(!input||!result) return;
+  const id=input.value.trim();
+  if(!id){showT('❌ ادخل رقم الطلب');return;}
+  result.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);">⏳ جاري البحث...</div>';
+  try{
+    const {db}=await initFB();
+    const {collection,query,where,getDocs,orderBy,limit}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    // Search by order ID suffix
+    const q=query(collection(db,'orders'),where('id','>=',id),where('id','<=',id+''),limit(5));
+    const snap=await getDocs(q);
+    if(snap.empty){
+      result.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted);">❌ لم يتم العثور على طلب بهذا الرقم</div>';
+      return;
+    }
+    const statusColors={'جديد':'#FF6B00','قيد التنفيذ':'#FF9800','مكتمل':'#4CAF50','ملغى':'#EF5350'};
+    const statusIcons={'جديد':'🔔','قيد التنفيذ':'👨‍🍳','مكتمل':'✅','ملغى':'❌'};
+    result.innerHTML=snap.docs.map(d=>{
+      const o=d.data();
+      const color=statusColors[o.status]||'var(--or)';
+      const icon=statusIcons[o.status]||'📦';
+      const items=(o.items||[]).map(i=>`${i.em||'🍕'} ${L==='ar'?i.ar:i.en} ×${i.qty}`).join(', ');
+      const dt=o.createdAt?new Date(o.createdAt).toLocaleString('ar-EG'):'—';
+      return `<div style="background:var(--card);border:2px solid ${color};border-radius:14px;padding:16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--or);">#${(o.id||d.id).slice(-8).toUpperCase()}</span>
+          <span style="background:${color}22;color:${color};padding:4px 10px;border-radius:50px;font-size:.75rem;font-weight:700;">${icon} ${o.status||'جديد'}</span>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px;">🛒 ${items||'—'}</div>
+        <div style="display:flex;justify-content:space-between;font-size:.75rem;">
+          <span style="color:var(--muted);">⏰ ${dt}</span>
+          <span style="color:var(--or);font-weight:700;">💰 ${o.total||o.subtotal||0} EGP</span>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    result.innerHTML='<div style="text-align:center;padding:20px;color:#EF5350;">❌ خطأ في البحث</div>';
+    console.warn('trackOrder:',e);
+  }
+}
+async function loadOffers(){
+  try{
+    const {db}=await initFB();
+    const {doc,getDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const snap=await getDoc(doc(db,'config','offers'));
+    if(!snap.exists()) return;
+    const now=Date.now();
+    const allOffers=snap.data().offers||[];
+    // Filter active, not expired, not limit-reached
+    window._OFFERS=allOffers.filter(o=>{
+      if(!o.active) return false;
+      if(o.start && o.start>now) return false;
+      if(o.end && o.end<now) return false;
+      if(o.limit && o.usedCount>=o.limit) return false;
+      return true;
+    });
+    // Show offers nav if any active
+    const navOff=document.getElementById('navOffers');
+    if(navOff) navOff.style.display=window._OFFERS.length?'':'none';
+    // Apply badges to MEALS
+    window._OFFERS.forEach(o=>{
+      if(o.type==='product' && o.badge){
+        const m=MEALS.find(m=>m.id==o.productId);
+        if(m) m._offerBadge=o.badge;
+      }
+    });
+    // Render offers page
+    renderOffersGrid();
+  }catch(e){console.warn('loadOffers:',e);}
+}
+
+function getOfferPrice(mealId, basePrice){
+  if(!window._OFFERS) return basePrice;
+  const o=window._OFFERS.find(x=>x.type==='product'&&x.productId==mealId);
+  if(!o) return basePrice;
+  if(o.discType==='percent') return Math.round(basePrice*(1-o.discVal/100));
+  if(o.discType==='fixed') return Math.max(0,basePrice-o.discVal);
+  if(o.discType==='fixed_price') return o.discVal;
+  return basePrice;
+}
+
+function renderOffersGrid(){
+  const grid=document.getElementById('offersGrid');
+  if(!grid||!window._OFFERS) return;
+  if(!window._OFFERS.length){
+    grid.innerHTML='<div style="text-align:center;padding:50px;color:var(--muted);grid-column:1/-1;">لا توجد عروض متاحة الآن</div>';
+    return;
+  }
+  grid.innerHTML=window._OFFERS.map(o=>{
+    const now=Date.now();
+    const timeLeft=o.end?o.end-now:null;
+    const days=timeLeft?Math.floor(timeLeft/864e5):null;
+    const hrs=timeLeft?Math.floor((timeLeft%864e5)/36e5):null;
+    const timeStr=days>0?`ينتهي خلال ${days} يوم`:hrs>0?`ينتهي خلال ${hrs} ساعة`:'ينتهي قريباً';
+    const limitBar=o.limit?`<div style="margin-top:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-bottom:3px;">
+        <span>تم الاستفادة ${o.usedCount||0} / ${o.limit}</span>
+        <span>${Math.round((o.usedCount||0)/o.limit*100)}%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:50px;height:4px;overflow:hidden;">
+        <div style="background:var(--or);height:100%;width:${Math.min(100,Math.round((o.usedCount||0)/o.limit*100))}%;border-radius:50px;"></div>
+      </div></div>`:'';
+
+    if(o.type==='product'){
+      const m=MEALS.find(x=>x.id==o.productId);
+      if(!m) return '';
+      const newPrice=getOfferPrice(m.id,m.pr);
+      const saving=m.pr-newPrice;
+      return `<div style="background:var(--card);border:1px solid rgba(255,107,0,.35);border-radius:16px;overflow:hidden;position:relative;">
+        <div style="position:absolute;top:10px;right:10px;background:var(--or);color:#fff;padding:3px 10px;border-radius:50px;font-size:.65rem;font-weight:800;z-index:2;">${o.badge||'🔥 عرض'}</div>
+        <div style="height:120px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3.5rem;">${m.img&&!m.img.startsWith('data:')?`<img src="${m.img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='${m.em||'🍕'}'">`:m.em||'🍕'}</div>
+        <div style="padding:14px;">
+          <div style="font-weight:700;font-size:.88rem;margin-bottom:4px;">${L==='ar'?m.ar:m.en}</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">${o.desc||''}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--or);">${newPrice} <small style="font-size:.7rem;">EGP</small></span>
+            <span style="text-decoration:line-through;color:var(--muted);font-size:.8rem;">${m.pr} EGP</span>
+            ${saving>0?`<span style="background:#4CAF5022;color:#4CAF50;padding:2px 7px;border-radius:50px;font-size:.65rem;font-weight:700;">وفر ${saving} EGP</span>`:''}
+          </div>
+          ${timeLeft!==null?`<div style="font-size:.67rem;color:var(--or);margin-bottom:8px;">⏰ ${timeStr}</div>`:''}
+          ${limitBar}
+          <button class="bprim" style="width:100%;justify-content:center;margin-top:10px;" onclick="openDish('${m.id}')">أضف للسلة 🛒</button>
+        </div></div>`;
+    } else {
+      // Meal deal
+      const items=(o.mealItems||[]).map(id=>MEALS.find(m=>m.id==id)).filter(Boolean);
+      const originalTotal=items.reduce((s,m)=>s+m.pr,0);
+      const saving=originalTotal-o.mealPrice;
+      return `<div style="background:var(--card);border:1px solid rgba(255,107,0,.35);border-radius:16px;overflow:hidden;position:relative;">
+        <div style="background:linear-gradient(135deg,#FF6B00,#C93000);padding:14px;">
+          <div style="color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;">${o.badge||'🍱 وجبة خاصة'}</div>
+          <div style="color:rgba(255,255,255,.85);font-size:.75rem;margin-top:2px;">${o.nameAr}</div>
+        </div>
+        <div style="padding:14px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            ${items.map(m=>`<span style="background:var(--bg3);padding:3px 9px;border-radius:50px;font-size:.7rem;">${m.em||''} ${m.ar}</span>`).join('')}
+          </div>
+          <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;">${o.desc||''}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--or);">${o.mealPrice} <small style="font-size:.7rem;">EGP</small></span>
+            <span style="text-decoration:line-through;color:var(--muted);font-size:.8rem;">${originalTotal} EGP</span>
+            ${saving>0?`<span style="background:#4CAF5022;color:#4CAF50;padding:2px 7px;border-radius:50px;font-size:.65rem;font-weight:700;">وفر ${saving} EGP</span>`:''}
+          </div>
+          ${timeLeft!==null?`<div style="font-size:.67rem;color:var(--or);margin-bottom:8px;">⏰ ${timeStr}</div>`:''}
+          ${limitBar}
+          <button class="bprim" style="width:100%;justify-content:center;margin-top:10px;" onclick="addMealDeal('${o.id}')">أضف الوجبة 🛒</button>
+        </div></div>`;
+    }
+  }).join('');
+}
+
+function addMealDeal(offerId){
+  const o=window._OFFERS.find(x=>x.id===offerId);
+  if(!o) return;
+  const items=(o.mealItems||[]).map(id=>MEALS.find(m=>m.id==id)).filter(Boolean);
+  items.forEach(m=>{
+    const existing=cart.find(c=>c.id===m.id+'_deal_'+offerId);
+    if(existing) existing.qty++;
+    else cart.push({...m, id:m.id+'_deal_'+offerId, pr:Math.round(o.mealPrice/items.length), _dealId:offerId});
+  });
+  updB(); showT('✅ '+(L==='ar'?'تمت إضافة الوجبة':'Meal deal added!'));
+}
+
 async function loadSocialConfig(){
   try{
     const {db}=await initFB();
@@ -1400,6 +1627,7 @@ rHome();
 loadFromFirebase().then(()=>{
   loadRamadanConfig();
   loadSocialConfig();
+  loadOffers();
 });
 
 // ════════════════════════════════════════
